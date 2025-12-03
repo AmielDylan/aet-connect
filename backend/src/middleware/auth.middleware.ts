@@ -2,18 +2,8 @@ import { Request, Response, NextFunction } from 'express'
 import { JWTUtils } from '@/utils/jwt'
 import { logger } from '@/utils/logger'
 
-// Étendre le type Request pour inclure user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string
-        email: string
-        role: 'alumni' | 'moderator' | 'admin'
-      }
-    }
-  }
-}
+// Note: Le type Request.user est maintenant défini dans supabase-auth.middleware.ts
+// Ce fichier est conservé pour référence mais ne sera plus utilisé après migration complète
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
   try {

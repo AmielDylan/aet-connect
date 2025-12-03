@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { usersController } from '@/controllers/users.controller'
-import { authMiddleware } from '@/middleware/auth.middleware'
+import { supabaseAuthMiddleware as authMiddleware } from '@/middleware/supabase-auth.middleware'
 import { validateRequest } from '@/middleware/validation.middleware'
-import { UpdateProfileSchema, UpdatePrivacySchema } from '@/utils/validations'
+import { UpdateProfileSchema, UpdatePrivacySchema, ChangePasswordSchema } from '@/utils/validations'
 
 const router = Router()
 
@@ -30,6 +30,13 @@ router.patch(
   '/me/privacy',
   validateRequest(UpdatePrivacySchema),
   usersController.updateMyPrivacy.bind(usersController)
+)
+
+// PATCH /api/users/me/password (changer mon mot de passe)
+router.patch(
+  '/me/password',
+  validateRequest(ChangePasswordSchema),
+  usersController.changePassword.bind(usersController)
 )
 
 // GET /api/users/:id (profil public)

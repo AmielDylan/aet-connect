@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { codesController } from '@/controllers/codes.controller'
-import { authMiddleware } from '@/middleware/auth.middleware'
+import { supabaseAuthMiddleware as authMiddleware } from '@/middleware/supabase-auth.middleware'
 
 const router = Router()
 

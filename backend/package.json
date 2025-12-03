@@ -32,9 +32,9 @@
     "report:admin": "tsx scripts/generate-admin-report.ts",
     "report:v1": "tsx scripts/generate-v1-report.ts",
     "docs:convert": "tsx scripts/generate-gitbook-from-reports.ts",
-    "docs:install": "cd docs && gitbook install",
-    "docs:build": "cd docs && gitbook build",
-    "docs:serve": "cd docs && gitbook serve",
+    "docs:install": "cd documentation/backend && gitbook install",
+    "docs:build": "cd documentation/backend && gitbook build",
+    "docs:serve": "cd documentation/backend && gitbook serve",
     "docs:all": "npm run docs:convert && npm run docs:build && npm run docs:serve",
     "admin:create-code": "tsx scripts/create-admin-universal-code.ts",
     "setup:test-users": "tsx scripts/setup-test-users.ts",
@@ -43,7 +43,8 @@
     "db:test": "tsx scripts/test-connection.ts",
     "db:add-max-codes": "tsx scripts/add-max-codes-column.ts",
     "db:create-events": "tsx scripts/create-events-tables.ts",
-    "db:add-user-privacy": "tsx scripts/add-user-privacy.ts"
+    "db:add-user-privacy": "tsx scripts/add-user-privacy.ts",
+    "migrate:entry-year": "tsx scripts/migrate-entry-year.ts"
   },
   "keywords": ["api", "backend", "aet", "alumni", "africa"],
   "author": "AET Connect Team",

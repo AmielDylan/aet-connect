@@ -91,6 +91,15 @@ export interface VerifyInvitationCodeRequest {
   entry_year: string
 }
 
+export interface VerifyInvitationCodeResponse {
+  valid: boolean
+  code_id?: string
+  message: string
+  school_id?: string
+  entry_year?: string
+  school_name?: string
+}
+
 export interface CompleteRegistrationRequest {
   invitation_code: string
   first_name: string

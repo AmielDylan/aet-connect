@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { adminController } from '@/controllers/admin.controller'
-import { authMiddleware, adminMiddleware } from '@/middleware/auth.middleware'
+import { supabaseAuthMiddleware as authMiddleware, adminMiddleware } from '@/middleware/supabase-auth.middleware'
 import { validateRequest } from '@/middleware/validation.middleware'
 import { 
   UpdateUserSchema, 

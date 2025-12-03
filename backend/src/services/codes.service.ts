@@ -18,6 +18,11 @@ export class CodesService {
       throw new Error('Utilisateur non trouvé')
     }
     
+    // VALIDATION : S'assurer que entry_year est au format YYYY
+    if (!user.entry_year || user.entry_year.length !== 4) {
+      throw new Error('Année d\'entrée invalide (format YYYY requis)')
+    }
+    
     // 2. Compter les codes déjà créés par cet utilisateur
     const { count, error: countError } = await supabase
       .from('invitation_codes')

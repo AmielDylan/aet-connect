@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { eventsController } from '@/controllers/events.controller'
 import { validateRequest } from '@/middleware/validation.middleware'
-import { authMiddleware } from '@/middleware/auth.middleware'
+import { supabaseAuthMiddleware as authMiddleware } from '@/middleware/supabase-auth.middleware'
 import { CreateEventSchema, UpdateEventSchema } from '@/utils/validations'
 
 const router = Router()

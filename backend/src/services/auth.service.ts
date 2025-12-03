@@ -98,7 +98,7 @@ export class AuthService {
         current_country,
         max_codes_allowed,
         created_at,
-        schools:school_id (
+        school:school_id (
           id,
           name_fr,
           country
@@ -112,7 +112,61 @@ export class AuthService {
       throw new Error('Utilisateur non trouvé')
     }
     
-    return user
+    // Normaliser school (peut être un tableau ou un objet selon Supabase)
+    return {
+      ...user,
+      school: Array.isArray(user.school) ? user.school[0] : user.school
+    }
+  }
+
+  /**
+   * Change le mot de passe d'un utilisateur
+   */
+  async changePassword(userId: string, oldPassword: string, newPassword: string) {
+    try {
+      // 1. Vérifier que l'ancien mot de passe est correct
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('password_hash')
+        .eq('id', userId)
+        .single()
+
+      if (userError || !user) {
+        throw new Error('Utilisateur non trouvé')
+      }
+
+      // 2. Comparer l'ancien mot de passe
+      const isValid = await bcrypt.compare(oldPassword, user.password_hash)
+      if (!isValid) {
+        throw new Error('Ancien mot de passe incorrect')
+      }
+
+      // 3. Valider le nouveau mot de passe
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      if (!passwordRegex.test(newPassword)) {
+        throw new Error(
+          'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial'
+        )
+      }
+
+      // 4. Hasher le nouveau mot de passe
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+      // 5. Mettre à jour dans la base de données
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ password_hash: hashedPassword })
+        .eq('id', userId)
+
+      if (updateError) {
+        throw updateError
+      }
+
+      return { success: true, message: 'Mot de passe changé avec succès' }
+    } catch (error) {
+      console.error('Error changing password:', error)
+      throw error
+    }
   }
 }
 

@@ -193,6 +193,16 @@ export const UpdateProfileSchema = z.object({
   avatar_url: z.string().url().optional()
 }).passthrough() // Permet les champs supplémentaires (comme email) qui seront ignorés
 
+export const ChangePasswordSchema = z.object({
+  old_password: z.string().min(1, 'Ancien mot de passe requis'),
+  new_password: z.string()
+    .min(8, 'Mot de passe trop court (min 8 caractères)')
+    .regex(/[A-Z]/, 'Doit contenir une majuscule')
+    .regex(/[a-z]/, 'Doit contenir une minuscule')
+    .regex(/\d/, 'Doit contenir un chiffre')
+    .regex(/[@$!%*?&]/, 'Doit contenir un caractère spécial (@$!%*?&)'),
+})
+
 export const UpdatePrivacySchema = z.object({
   show_email: z.boolean().optional(),
   show_phone: z.boolean().optional(),

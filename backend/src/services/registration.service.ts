@@ -4,7 +4,8 @@ import {
   CheckSchoolPromoResponse,
   AccessRequest,
   User,
-  InvitationCode
+  InvitationCode,
+  VerifyInvitationCodeResponse
 } from '@/models/registration.model'
 
 export class RegistrationService {
@@ -14,6 +15,26 @@ export class RegistrationService {
     school_id: string,
     entry_year: string
   ): Promise<CheckSchoolPromoResponse> {
+    
+    // Valider l'année d'entrée selon established_year de l'école
+    const { data: school } = await supabase
+      .from('schools')
+      .select('established_year')
+      .eq('id', school_id)
+      .single()
+    
+    if (school) {
+      const entryYearNum = parseInt(entry_year, 10)
+      const minYear = school.established_year || 1950
+      
+      if (entryYearNum < minYear) {
+        throw new Error(
+          school.established_year 
+            ? `Cette école a été créée en ${school.established_year}. L'année minimale est ${school.established_year}.`
+            : 'Année d\'entrée invalide'
+        )
+      }
+    }
     
     // Compter les membres de cette promo
     const { count, error: countError } = await supabase
@@ -65,6 +86,26 @@ export class RegistrationService {
     wants_ambassador: boolean
   }): Promise<AccessRequest> {
     
+    // Valider l'année d'entrée selon established_year de l'école
+    const { data: school } = await supabase
+      .from('schools')
+      .select('established_year')
+      .eq('id', data.school_id)
+      .single()
+    
+    if (school) {
+      const entryYearNum = parseInt(data.entry_year, 10)
+      const minYear = school.established_year || 1950
+      
+      if (entryYearNum < minYear) {
+        throw new Error(
+          school.established_year 
+            ? `Cette école a été créée en ${school.established_year}. L'année minimale est ${school.established_year}.`
+            : 'Année d\'entrée invalide'
+        )
+      }
+    }
+    
     const { data: request, error } = await supabase
       .from('access_requests')
       .insert({
@@ -90,7 +131,7 @@ export class RegistrationService {
     code: string,
     school_id: string,
     entry_year: string
-  ): Promise<{ valid: boolean; code_id?: string; message: string }> {
+  ): Promise<VerifyInvitationCodeResponse> {
     
     // Récupérer le code avec le nom de l'école
     const { data: invCode, error } = await supabase
@@ -137,7 +178,10 @@ export class RegistrationService {
       return { 
         valid: true, 
         code_id: invCode.id, 
-        message: 'Code admin valide pour toutes les écoles et promotions' 
+        message: 'Code admin valide pour toutes les écoles et promotions',
+        school_id: invCode.school_id,
+        entry_year: invCode.entry_year,
+        school_name: invCode.schools?.name_fr
       }
     }
     
@@ -164,7 +208,10 @@ export class RegistrationService {
     return { 
       valid: true, 
       code_id: invCode.id, 
-      message: 'Code valide' 
+      message: 'Code valide',
+      school_id: invCode.school_id,
+      entry_year: invCode.entry_year,
+      school_name: invCode.schools?.name_fr
     }
   }
   
@@ -211,7 +258,7 @@ export class RegistrationService {
         first_name: data.first_name,
         last_name: data.last_name,
         school_id: invCode.school_id,
-        entry_year: invCode.entry_year === '00' ? '2000' : invCode.entry_year, // Gérer le cas "00"
+        entry_year: invCode.entry_year,
         role: 'alumni',
         is_ambassador: false,
         is_active: true
@@ -238,6 +285,26 @@ export class RegistrationService {
     last_name: string
     message: string
   }): Promise<{ recipient_name: string }> {
+    
+    // Valider l'année d'entrée selon established_year de l'école
+    const { data: school } = await supabase
+      .from('schools')
+      .select('established_year')
+      .eq('id', data.school_id)
+      .single()
+    
+    if (school) {
+      const entryYearNum = parseInt(data.entry_year, 10)
+      const minYear = school.established_year || 1950
+      
+      if (entryYearNum < minYear) {
+        throw new Error(
+          school.established_year 
+            ? `Cette école a été créée en ${school.established_year}. L'année minimale est ${school.established_year}.`
+            : 'Année d\'entrée invalide'
+        )
+      }
+    }
     
     // Chercher l'ambassadeur ou un membre actif
     const { data: recipient } = await supabase

@@ -13,6 +13,7 @@ import eventsRoutes from '@/routes/events.routes'
 import adminRoutes from '@/routes/admin.routes'
 import schoolsRoutes from '@/routes/schools.routes'
 import usersRoutes from '@/routes/users.routes'
+import dashboardRoutes from '@/routes/dashboard.routes'
 
 const app = express()
 
@@ -47,6 +48,7 @@ app.use('/api/events', eventsRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/schools', schoolsRoutes)
 app.use('/api/users', usersRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
 // Error handling (doit être en dernier)
 app.use(notFoundHandler)

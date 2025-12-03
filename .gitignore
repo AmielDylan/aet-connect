@@ -1,0 +1,30 @@
+# ═══════════════════════════════════════════════════
+# GITIGNORE RACINE - AET CONNECT
+# Fichiers à ignorer au niveau racine du projet
+# ═══════════════════════════════════════════════════
+
+# Variables d'environnement partagées
+.env.shared
+.env.shared.local
+
+# Fichiers de configuration locaux
+*.local
+
+# Scripts temporaires (garder sync-env.sh)
+*.sh.bak
+*.sh~
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*~
+
+
+

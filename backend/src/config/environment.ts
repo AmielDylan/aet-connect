@@ -1,7 +1,11 @@
 import dotenv from 'dotenv'
 import path from 'path'
 
-// Charger .env.local
+// Charger d'abord .env.shared depuis la racine du projet (variables partagées)
+const rootDir = path.resolve(process.cwd(), '..')
+dotenv.config({ path: path.resolve(rootDir, '.env.shared') })
+
+// Puis charger .env.local du backend (peut surcharger les variables partagées)
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 
 export const config = {
