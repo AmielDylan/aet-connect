@@ -1,8 +1,9 @@
 ---
+title: Rapport Final - Modules Users & Schools (Backend V1)
+layout: default
+---
 
 [← Retour aux rapports](../README.md) | [documentation complète](../README.md)
-
----
 
 # 🎓 Rapport Final - Modules Users & Schools (Backend V1)
 

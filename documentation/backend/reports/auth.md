@@ -1,8 +1,9 @@
 ---
+title: Rapport de Tests - Module Auth V0
+layout: default
+---
 
 [← Retour aux rapports](../README.md) | [documentation complète](../README.md)
-
----
 
 # 🔐 Rapport de Tests - Module Auth V0
 

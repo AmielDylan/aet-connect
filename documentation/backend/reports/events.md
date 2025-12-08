@@ -1,8 +1,9 @@
 ---
+title: Rapport Final - Module Events V0
+layout: default
+---
 
 [← Retour aux rapports](../README.md) | [documentation complète](../README.md)
-
----
 
 # 🎉 Rapport Final - Module Events V0
 
