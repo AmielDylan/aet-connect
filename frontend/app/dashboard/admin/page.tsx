@@ -9,11 +9,12 @@ import { AdminBarChart } from '@/components/charts/admin-bar-chart'
 import { AdminPieChart } from '@/components/charts/admin-pie-chart'
 import { Users, School, Ticket, UserCheck, Loader2, Clock } from 'lucide-react'
 import Link from 'next/link'
+import type { AdminStats } from '@/types'
 
 export default function AdminDashboard() {
   const { isAdmin } = useAdminCheck()
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<AdminStats>({
     queryKey: ['admin-stats'],
     queryFn: () => apiClient.getAdminStats(),
     enabled: isAdmin,
@@ -29,7 +30,16 @@ export default function AdminDashboard() {
     )
   }
 
-  const overview = stats?.overview || {}
+  const overview = stats?.overview || {
+    totalUsers: 0,
+    newUsers: 0,
+    totalSchools: 0,
+    totalCodes: 0,
+    usedCodes: 0,
+    pendingRequests: 0,
+    totalRequests: 0,
+    approvedRequests: 0,
+  }
   const roles = stats?.roles || {}
   const schools = stats?.schools || {}
 

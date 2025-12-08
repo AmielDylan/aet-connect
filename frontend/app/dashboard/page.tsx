@@ -21,8 +21,6 @@ import {
   UserCheck,
   Network,
   AlertCircle,
-  CalendarCheck,
-  FileCheck,
 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════
