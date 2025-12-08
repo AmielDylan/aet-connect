@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { RegistrationSteps } from '@/components/registration/registration-steps'
 import { FormField } from '@/components/registration/form-field'
@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { apiClient } from '@/lib/api'
+import { useAuthStore } from '@/store/auth-store'
+import { useToast } from '@/hooks/use-toast'
 import { Loader2, CheckCircle2, Info, AlertCircle } from 'lucide-react'
-import { toast } from 'sonner'
 
 const STEPS = [
   { number: 1, title: 'Code', description: 'Vérification' },
@@ -20,16 +21,30 @@ const STEPS = [
 
 export default function RegisterWithCodePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const codeFromUrl = searchParams.get('code')
+  const { user, logout } = useAuthStore()
+  const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(1)
 
+  // Déconnecter automatiquement si connecté
+  useEffect(() => {
+    if (user) {
+      logout().then(() => {
+        console.log('Déconnexion automatique pour inscription')
+      })
+    }
+  }, [user, logout])
+
   // Étape 1 : Code invitation
-  const [invitationCode, setInvitationCode] = useState('')
+  const [invitationCode, setInvitationCode] = useState(codeFromUrl || '')
   const [step1Error, setStep1Error] = useState('') // Erreur SYSTÈME uniquement (API, code invalide)
 
   // Données du code vérifié
   const [verifiedSchoolId, setVerifiedSchoolId] = useState('')
   const [verifiedEntryYear, setVerifiedEntryYear] = useState('')
   const [verifiedSchoolName, setVerifiedSchoolName] = useState('')
+  const [codeFromLink, setCodeFromLink] = useState(false) // Indique si le code vient du lien
 
   // Étape 2 : Informations utilisateur
   const [firstName, setFirstName] = useState('')
@@ -56,6 +71,34 @@ export default function RegisterWithCodePage() {
     return errors.length === 0
   }
 
+  // Vérifier automatiquement le code si présent dans l'URL
+  useEffect(() => {
+    if (codeFromUrl && codeFromUrl.trim()) {
+      setCodeFromLink(true)
+      apiClient.verifyCodeInfo(codeFromUrl)
+        .then((data) => {
+          setVerifiedSchoolId(data.school_id)
+          setVerifiedEntryYear(data.entry_year)
+          setVerifiedSchoolName(data.school_name)
+          setInvitationCode(data.code)
+          setStep1Error('')
+          setCurrentStep(2) // Passer directement à l'étape 2
+          toast({
+            title: 'Code valide !',
+            description: `Inscription pour ${data.school_name} - Promo ${data.entry_year}`,
+          })
+        })
+        .catch((error) => {
+          setStep1Error(error.message || 'Code invalide')
+          toast({
+            title: 'Erreur',
+            description: error.message || 'Code invalide',
+            variant: 'destructive',
+          })
+        })
+    }
+  }, [codeFromUrl])
+
   // Mutation vérification code
   const verifyCodeMutation = useMutation({
     mutationFn: () =>
@@ -76,15 +119,25 @@ export default function RegisterWithCodePage() {
 
         setStep1Error('')
         setCurrentStep(2)
-        toast.success('Code valide !')
+        toast({
+          title: 'Code valide !',
+        })
       } else {
         setStep1Error(data.message)
-        toast.error(data.message)
+        toast({
+          title: 'Erreur',
+          description: data.message,
+          variant: 'destructive',
+        })
       }
     },
     onError: () => {
       setStep1Error('Erreur lors de la vérification du code')
-      toast.error('Erreur lors de la vérification')
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la vérification',
+        variant: 'destructive',
+      })
     },
   })
 
@@ -100,14 +153,22 @@ export default function RegisterWithCodePage() {
       }),
     onSuccess: () => {
       setCurrentStep(3)
-      toast.success('Inscription réussie !')
+      toast({
+        title: 'Compte créé avec succès !',
+        description: 'Un email de confirmation a été envoyé à votre adresse. Vous pouvez vous connecter dès maintenant.',
+        duration: 8000,
+      })
       setTimeout(() => {
-        router.push('/login')
+        window.location.href = '/login'
       }, 2000)
     },
     onError: (error: Error) => {
       setStep2Error(error.message || 'Erreur lors de l\'inscription')
-      toast.error('Erreur lors de l\'inscription')
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de l\'inscription',
+        variant: 'destructive',
+      })
     },
   })
 
@@ -206,8 +267,13 @@ export default function RegisterWithCodePage() {
                   onChange={setInvitationCode}
                   // error supprimé : step1Error est une erreur SYSTÈME, affichée dans Alert uniquement
                   required
-                  disabled={verifyCodeMutation.isPending}
+                  disabled={verifyCodeMutation.isPending || codeFromLink}
                 />
+                {codeFromLink && (
+                  <p className="text-sm text-muted-foreground">
+                    Code d'invitation : {codeFromUrl}
+                  </p>
+                )}
 
                 {step1Error && (
                   <Alert variant="destructive">
@@ -286,10 +352,16 @@ export default function RegisterWithCodePage() {
                     <div>
                       <span className="text-muted-foreground">École :</span>
                       <span className="ml-2 font-medium">{verifiedSchoolName || 'Chargement...'}</span>
+                      {codeFromLink && (
+                        <span className="ml-2 text-xs text-muted-foreground">(pré-remplie)</span>
+                      )}
                     </div>
                     <div>
                       <span className="text-muted-foreground">Promotion :</span>
                       <span className="ml-2 font-medium">{verifiedEntryYear}</span>
+                      {codeFromLink && (
+                        <span className="ml-2 text-xs text-muted-foreground">(pré-remplie)</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -338,7 +410,7 @@ export default function RegisterWithCodePage() {
                   disabled={registerMutation.isPending}
                 />
 
-                <div className="space-y-2">
+                <div className="space-y-2 mb-6">
                   <FormField
                     id="password"
                     type="password"
@@ -354,7 +426,7 @@ export default function RegisterWithCodePage() {
                     description="Doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre"
                   />
                   {passwordErrors.length > 0 && (
-                    <ul className="text-xs space-y-1 -mt-4">
+                    <ul className="text-xs space-y-1 mt-2">
                       {passwordErrors.map((err, i) => (
                         <li key={i} className="flex items-center gap-2 text-muted-foreground">
                           <span className="text-destructive">✗</span> {err}

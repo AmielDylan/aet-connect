@@ -1,83 +1,100 @@
 import { supabase } from '@/config/database'
 import { AdminStats, AccessRequestFilters, UserFilters, UpdateUserRequest, IncreaseCodeLimitRequest, SetAmbassadorRequest } from '@/models/admin.model'
-import bcrypt from 'bcrypt'
+// bcrypt supprimé - plus nécessaire avec Supabase Auth
 
 export class AdminService {
   
   // Récupérer statistiques globales
-  async getStats(): Promise<AdminStats> {
-    // Users stats
-    const { data: users } = await supabase
+  async getStats(): Promise<any> {
+    // Total utilisateurs
+    const { count: totalUsers } = await supabase
       .from('users')
-      .select('role, is_active')
+      .select('*', { count: 'exact', head: true })
     
-    const userStats = {
-      total: users?.length || 0,
-      by_role: {
-        alumni: users?.filter(u => u.role === 'alumni').length || 0,
-        moderator: users?.filter(u => u.role === 'moderator').length || 0,
-        admin: users?.filter(u => u.role === 'admin').length || 0
-      },
-      active: users?.filter(u => u.is_active).length || 0,
-      inactive: users?.filter(u => !u.is_active).length || 0
-    }
+    // Nouveaux utilisateurs (7 derniers jours)
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
     
-    // Events stats
-    const { data: events } = await supabase
-      .from('events')
-      .select('status')
+    const { count: newUsers } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', sevenDaysAgo.toISOString())
     
-    const eventStats = {
-      total: events?.length || 0,
-      by_status: {
-        upcoming: events?.filter(e => e.status === 'upcoming').length || 0,
-        ongoing: events?.filter(e => e.status === 'ongoing').length || 0,
-        completed: events?.filter(e => e.status === 'completed').length || 0,
-        cancelled: events?.filter(e => e.status === 'cancelled').length || 0
-      }
-    }
+    // Total écoles
+    const { count: totalSchools } = await supabase
+      .from('schools')
+      .select('*', { count: 'exact', head: true })
     
-    // Codes stats
-    const { data: codes } = await supabase
+    // Codes générés
+    const { count: totalCodes } = await supabase
       .from('invitation_codes')
-      .select('current_uses, max_uses, expires_at, is_active')
+      .select('*', { count: 'exact', head: true })
     
-    const codeStats = {
-      total_generated: codes?.length || 0,
-      total_used: codes?.reduce((sum, c) => sum + (c.current_uses || 0), 0) || 0,
-      active: codes?.filter(c => {
-        if (!c.is_active) return false
-        const isNotExpired = !c.expires_at || new Date(c.expires_at) > new Date()
-        const isNotMaxed = (c.current_uses || 0) < (c.max_uses || 0)
-        return isNotExpired && isNotMaxed
-      }).length || 0
-    }
+    // Codes utilisés
+    const { count: usedCodes } = await supabase
+      .from('invitation_codes')
+      .select('*', { count: 'exact', head: true })
+      .gt('current_uses', 0)
     
-    // Access requests stats
-    const { data: requests } = await supabase
+    // Stats des demandes d'accès
+    const { count: pendingRequestsCount } = await supabase
       .from('access_requests')
-      .select('status')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending')
     
-    const requestStats = {
-      pending: requests?.filter(r => r.status === 'pending').length || 0,
-      approved: requests?.filter(r => r.status === 'approved').length || 0,
-      rejected: requests?.filter(r => r.status === 'rejected').length || 0
-    }
+    const { count: totalRequestsCount } = await supabase
+      .from('access_requests')
+      .select('*', { count: 'exact', head: true })
     
-    // Registrations by month (last 6 months)
-    const { data: registrations } = await supabase
+    const { count: approvedRequestsCount } = await supabase
+      .from('access_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'approved')
+    
+    // Répartition par rôle
+    const { data: allUsers } = await supabase
       .from('users')
-      .select('created_at')
-      .order('created_at', { ascending: false })
+      .select('role')
     
-    const registrationsByMonth = this.groupByMonth(registrations || [])
+    const roles = allUsers?.reduce((acc: any, user: any) => {
+      acc[user.role] = (acc[user.role] || 0) + 1
+      return acc
+    }, {}) || {}
+    
+    // Top 10 écoles (avec acronymes)
+    const { data: usersWithSchools } = await supabase
+      .from('users')
+      .select('school_id, schools!inner(name_fr, acronym)')
+    
+    const schoolCounts: Record<string, number> = {}
+    usersWithSchools?.forEach((user: any) => {
+      const school = Array.isArray(user.schools) ? user.schools[0] : user.schools
+      // Utiliser le sigle si disponible, sinon le nom
+      const schoolLabel = school?.acronym || school?.name_fr || 'Non spécifiée'
+      schoolCounts[schoolLabel] = (schoolCounts[schoolLabel] || 0) + 1
+    })
+    
+    const topSchools = Object.entries(schoolCounts)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
+      .slice(0, 10)
+      .reduce((acc, [school, count]) => {
+        acc[school] = count as number
+        return acc
+      }, {} as Record<string, number>)
     
     return {
-      users: userStats,
-      events: eventStats,
-      codes: codeStats,
-      access_requests: requestStats,
-      registrations_by_month: registrationsByMonth
+      overview: {
+        totalUsers: totalUsers || 0,
+        newUsers: newUsers || 0,
+        totalSchools: totalSchools || 0,
+        totalCodes: totalCodes || 0,
+        usedCodes: usedCodes || 0,
+        pendingRequests: pendingRequestsCount || 0,
+        totalRequests: totalRequestsCount || 0,
+        approvedRequests: approvedRequestsCount || 0,
+      },
+      roles,
+      schools: topSchools,
     }
   }
   
@@ -167,30 +184,46 @@ export class AdminService {
       throw new Error('Un utilisateur avec cet email existe déjà')
     }
     
-    // Créer l'utilisateur
+    // Créer l'utilisateur avec signUp standard (PAS d'API Admin)
     const tempPassword = this.generateTempPassword()
-    const passwordHash = await bcrypt.hash(tempPassword, 10)
-    
     const maxCodesAllowed = request.wants_ambassador ? 20 : 3
+    
+    // Créer l'utilisateur dans Supabase Auth (le trigger créera l'entrée dans public.users)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: request.email,
+      password: tempPassword,
+      options: {
+        data: {
+          first_name: request.first_name,
+          last_name: request.last_name,
+          school_id: request.school_id,
+          entry_year: request.entry_year,
+          role: 'alumni',
+          is_ambassador: request.wants_ambassador,
+          is_active: true,
+          max_codes_allowed: maxCodesAllowed,
+        },
+        emailRedirectTo: undefined, // Pas de redirection email nécessaire
+      },
+    })
+    
+    if (authError || !authData.user) {
+      throw new Error(authError?.message || 'Erreur lors de la création du compte')
+    }
+
+    // Le trigger SQL handle_new_user() créera automatiquement l'entrée dans public.users
+    // Attendre un peu que le trigger s'exécute, puis récupérer l'utilisateur créé
+    await new Promise(resolve => setTimeout(resolve, 500))
     
     const { data: user, error: userError } = await supabase
       .from('users')
-      .insert({
-        email: request.email,
-        password_hash: passwordHash,
-        first_name: request.first_name,
-        last_name: request.last_name,
-        school_id: request.school_id,
-        entry_year: request.entry_year,
-        role: 'alumni',
-        is_active: true,
-        is_ambassador: request.wants_ambassador,
-        max_codes_allowed: maxCodesAllowed
-      })
-      .select()
+      .select('*')
+      .eq('id', authData.user.id)
       .single()
     
-    if (userError) throw userError
+    if (userError || !user) {
+      throw new Error('Erreur lors de la création de l\'utilisateur dans public.users')
+    }
     
     // Mettre à jour la demande
     const { error: updateError } = await supabase

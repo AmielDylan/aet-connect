@@ -9,7 +9,6 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/hooks/use-auth'
 import { StatsCard } from '@/components/dashboard/stats-card'
-import { UserChart } from '@/components/dashboard/user-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -252,6 +251,10 @@ function AdminDashboard() {
     );
   }
 
+  // Extraire les valeurs avec des fallbacks sécurisés
+  const overview = stats?.overview || {}
+  const roles = stats?.roles || {}
+
   return (
     <div className="space-y-6">
       <div>
@@ -263,73 +266,60 @@ function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Utilisateurs"
-          value={stats.users.total}
-          description={`${stats.users.active} actifs`}
+          value={overview.totalUsers || 0}
+          description={`+${overview.newUsers || 0} cette semaine`}
           icon={Users}
           iconColor="text-blue-600"
         />
         <StatsCard
-          title="Total Événements"
-          value={stats.events.total}
-          description={`${stats.events.by_status.upcoming || 0} à venir`}
-          icon={CalendarCheck}
+          title="Total Écoles"
+          value={overview.totalSchools || 0}
+          description="écoles enregistrées"
+          icon={School}
           iconColor="text-green-600"
         />
         <StatsCard
           title="Codes Générés"
-          value={stats.codes.total_generated}
-          description={`${stats.codes.active} actifs`}
+          value={overview.totalCodes || 0}
+          description={`${overview.usedCodes || 0} utilisés`}
           icon={TicketCheck}
           iconColor="text-purple-600"
         />
         <StatsCard
-          title="Demandes en attente"
-          value={stats.access_requests.pending}
-          description={`${stats.access_requests.approved} approuvées`}
-          icon={FileCheck}
+          title="Codes Utilisés"
+          value={overview.usedCodes || 0}
+          description={`${overview.totalCodes > 0 
+            ? Math.round((overview.usedCodes / overview.totalCodes) * 100)
+            : 0}% de taux d'utilisation`}
+          icon={UserCheck}
           iconColor="text-orange-600"
         />
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Users by School Chart */}
-        {stats.users.by_school && stats.users.by_school.length > 0 && (
-          <UserChart data={stats.users.by_school} />
-        )}
-
-        {/* Users by Role Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Répartition par Rôle</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+      {/* Users by Role Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Répartition par Rôle</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {Object.entries(roles).map(([role, count]) => (
+              <div key={role} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Alumni</span>
+                  <span className="text-sm font-medium capitalize">{role}</span>
                 </div>
-                <Badge variant="secondary">{stats.users.by_role.alumni || 0}</Badge>
+                <Badge variant="secondary">{count as number}</Badge>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Modérateurs</span>
-                </div>
-                <Badge variant="secondary">{stats.users.by_role.moderator || 0}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Admins</span>
-                </div>
-                <Badge variant="secondary">{stats.users.by_role.admin || 0}</Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            ))}
+            {Object.keys(roles).length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Aucune donnée disponible
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

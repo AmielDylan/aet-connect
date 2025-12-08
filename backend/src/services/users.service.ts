@@ -28,7 +28,54 @@ export class UsersService {
   }
   
   // Liste utilisateurs (annuaire) - AUTH REQUIS
-  async getUsers(filters: UserFilters) {
+  async getUsers(filters: UserFilters): Promise<{ users: any[]; total: number }> {
+    // Construire la query de base pour le count (sans pagination)
+    // Utiliser une jointure avec schools pour filtrer par pays de l'école
+    let countQuery = supabase
+      .from('users')
+      .select(`
+        *,
+        school:school_id (
+          id,
+          country
+        )
+      `, { count: 'exact', head: true })
+      .eq('is_active', true)
+    
+    // Appliquer les mêmes filtres pour le count
+    if (filters.school_id) {
+      countQuery = countQuery.eq('school_id', filters.school_id)
+    }
+    
+    if (filters.entry_year) {
+      countQuery = countQuery.eq('entry_year', filters.entry_year)
+    }
+    
+    // ✅ Filtrer par pays de l'école (pas current_country)
+    if (filters.country) {
+      // Pour filtrer par pays de l'école, on doit utiliser une sous-requête
+      // ou filtrer après avoir récupéré les données
+      // Pour l'instant, on va filtrer après le fetch
+    }
+    
+    if (filters.city) {
+      countQuery = countQuery.ilike('current_city', `%${filters.city}%`)
+    }
+    
+    if (filters.is_ambassador !== undefined) {
+      countQuery = countQuery.eq('is_ambassador', filters.is_ambassador)
+    }
+    
+    if (filters.search) {
+      countQuery = countQuery.or(`first_name.ilike.%${filters.search}%,last_name.ilike.%${filters.search}%`)
+    }
+    
+    // Compter le total (sans pagination)
+    const { count: totalCount, error: countError } = await countQuery
+    
+    if (countError) throw countError
+    
+    // Query pour récupérer les utilisateurs avec pagination
     let query = supabase
       .from('users')
       .select(`
@@ -58,9 +105,8 @@ export class UsersService {
       query = query.eq('entry_year', filters.entry_year)
     }
     
-    if (filters.country) {
-      query = query.ilike('current_country', `%${filters.country}%`)
-    }
+    // Note: Le filtre par pays de l'école sera appliqué après le fetch
+    // car Supabase ne permet pas facilement de filtrer sur une relation imbriquée
     
     if (filters.city) {
       query = query.ilike('current_city', `%${filters.city}%`)
@@ -85,10 +131,18 @@ export class UsersService {
     if (error) throw error
     
     // Filtrer les users qui ne veulent pas apparaître dans l'annuaire
-    const filteredUsers = (users || []).filter((u: any) => {
+    let filteredUsers = (users || []).filter((u: any) => {
       const privacy = Array.isArray(u.privacy) ? u.privacy[0] : u.privacy
       return privacy?.show_in_directory !== false
     })
+    
+    // ✅ Filtrer par pays de l'école (après le fetch car c'est une relation imbriquée)
+    if (filters.country) {
+      filteredUsers = filteredUsers.filter((u: any) => {
+        const school = Array.isArray(u.school) ? u.school[0] : u.school
+        return school?.country === filters.country
+      })
+    }
     
     // Ajouter statistiques pour chaque user
     const usersWithStats = await Promise.all(
@@ -119,7 +173,64 @@ export class UsersService {
       })
     )
     
-    return usersWithStats
+    // Calculer le total réel en tenant compte du filtre privacy et pays
+    // Si on filtre par pays, on doit compter après filtrage
+    let finalTotal = totalCount || 0
+    
+    // Si on filtre par pays, on doit recalculer le total
+    // car le count initial ne prend pas en compte le filtre pays de l'école
+    if (filters.country) {
+      // Faire une requête pour compter les users avec le filtre pays
+      // On récupère tous les users (sans pagination) pour compter ceux qui matchent
+      let countQueryWithFilters = supabase
+        .from('users')
+        .select(`
+          school:school_id (
+            country
+          ),
+          privacy:user_privacy_settings!user_privacy_settings_user_id_fkey (
+            show_in_directory
+          )
+        `)
+        .eq('is_active', true)
+      
+      // Appliquer les mêmes filtres que pour la query principale
+      if (filters.school_id) {
+        countQueryWithFilters = countQueryWithFilters.eq('school_id', filters.school_id)
+      }
+      if (filters.entry_year) {
+        countQueryWithFilters = countQueryWithFilters.eq('entry_year', filters.entry_year)
+      }
+      if (filters.is_ambassador !== undefined) {
+        countQueryWithFilters = countQueryWithFilters.eq('is_ambassador', filters.is_ambassador)
+      }
+      if (filters.city) {
+        countQueryWithFilters = countQueryWithFilters.ilike('current_city', `%${filters.city}%`)
+      }
+      if (filters.search) {
+        countQueryWithFilters = countQueryWithFilters.or(`first_name.ilike.%${filters.search}%,last_name.ilike.%${filters.search}%`)
+      }
+      
+      const { data: allUsersForCount } = await countQueryWithFilters
+      
+      // Filtrer par privacy et pays de l'école
+      const countFiltered = (allUsersForCount || []).filter((u: any) => {
+        const privacy = Array.isArray(u.privacy) ? u.privacy[0] : u.privacy
+        if (privacy?.show_in_directory === false) return false
+        
+        const school = Array.isArray(u.school) ? u.school[0] : u.school
+        if (filters.country && school?.country !== filters.country) return false
+        
+        return true
+      })
+      
+      finalTotal = countFiltered.length
+    }
+    
+    return {
+      users: usersWithStats,
+      total: finalTotal
+    }
   }
   
   // Profil public d'un user - AUTH REQUIS

@@ -1,75 +1,51 @@
 import { supabase } from './supabase'
 
 /**
- * Check if Supabase is configured
+ * Upload avatar dans Storage
+ * Path: {userId}/{timestamp}.{ext}
+ * Best practice: Upsert true pour remplacer
  */
-function isSupabaseConfigured(): boolean {
-  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && supabase)
+export const uploadAvatar = async (userId: string, file: File): Promise<string> => {
+  const timestamp = Date.now()
+  const fileExt = file.name.split('.').pop()
+  const filePath = `${userId}/${timestamp}.${fileExt}`
+
+  const { error } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true, // Remplace si existe
+    })
+
+  if (error) throw error
+
+  // Bucket PUBLIC → utiliser getPublicUrl
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(filePath)
+
+  return publicUrl
 }
 
 /**
- * Upload avatar to Supabase Storage
+ * Delete avatar depuis Storage
+ * IMPORTANT: Toujours via API, jamais via SQL (doc Supabase)
  */
-export async function uploadAvatar(file: File, userId: string): Promise<string> {
-  if (!isSupabaseConfigured() || !supabase) {
-    throw new Error('Supabase n\'est pas configuré. Veuillez définir NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY dans votre fichier .env.local')
-  }
+export const deleteAvatar = async (_userId: string, avatarUrl: string): Promise<void> => {
+  // Extraire le path depuis l'URL publique
+  // Ex: https://xxx.supabase.co/storage/v1/object/public/avatars/user-id/file.jpg
+  //     → user-id/file.jpg
   
-  try {
-    // 1. Générer un nom de fichier unique
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${userId}/${Date.now()}.${fileExt}`
-
-    // 2. Upload le fichier
-    const { error } = await supabase.storage
-      .from('avatars')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: true,
-      })
-
-    if (error) {
-      throw error
-    }
-
-    // 3. Récupérer l'URL publique
-    const { data: urlData } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(fileName)
-
-    return urlData.publicUrl
-  } catch (error) {
-    console.error('Error uploading avatar:', error)
-    throw new Error('Erreur lors de l\'upload de l\'avatar')
+  const match = avatarUrl.match(/\/avatars\/(.+)$/)
+  if (!match?.[1]) {
+    throw new Error('Invalid avatar URL format')
   }
+
+  const filePath = match[1]
+
+  const { error } = await supabase.storage
+    .from('avatars')
+    .remove([filePath])
+
+  if (error) throw error
 }
-
-/**
- * Delete avatar from Supabase Storage
- */
-export async function deleteAvatar(url: string): Promise<void> {
-  if (!isSupabaseConfigured() || !supabase) {
-    throw new Error('Supabase n\'est pas configuré. Veuillez définir NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY dans votre fichier .env.local')
-  }
-  
-  try {
-    // Extraire le path depuis l'URL
-    const path = url.split('/avatars/')[1]
-    
-    if (!path) {
-      throw new Error('URL invalide')
-    }
-
-    const { error } = await supabase.storage
-      .from('avatars')
-      .remove([path])
-
-    if (error) {
-      throw error
-    }
-  } catch (error) {
-    console.error('Error deleting avatar:', error)
-    throw new Error('Erreur lors de la suppression de l\'avatar')
-  }
-}
-

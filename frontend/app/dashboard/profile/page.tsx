@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/hooks/use-auth'
@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AvatarUpload } from '@/components/profile/avatar-upload'
 import { PasswordStrength } from '@/components/profile/password-strength'
 import { 
   Loader2, 
@@ -20,14 +19,24 @@ import {
   CheckCircle2,
   Lock,
 } from 'lucide-react'
-import type { UpdateProfileRequest } from '@/types'
+import { Switch } from '@/components/ui/switch'
+import { useToast } from '@/hooks/use-toast'
+import type { UpdateProfileRequest, UpdatePrivacyRequest } from '@/types'
 import type { ChangePasswordData, PasswordValidation } from '@/types/profile'
 
 export default function ProfilePage() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const [isEditing, setIsEditing] = useState(false)
-  const [profileData, setProfileData] = useState<UpdateProfileRequest>({})
+  const [profileData, setProfileData] = useState<UpdateProfileRequest>({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    current_city: '',
+    current_country: '',
+    linkedin_url: '',
+    bio: '',
+  })
   const [passwordData, setPasswordData] = useState<ChangePasswordData>({
     old_password: '',
     new_password: '',
@@ -40,12 +49,68 @@ export default function ProfilePage() {
     hasNumber: false,
     hasSpecialChar: false,
   })
+  const [privacySettings, setPrivacySettings] = useState({
+    show_email: true,
+    show_phone: false,
+    show_current_location: true,
+    show_bio: true,
+    show_linkedin: true,
+    show_entry_year: true,
+  })
+
+  const { toast } = useToast()
 
   // Récupérer le profil
   const { data: profile, isLoading } = useQuery({
     queryKey: ['user', 'profile'],
     queryFn: () => apiClient.getUserProfile(),
   })
+
+  // Récupérer les privacy settings
+  const { data: privacyData } = useQuery({
+    queryKey: ['user', 'privacy'],
+    queryFn: () => apiClient.getPrivacySettings(),
+    enabled: !!user,
+  })
+
+  // Mettre à jour privacySettings quand privacyData change
+  useEffect(() => {
+    if (privacyData) {
+      setPrivacySettings({
+        show_email: privacyData.show_email ?? true,
+        show_phone: privacyData.show_phone ?? false,
+        show_current_location: privacyData.show_current_location ?? true,
+        show_bio: privacyData.show_bio ?? true,
+        show_linkedin: privacyData.show_linkedin ?? true,
+        show_entry_year: privacyData.show_entry_year ?? true,
+      })
+    }
+  }, [privacyData])
+
+  // Mettre à jour formData quand profile ou user change
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        phone: profile.phone || '',
+        current_city: profile.current_city || '',
+        current_country: profile.current_country || '',
+        linkedin_url: profile.linkedin_url || '',
+        bio: profile.bio || '',
+      })
+    } else if (user) {
+      setProfileData({
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        phone: user.phone || '',
+        current_city: user.current_city || '',
+        current_country: user.current_country || '',
+        linkedin_url: user.linkedin_url || '',
+        bio: user.bio || '',
+      })
+    }
+  }, [profile, user])
 
   // Mutation mise à jour profil
   const updateProfileMutation = useMutation({
@@ -77,6 +142,29 @@ export default function ProfilePage() {
     },
   })
 
+  // Mutation mise à jour privacy
+  const updatePrivacyMutation = useMutation({
+    mutationFn: (data: UpdatePrivacyRequest) => apiClient.updatePrivacySettings(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'privacy'] })
+      toast({
+        title: 'Préférences mises à jour',
+        description: 'Vos paramètres de confidentialité ont été enregistrés',
+      })
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de mettre à jour les préférences',
+        variant: 'destructive',
+      })
+    },
+  })
+
+  const handlePrivacySubmit = () => {
+    updatePrivacyMutation.mutate(privacySettings)
+  }
+
   // Valider le mot de passe en temps réel
   const validatePassword = (password: string) => {
     setPasswordValidation({
@@ -90,7 +178,18 @@ export default function ProfilePage() {
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateProfileMutation.mutate(profileData)
+    // Nettoyer les champs vides (convertir les chaînes vides en undefined)
+    const cleanData: UpdateProfileRequest = {
+      first_name: profileData.first_name || undefined,
+      last_name: profileData.last_name || undefined,
+      phone: profileData.phone || undefined,
+      current_city: profileData.current_city || undefined,
+      current_country: profileData.current_country || undefined,
+      linkedin_url: profileData.linkedin_url || undefined,
+      bio: profileData.bio || undefined,
+    }
+    
+    updateProfileMutation.mutate(cleanData)
   }
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -146,19 +245,29 @@ export default function ProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* TEMPORAIREMENT COMMENTÉ - on reviendra dessus plus tard */}
             {/* Avatar */}
+            {/*
             <div>
               <Label>Photo de profil</Label>
               <div className="mt-2">
                 <AvatarUpload
                   currentAvatarUrl={profile.avatar_url}
                   userId={user.id}
-                  onAvatarUpdate={() => {
+                  onAvatarUpdate={async () => {
+                    // Invalider les queries React Query
                     queryClient.invalidateQueries({ queryKey: ['user', 'profile'] })
+                    // Recharger l'utilisateur depuis le store pour mettre à jour avatar_url
+                    try {
+                      await loadUser()
+                    } catch (error) {
+                      console.error('Error reloading user after avatar update:', error)
+                    }
                   }}
                 />
               </div>
             </div>
+            */}
 
             {/* Formulaire */}
             <form onSubmit={handleProfileSubmit} className="space-y-4">
@@ -167,7 +276,7 @@ export default function ProfilePage() {
                   <Label htmlFor="first_name">Prénom</Label>
                   <Input
                     id="first_name"
-                    defaultValue={profile.first_name}
+                    value={profileData.first_name || ''}
                     disabled={!isEditing}
                     onChange={(e) =>
                       setProfileData({ ...profileData, first_name: e.target.value })
@@ -178,7 +287,7 @@ export default function ProfilePage() {
                   <Label htmlFor="last_name">Nom</Label>
                   <Input
                     id="last_name"
-                    defaultValue={profile.last_name}
+                    value={profileData.last_name || ''}
                     disabled={!isEditing}
                     onChange={(e) =>
                       setProfileData({ ...profileData, last_name: e.target.value })
@@ -192,7 +301,7 @@ export default function ProfilePage() {
                 <Input
                   id="email"
                   type="email"
-                  defaultValue={profile.email}
+                  value={profile?.email || ''}
                   disabled={true}
                   className="bg-muted"
                 />
@@ -201,54 +310,69 @@ export default function ProfilePage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  defaultValue={profile.phone || ''}
-                  disabled={!isEditing}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, phone: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              {/* Grid avec téléphone et LinkedIn */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="city">Ville actuelle</Label>
+                  <Label htmlFor="phone">Téléphone</Label>
                   <Input
-                    id="city"
-                    defaultValue={profile.current_city || ''}
+                    id="phone"
+                    type="tel"
+                    value={profileData.phone || ''}
+                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                    placeholder="+33 6 12 34 56 78"
                     disabled={!isEditing}
-                    onChange={(e) =>
-                      setProfileData({ ...profileData, current_city: e.target.value })
-                    }
                   />
                 </div>
+
+                {/* Champ LinkedIn */}
                 <div className="space-y-2">
-                  <Label htmlFor="country">Pays</Label>
+                  <Label htmlFor="linkedin">LinkedIn</Label>
                   <Input
-                    id="country"
-                    defaultValue={profile.current_country || ''}
+                    id="linkedin"
+                    type="url"
+                    value={profileData.linkedin_url || ''}
+                    onChange={(e) => setProfileData({ ...profileData, linkedin_url: e.target.value })}
+                    placeholder="https://linkedin.com/in/votre-profil"
                     disabled={!isEditing}
-                    onChange={(e) =>
-                      setProfileData({ ...profileData, current_country: e.target.value })
-                    }
                   />
                 </div>
               </div>
 
+              {/* Grid ville et pays */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="current-city">Ville actuelle</Label>
+                  <Input
+                    id="current-city"
+                    value={profileData.current_city || ''}
+                    onChange={(e) => setProfileData({ ...profileData, current_city: e.target.value })}
+                    placeholder="Paris"
+                    disabled={!isEditing}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="current-country">Pays actuel</Label>
+                  <Input
+                    id="current-country"
+                    value={profileData.current_country || ''}
+                    onChange={(e) => setProfileData({ ...profileData, current_country: e.target.value })}
+                    placeholder="France"
+                    disabled={!isEditing}
+                  />
+                </div>
+              </div>
+
+              {/* Biographie */}
               <div className="space-y-2">
                 <Label htmlFor="bio">Biographie</Label>
                 <Textarea
                   id="bio"
-                  defaultValue={profile.bio || ''}
-                  disabled={!isEditing}
+                  value={profileData.bio || ''}
+                  onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                  placeholder="Parlez de vous..."
                   rows={4}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, bio: e.target.value })
-                  }
+                  disabled={!isEditing}
                 />
               </div>
 
@@ -280,25 +404,48 @@ export default function ProfilePage() {
                       type="submit"
                       disabled={updateProfileMutation.isPending}
                     >
-                      {updateProfileMutation.isPending && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {updateProfileMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Modification...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Enregistrer
+                        </>
                       )}
-                      <Save className="mr-2 h-4 w-4" />
-                      Enregistrer
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => {
                         setIsEditing(false)
-                        setProfileData({})
+                        // Réinitialiser avec les valeurs du profil
+                        if (profile) {
+                          setProfileData({
+                            first_name: profile.first_name || '',
+                            last_name: profile.last_name || '',
+                            phone: profile.phone || '',
+                            current_city: profile.current_city || '',
+                            current_country: profile.current_country || '',
+                            linkedin_url: profile.linkedin_url || '',
+                            bio: profile.bio || '',
+                          })
+                        }
                       }}
                     >
                       Annuler
                     </Button>
                   </>
                 ) : (
-                  <Button type="button" onClick={() => setIsEditing(true)}>
+                  <Button 
+                    type="button" 
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setIsEditing(true)
+                    }}
+                  >
                     Modifier
                   </Button>
                 )}
@@ -404,6 +551,145 @@ export default function ProfilePage() {
                 Changer le mot de passe
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Section Confidentialité */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Confidentialité du profil</CardTitle>
+            <CardDescription>
+              Choisissez les informations visibles sur votre profil public
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Adresse email</Label>
+                <p className="text-sm text-muted-foreground">
+                  Afficher votre email sur votre profil public
+                </p>
+              </div>
+              <Switch
+                checked={privacySettings.show_email}
+                onCheckedChange={(checked) =>
+                  setPrivacySettings({ ...privacySettings, show_email: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Téléphone</Label>
+                <p className="text-sm text-muted-foreground">
+                  Afficher votre téléphone sur votre profil public
+                </p>
+              </div>
+              <Switch
+                checked={privacySettings.show_phone}
+                onCheckedChange={(checked) =>
+                  setPrivacySettings({ ...privacySettings, show_phone: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Localisation actuelle</Label>
+                <p className="text-sm text-muted-foreground">
+                  Afficher votre ville et pays actuels
+                </p>
+              </div>
+              <Switch
+                checked={privacySettings.show_current_location}
+                onCheckedChange={(checked) =>
+                  setPrivacySettings({ ...privacySettings, show_current_location: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>LinkedIn</Label>
+                <p className="text-sm text-muted-foreground">
+                  Afficher votre profil LinkedIn
+                </p>
+              </div>
+              <Switch
+                checked={privacySettings.show_linkedin}
+                onCheckedChange={(checked) =>
+                  setPrivacySettings({ ...privacySettings, show_linkedin: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Biographie</Label>
+                <p className="text-sm text-muted-foreground">
+                  Afficher votre présentation
+                </p>
+              </div>
+              <Switch
+                checked={privacySettings.show_bio}
+                onCheckedChange={(checked) =>
+                  setPrivacySettings({ ...privacySettings, show_bio: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Année de promotion</Label>
+                <p className="text-sm text-muted-foreground">
+                  Afficher votre année d'entrée
+                </p>
+              </div>
+              <Switch
+                checked={privacySettings.show_entry_year}
+                onCheckedChange={(checked) =>
+                  setPrivacySettings({ ...privacySettings, show_entry_year: checked })
+                }
+              />
+            </div>
+
+            {/* Success message */}
+            {updatePrivacyMutation.isSuccess && (
+              <Alert>
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertDescription>Préférences de confidentialité mises à jour avec succès</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Error message */}
+            {updatePrivacyMutation.isError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {updatePrivacyMutation.error instanceof Error
+                    ? updatePrivacyMutation.error.message
+                    : 'Erreur lors de la mise à jour'}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              onClick={handlePrivacySubmit}
+              disabled={updatePrivacyMutation.isPending}
+              className="w-full"
+            >
+              {updatePrivacyMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enregistrement...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Enregistrer les préférences
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
       </div>

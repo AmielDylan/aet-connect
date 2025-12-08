@@ -18,5 +18,25 @@ router.get(
   codesController.getMyCodes.bind(codesController)
 )
 
+// GET /api/codes/verify/:code (pas d'authentification requise)
+router.get(
+  '/verify/:code',
+  codesController.verifyCode.bind(codesController)
+)
+
+// DELETE /api/codes/:id - Supprimer un code
+router.delete(
+  '/:id',
+  authMiddleware,
+  codesController.deleteCode.bind(codesController)
+)
+
+// GET /api/codes/history - Historique des codes utilisés
+router.get(
+  '/history',
+  authMiddleware,
+  codesController.getCodesHistory.bind(codesController)
+)
+
 export default router
 

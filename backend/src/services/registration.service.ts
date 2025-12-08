@@ -1,5 +1,5 @@
 import { supabase } from '@/config/database'
-import bcrypt from 'bcrypt'
+// bcrypt supprimé - plus nécessaire avec Supabase Auth
 import {
   CheckSchoolPromoResponse,
   AccessRequest,
@@ -85,6 +85,29 @@ export class RegistrationService {
     message: string
     wants_ambassador: boolean
   }): Promise<AccessRequest> {
+    
+    // Vérifier que l'email n'est pas déjà utilisé
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', data.email)
+      .maybeSingle()
+    
+    if (existingUser) {
+      throw new Error('Cet email est déjà utilisé')
+    }
+    
+    // Vérifier aussi dans access_requests
+    const { data: existingRequest } = await supabase
+      .from('access_requests')
+      .select('id')
+      .eq('email', data.email)
+      .eq('status', 'pending')
+      .maybeSingle()
+    
+    if (existingRequest) {
+      throw new Error('Une demande est déjà en attente pour cet email')
+    }
     
     // Valider l'année d'entrée selon established_year de l'école
     const { data: school } = await supabase
@@ -224,57 +247,83 @@ export class RegistrationService {
     password: string
   }): Promise<{ user_id: string }> {
     
-    // 1. Vérifier que l'email n'existe pas
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', data.email)
-      .single()
-    
-    if (existingUser) {
-      throw new Error('Cet email est déjà utilisé')
-    }
-    
-    // 2. Récupérer le code
-    const { data: invCode } = await supabase
+    // 1. Récupérer le code
+    const { data: invCode, error: codeError } = await supabase
       .from('invitation_codes')
       .select('*')
       .eq('code', data.invitation_code)
       .single()
     
-    if (!invCode) {
+    if (codeError || !invCode) {
       throw new Error('Code invalide')
     }
+
+    // Vérifier que le code n'est pas déjà utilisé
+    if (invCode.current_uses >= invCode.max_uses) {
+      throw new Error('Ce code a déjà été utilisé')
+    }
+
+    // Vérifier que le code est actif
+    if (!invCode.is_active) {
+      throw new Error('Ce code a été révoqué')
+    }
+
+    // Vérifier expiration si applicable
+    if (invCode.expires_at && new Date(invCode.expires_at) < new Date()) {
+      throw new Error('Ce code a expiré')
+    }
     
-    // 3. Hasher le mot de passe
-    const password_hash = await bcrypt.hash(data.password, 10)
-    
-    // 4. Créer l'utilisateur
-    const { data: user, error: userError } = await supabase
+    // 2. Vérifier que l'email n'existe pas déjà (SANS API Admin)
+    const { data: existingUser } = await supabase
       .from('users')
-      .insert({
-        email: data.email,
-        password_hash,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        school_id: invCode.school_id,
-        entry_year: invCode.entry_year,
-        role: 'alumni',
-        is_ambassador: false,
-        is_active: true
-      })
       .select('id')
-      .single()
+      .eq('email', data.email)
+      .maybeSingle() // ✅ maybeSingle() pour éviter erreur si pas trouvé
     
-    if (userError) throw userError
+    if (existingUser) {
+      throw new Error('Un compte existe déjà avec cet email')
+    }
     
-    // 5. Incrémenter current_uses du code
-    await supabase
+    // 3. Créer l'utilisateur avec signUp standard (PAS d'API Admin)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          school_id: invCode.school_id,
+          entry_year: invCode.entry_year,
+          role: 'alumni',
+          is_ambassador: false,
+          is_active: true,
+          max_codes_allowed: 3,
+        },
+      },
+    })
+    
+    if (authError || !authData.user) {
+      throw new Error(authError?.message || 'Erreur lors de la création du compte')
+    }
+
+    // Le trigger SQL handle_new_user() créera automatiquement l'entrée dans public.users
+    
+    // 4. Marquer le code comme utilisé AVEC l'utilisateur et la date
+    const { error: updateError } = await supabase
       .from('invitation_codes')
-      .update({ current_uses: invCode.current_uses + 1 })
+      .update({ 
+        current_uses: invCode.current_uses + 1,
+        used_by_user_id: authData.user.id, // ✅ Ajouter
+        used_at: new Date().toISOString(), // ✅ Ajouter
+      })
       .eq('id', invCode.id)
     
-    return { user_id: user.id }
+    if (updateError) {
+      console.error('Error updating code usage:', updateError)
+      // Ne pas faire échouer l'inscription si l'incrémentation échoue
+    }
+    
+    return { user_id: authData.user.id }
   }
   
   // Demander un code à un ambassadeur/membre

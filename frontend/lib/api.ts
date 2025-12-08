@@ -9,7 +9,7 @@ import { supabase } from './supabase'
 import type { 
   User,
   UserProfile,
-  UserPrivacy,
+  UserPrivacySettings,
   AdminStats, 
   SchoolsResponse,
   SchoolWithStats,
@@ -36,6 +36,7 @@ import type {
   DashboardStats,
   RecentMember
 } from '@/types'
+import type { DirectoryMember } from '@/types/directory'
 
 class ApiClient {
   private baseURL: string
@@ -167,19 +168,20 @@ class ApiClient {
    * Get user privacy settings
    * GET /api/users/me/privacy
    */
-  async getPrivacySettings(): Promise<UserPrivacy> {
-    return this.fetch<UserPrivacy>('/api/users/me/privacy')
+  async getPrivacySettings(): Promise<UserPrivacySettings> {
+    return this.fetch<UserPrivacySettings>('/api/users/me/privacy')
   }
 
   /**
    * Update user privacy settings
    * PATCH /api/users/me/privacy
    */
-  async updatePrivacySettings(data: UpdatePrivacyRequest): Promise<UserPrivacy> {
-    return this.fetch<UserPrivacy>('/api/users/me/privacy', {
+  async updatePrivacySettings(data: UpdatePrivacyRequest): Promise<UserPrivacySettings> {
+    const response = await this.fetch<{ success: boolean; privacy: UserPrivacySettings; message: string }>('/api/users/me/privacy', {
       method: 'PATCH',
       body: JSON.stringify(data),
     })
+    return response.privacy
   }
 
   /**
@@ -226,6 +228,155 @@ class ApiClient {
    */
   async getAdminStats(): Promise<AdminStats> {
     return this.fetch<AdminStats>('/api/admin/stats')
+  }
+
+  /**
+   * Get admin users list (requires admin role)
+   * GET /api/admin/users
+   */
+  async getAdminUsers(params?: {
+    search?: string
+    role?: string
+    school_id?: string
+    is_ambassador?: boolean
+    page?: number
+    limit?: number
+  }): Promise<{ users: any[]; pagination: any }> {
+    const queryParams = new URLSearchParams()
+    if (params?.search) queryParams.append('search', params.search)
+    if (params?.role) queryParams.append('role', params.role)
+    if (params?.school_id) queryParams.append('school_id', params.school_id)
+    if (params?.is_ambassador) queryParams.append('is_ambassador', 'true')
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+
+    return this.fetch<{ users: any[]; pagination: any }>(`/api/admin/users?${queryParams}`)
+  }
+
+  /**
+   * Update user role (requires admin role)
+   * PATCH /api/admin/users/:id/role
+   */
+  async updateUserRole(userId: string, role: string): Promise<any> {
+    const response = await this.fetch(`/api/admin/users/${userId}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role })
+    })
+    return response
+  }
+
+  /**
+   * Update user ambassador status (requires admin role)
+   * PATCH /api/admin/users/:id/ambassador
+   */
+  async updateUserAmbassador(userId: string, is_ambassador: boolean): Promise<any> {
+    const response = await this.fetch(`/api/admin/users/${userId}/ambassador`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_ambassador })
+    })
+    return response
+  }
+
+  /**
+   * Delete user (requires admin role)
+   * DELETE /api/admin/users/:id
+   */
+  async deleteUser(userId: string): Promise<{ success: boolean }> {
+    return this.fetch<{ success: boolean }>(`/api/admin/users/${userId}`, {
+      method: 'DELETE'
+    })
+  }
+
+  /**
+   * Get admin schools list (requires admin role)
+   * GET /api/admin/schools
+   */
+  async getAdminSchools(): Promise<any[]> {
+    return this.fetch<any[]>('/api/admin/schools')
+  }
+
+  /**
+   * Create school (requires admin role)
+   * POST /api/admin/schools
+   */
+  async createSchool(data: any): Promise<any> {
+    return this.fetch<any>('/api/admin/schools', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  }
+
+  /**
+   * Update school (requires admin role)
+   * PATCH /api/admin/schools/:id
+   */
+  async updateSchool(id: string, data: any): Promise<any> {
+    return this.fetch<any>(`/api/admin/schools/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    })
+  }
+
+  /**
+   * Delete school (requires admin role)
+   * DELETE /api/admin/schools/:id
+   */
+  async deleteSchool(id: string): Promise<{ success: boolean }> {
+    return this.fetch<{ success: boolean }>(`/api/admin/schools/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  /**
+   * Get access requests (requires admin role)
+   * GET /api/admin/access-requests
+   */
+  async getAccessRequests(status: string = 'pending'): Promise<any[]> {
+    return this.fetch<any[]>(`/api/admin/access-requests?status=${status}`)
+  }
+
+  /**
+   * Approve access request (requires admin role)
+   * POST /api/admin/access-requests/:id/approve
+   */
+  async approveAccessRequest(id: string): Promise<{ success: boolean; code: string; email: string }> {
+    return this.fetch<{ success: boolean; code: string; email: string }>(`/api/admin/access-requests/${id}/approve`, {
+      method: 'POST'
+    })
+  }
+
+  /**
+   * Reject access request (requires admin role)
+   * POST /api/admin/access-requests/:id/reject
+   */
+  async rejectAccessRequest(id: string, reason?: string): Promise<{ success: boolean }> {
+    return this.fetch<{ success: boolean }>(`/api/admin/access-requests/${id}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason })
+    })
+  }
+
+  /**
+   * Get public user profile (no auth required)
+   * GET /api/users/profile/:id
+   */
+  async getPublicProfile(userId: string): Promise<any> {
+    // Cette route est publique, pas besoin d'authentification
+    const response = await fetch(`${this.baseURL}/api/users/profile/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Utilisateur non trouvé')
+      }
+      throw new Error('Erreur lors du chargement du profil')
+    }
+    
+    return response.json()
   }
 
   // ═══════════════════════════════════════════════════
@@ -379,9 +530,10 @@ class ApiClient {
    * Generate invitation code
    * POST /api/codes/generate
    */
-  async generateCode(): Promise<GenerateCodeResponse> {
+  async generateCode(data?: { school_id?: string; entry_year?: string }): Promise<GenerateCodeResponse> {
     return this.fetch<GenerateCodeResponse>('/api/codes/generate', {
       method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
     })
   }
 
@@ -391,6 +543,62 @@ class ApiClient {
    */
   async getMyCodes(): Promise<MyCodesResponse> {
     return this.fetch<MyCodesResponse>('/api/codes/my-codes')
+  }
+
+  /**
+   * Verify an invitation code and get its info (no auth required)
+   * GET /api/codes/verify/:code
+   */
+  async verifyCodeInfo(code: string): Promise<{
+    code: string
+    school_id: string
+    school_name: string
+    entry_year: string
+    valid: boolean
+  }> {
+    const response = await fetch(
+      `${this.baseURL}/api/codes/verify/${code}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Code invalide')
+    }
+
+    return response.json()
+  }
+
+  /**
+   * Delete an invitation code
+   * DELETE /api/codes/:id
+   */
+  async deleteCode(codeId: string): Promise<void> {
+    await this.fetch(`/api/codes/${codeId}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // Récupérer l'historique des codes utilisés
+  async getCodesHistory(): Promise<{ codes: Array<{
+    id: string
+    code: string
+    school_name: string
+    entry_year: string
+    created_at: string
+    used_at: string
+    used_by: {
+      id: string
+      first_name: string
+      last_name: string
+      email: string
+    } | null
+  }> }> {
+    return this.fetch('/api/codes/history')
   }
 
   // ═══════════════════════════════════════════════════
@@ -483,6 +691,52 @@ class ApiClient {
    */
   async getDashboardRecentMembers(): Promise<RecentMember[]> {
     return this.fetch<RecentMember[]>('/api/dashboard/recent')
+  }
+
+  /**
+   * Get members directory with filters
+   * GET /api/users
+   */
+  async getMembers(params: {
+    search?: string
+    school_id?: string
+    entry_year?: string
+    country?: string
+    limit?: number
+    offset?: number
+  }): Promise<{ users: DirectoryMember[]; total: number }> {
+    const searchParams = new URLSearchParams()
+    
+    if (params.search) searchParams.append('search', params.search)
+    if (params.school_id) searchParams.append('school_id', params.school_id)
+    if (params.entry_year) searchParams.append('entry_year', params.entry_year)
+    if (params.country) searchParams.append('country', params.country)
+    if (params.limit) searchParams.append('limit', params.limit.toString())
+    if (params.offset) searchParams.append('offset', params.offset.toString())
+
+    const response = await this.fetch<{ users: User[]; total: number }>(
+      `/api/users?${searchParams.toString()}`
+    )
+    
+    // Mapper User[] vers DirectoryMember[]
+    const members: DirectoryMember[] = response.users.map((user) => ({
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      avatar_url: user.avatar_url,
+      school_name: user.school?.name_fr || 'Non spécifiée',
+      entry_year: user.entry_year || 'N/A',
+      current_city: user.current_city,
+      current_country: user.current_country,
+      is_ambassador: user.is_ambassador,
+      bio: user.bio,
+    }))
+
+    return {
+      users: members,
+      total: response.total,
+    }
   }
 }
 

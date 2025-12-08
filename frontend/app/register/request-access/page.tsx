@@ -311,7 +311,7 @@ export default function RequestAccessPage() {
                   </Label>
                 </div>
                 <p className="text-xs text-muted-foreground ml-6">
-                  Les ambassadeurs peuvent générer jusqu&apos;à 20 codes d&apos;invitation (vs 3 pour les membres normaux)
+                  Les ambassadeurs peuvent générer jusqu&apos;à 15 codes d&apos;invitation (vs 3 pour les membres normaux)
                 </p>
 
                 {step2Error && (

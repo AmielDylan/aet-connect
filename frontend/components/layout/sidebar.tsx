@@ -9,9 +9,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { LayoutDashboard, User, School, X } from 'lucide-react'
+import { LayoutDashboard, User, School, Users, Ticket, X, BarChart, Clock } from 'lucide-react'
+import { useAuthStore } from '@/store/auth-store'
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api'
 
 interface SidebarProps {
   onClose?: () => void
@@ -23,6 +27,16 @@ const navigation = [
     name: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    name: 'Annuaire',
+    href: '/dashboard/directory',
+    icon: Users,
+  },
+  {
+    name: 'Mes codes',
+    href: '/dashboard/codes',
+    icon: Ticket,
   },
   {
     name: 'Mon Profil',
@@ -38,6 +52,15 @@ const navigation = [
 
 export function Sidebar({ onClose, isMobile }: SidebarProps) {
   const pathname = usePathname()
+  const user = useAuthStore((state) => state.user)
+  const isAdmin = user?.role === 'admin'
+  
+  const { data: stats } = useQuery({
+    queryKey: ['admin-stats'],
+    queryFn: () => apiClient.getAdminStats(),
+    enabled: isAdmin,
+    refetchInterval: 30000, // Rafraîchir toutes les 30 secondes
+  })
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -83,6 +106,80 @@ export function Sidebar({ onClose, isMobile }: SidebarProps) {
             )
           })}
         </div>
+
+        {isAdmin && (
+          <>
+            <Separator className="my-4" />
+            <div className="px-3 py-2">
+              <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+                Administration
+              </h2>
+              <div className="space-y-1">
+                <Button
+                  variant={pathname === '/dashboard/admin' ? 'secondary' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start',
+                    pathname === '/dashboard/admin' && 'bg-secondary font-semibold'
+                  )}
+                  asChild
+                  onClick={isMobile ? onClose : undefined}
+                >
+                  <Link href="/dashboard/admin">
+                    <BarChart className="mr-2 h-4 w-4" />
+                    Vue d'ensemble
+                  </Link>
+                </Button>
+                <Button
+                  variant={pathname === '/dashboard/admin/users' ? 'secondary' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start',
+                    pathname === '/dashboard/admin/users' && 'bg-secondary font-semibold'
+                  )}
+                  asChild
+                  onClick={isMobile ? onClose : undefined}
+                >
+                  <Link href="/dashboard/admin/users">
+                    <Users className="mr-2 h-4 w-4" />
+                    Utilisateurs
+                  </Link>
+                </Button>
+                <Button
+                  variant={pathname === '/dashboard/admin/schools' ? 'secondary' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start',
+                    pathname === '/dashboard/admin/schools' && 'bg-secondary font-semibold'
+                  )}
+                  asChild
+                  onClick={isMobile ? onClose : undefined}
+                >
+                  <Link href="/dashboard/admin/schools">
+                    <School className="mr-2 h-4 w-4" />
+                    Écoles
+                  </Link>
+                </Button>
+                <Button
+                  variant={pathname === '/dashboard/admin/pending' ? 'secondary' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start',
+                    pathname === '/dashboard/admin/pending' && 'bg-secondary font-semibold'
+                  )}
+                  asChild
+                  onClick={isMobile ? onClose : undefined}
+                >
+                  <Link href="/dashboard/admin/pending" className="flex items-center w-full">
+                    <Clock className="mr-2 h-4 w-4" />
+                    <span className="flex-1">Demandes</span>
+                    {stats?.overview && 'pendingRequests' in stats.overview && stats.overview.pendingRequests > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {stats.overview.pendingRequests}
+                      </Badge>
+                    )}
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
 
         <Separator className="my-4" />
 

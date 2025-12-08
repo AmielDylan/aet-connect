@@ -5,12 +5,13 @@
 // Page de connexion avec formulaire React Hook Form
 // ═══════════════════════════════════════════════════
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -28,7 +29,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════
@@ -54,7 +54,8 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { login, isAuthenticated } = useAuth()
+  const { login, loadUser } = useAuth()
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   // Get redirect URL from query params or default to dashboard
@@ -76,30 +77,23 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true)
     try {
-      // Utiliser le store Zustand qui appelle supabase.auth.signInWithPassword()
       await login(data.email, data.password)
+      await loadUser()
 
-      // Show success message
-      toast.success('Connexion réussie !')
+      toast({
+        title: 'Connexion réussie',
+        description: 'Redirection en cours...',
+      })
 
-      // Attendre que la session Supabase soit bien établie dans les cookies
-      // Le proxy détectera automatiquement la session et redirigera
-      // Utiliser window.location.href pour forcer un rechargement complet
-      // qui permettra au proxy de détecter la session Supabase
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Rediriger vers la page demandée
-      window.location.href = redirectUrl
-    } catch (error) {
-      // Show error message
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Une erreur est survenue lors de la connexion'
-      toast.error(errorMessage)
-      console.error('Login error:', error)
-    } finally {
-      // Toujours remettre isLoading à false, même en cas d'erreur
+      const finalRedirect = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
+      window.location.href = finalRedirect
+
+    } catch (error: any) {
+      toast({
+        title: 'Erreur de connexion',
+        description: error.message,
+        variant: 'destructive',
+      })
       setIsLoading(false)
     }
   }

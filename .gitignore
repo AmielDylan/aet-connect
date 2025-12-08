@@ -3,28 +3,57 @@
 # Fichiers à ignorer au niveau racine du projet
 # ═══════════════════════════════════════════════════
 
-# Variables d'environnement partagées
+# Variables d'environnement
+.env
+.env.local
+.env*.local
 .env.shared
 .env.shared.local
 
 # Fichiers de configuration locaux
 *.local
 
-# Scripts temporaires (garder sync-env.sh)
-*.sh.bak
-*.sh~
+# Build outputs
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
 
 # Fichiers système
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
 
-# Logs
-*.log
+# IDE
+.vscode/
+.idea/
+*.code-workspace
 
 # Fichiers temporaires
 *.tmp
 *.temp
 *~
+.cache/
 
+# Testing
+coverage/
+.nyc_output/
 
+# Vercel
+.vercel
 
+# Scripts temporaires
+*.sh.bak
+*.sh~

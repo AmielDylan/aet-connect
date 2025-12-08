@@ -2,7 +2,7 @@ import { supabase } from '@/config/database'
 
 export class CodesService {
   
-  async generateUserCode(user_id: string): Promise<{
+  async generateUserCode(user_id: string, data?: { school_id?: string; entry_year?: string }): Promise<{
     code: string
     codes_remaining: number
   }> {
@@ -18,8 +18,16 @@ export class CodesService {
       throw new Error('Utilisateur non trouvé')
     }
     
+    // Admin peut spécifier école + promo, sinon utilise les siennes
+    const schoolId = data?.school_id || user.school_id
+    const entryYear = data?.entry_year || user.entry_year
+    
+    if (!schoolId || !entryYear) {
+      throw new Error('École et promotion requises')
+    }
+    
     // VALIDATION : S'assurer que entry_year est au format YYYY
-    if (!user.entry_year || user.entry_year.length !== 4) {
+    if (entryYear.length !== 4) {
       throw new Error('Année d\'entrée invalide (format YYYY requis)')
     }
     
@@ -52,11 +60,11 @@ export class CodesService {
       .from('invitation_codes')
       .insert({
         code: code,
-        school_id: user.school_id,
-        entry_year: user.entry_year,
+        school_id: schoolId,
+        entry_year: entryYear,
         created_by_user_id: user_id,
-        is_admin_code: false,
-        max_uses: 10, // Par défaut
+        is_admin_code: user.role === 'admin',
+        max_uses: 1, // 1 code = 1 utilisation
         current_uses: 0,
         is_active: true
       })
@@ -67,7 +75,7 @@ export class CodesService {
     
     return {
       code: newCode.code,
-      codes_remaining: user.max_codes_allowed - codesCreated - 1
+      codes_remaining: user.role === 'admin' ? -1 : user.max_codes_allowed - codesCreated - 1
     }
   }
   
@@ -75,7 +83,9 @@ export class CodesService {
     const { data, error } = await supabase
       .from('invitation_codes')
       .select(`
+        id,
         code,
+        entry_year,
         max_uses,
         current_uses,
         expires_at,
@@ -91,6 +101,54 @@ export class CodesService {
     if (error) throw error
     
     return data
+  }
+
+  // Vérifier un code et récupérer ses informations (sans authentification)
+  async verifyCode(code: string) {
+    const { data, error } = await supabase
+      .from('invitation_codes')
+      .select(`
+        code,
+        school_id,
+        entry_year,
+        max_uses,
+        current_uses,
+        expires_at,
+        is_active,
+        schools:school_id (
+          id,
+          name_fr
+        )
+      `)
+      .eq('code', code)
+      .single()
+    
+    if (error || !data) {
+      throw new Error('Code invalide')
+    }
+
+    // Vérifier si le code est encore valide
+    if (!data.is_active) {
+      throw new Error('Ce code a été révoqué')
+    }
+
+    if (data.current_uses >= data.max_uses) {
+      throw new Error('Ce code a déjà été utilisé')
+    }
+
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      throw new Error('Ce code a expiré')
+    }
+
+    const school = Array.isArray(data.schools) ? data.schools[0] : data.schools
+
+    return {
+      code: data.code,
+      school_id: data.school_id,
+      school_name: school?.name_fr || 'Non spécifiée',
+      entry_year: data.entry_year,
+      valid: true,
+    }
   }
 }
 

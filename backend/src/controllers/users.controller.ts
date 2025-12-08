@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { usersService } from '@/services/users.service'
 import { authService } from '@/services/auth.service'
 import { logger } from '@/utils/logger'
+import { supabase } from '@/config/database'
 
 export class UsersController {
   
@@ -18,11 +19,11 @@ export class UsersController {
         offset: req.query.offset ? parseInt(req.query.offset as string) : undefined
       }
       
-      const users = await usersService.getUsers(filters)
+      const result = await usersService.getUsers(filters)
       
       res.json({
-        users,
-        total: users.length
+        users: result.users,
+        total: result.total
       })
     } catch (error: any) {
       logger.error('Error in getUsers:', error)
@@ -151,6 +152,73 @@ export class UsersController {
       logger.error('Error in changePassword:', error)
       const message = error instanceof Error ? error.message : 'Erreur serveur'
       res.status(400).json({ error: message })
+    }
+  }
+
+  async getFilterSchools(req: Request, res: Response) {
+    try {
+      const { data, error } = await supabase
+        .from('schools')
+        .select('id, name_fr, country')
+        .order('name_fr')
+
+      if (error) throw error
+
+      return res.json({ schools: data || [] })
+    } catch (error: any) {
+      logger.error('Error fetching schools:', error)
+      return res.status(500).json({ error: 'Erreur serveur' })
+    }
+  }
+
+  async getFilterYears(req: Request, res: Response) {
+    try {
+      const { school_id } = req.query
+
+      let query = supabase
+        .from('users')
+        .select('entry_year')
+        .eq('is_active', true)
+        .order('entry_year', { ascending: false })
+
+      if (school_id) {
+        query = query.eq('school_id', school_id as string)
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+
+      // Retourner années uniques
+      const uniqueYears = [...new Set((data || []).map(u => u.entry_year))]
+        .filter(Boolean)
+        .sort((a, b) => b.localeCompare(a))
+
+      return res.json({ years: uniqueYears })
+    } catch (error: any) {
+      logger.error('Error fetching years:', error)
+      return res.status(500).json({ error: 'Erreur serveur' })
+    }
+  }
+
+  async getFilterCountries(req: Request, res: Response) {
+    try {
+      const { data, error } = await supabase
+        .from('schools')
+        .select('country')
+        .order('country')
+
+      if (error) throw error
+
+      // Retourner pays uniques
+      const uniqueCountries = [...new Set((data || []).map(s => s.country))]
+        .filter(Boolean)
+        .sort()
+
+      return res.json({ countries: uniqueCountries })
+    } catch (error: any) {
+      logger.error('Error fetching countries:', error)
+      return res.status(500).json({ error: 'Erreur serveur' })
     }
   }
 }

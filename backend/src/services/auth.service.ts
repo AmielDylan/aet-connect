@@ -1,42 +1,46 @@
 import { supabase } from '@/config/database'
-import bcrypt from 'bcrypt'
+// bcrypt supprimé - plus nécessaire avec Supabase Auth
 import { JWTUtils } from '@/utils/jwt'
 import { LoginResponse } from '@/models/auth.model'
 
 export class AuthService {
   
   // Login utilisateur
+  // ⚠️ DEPRECATED: Le frontend utilise Supabase Auth directement
+  // Cette fonction n'est plus utilisée mais conservée pour compatibilité
   async login(email: string, password: string): Promise<LoginResponse> {
+    // Utiliser Supabase Auth pour vérifier les identifiants
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
     
-    // 1. Récupérer l'utilisateur par email
-    const { data: user, error } = await supabase
+    if (authError || !authData.user) {
+      throw new Error('Email ou mot de passe incorrect')
+    }
+    
+    // Récupérer l'utilisateur depuis public.users
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
-      .eq('email', email)
+      .eq('id', authData.user.id)
       .eq('is_active', true)
       .single()
     
-    if (error || !user) {
-      throw new Error('Email ou mot de passe incorrect')
+    if (userError || !user) {
+      throw new Error('Utilisateur non trouvé')
     }
     
-    // 2. Vérifier le mot de passe
-    const passwordMatch = await bcrypt.compare(password, user.password_hash)
-    
-    if (!passwordMatch) {
-      throw new Error('Email ou mot de passe incorrect')
-    }
-    
-    // 3. Générer les tokens JWT
+    // Générer les tokens JWT (pour compatibilité avec l'ancien système)
     const tokens = JWTUtils.generateTokens(user.id, user.email, user.role)
     
-    // 4. Mettre à jour last_login (optionnel)
+    // Mettre à jour last_login (optionnel)
     await supabase
       .from('users')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', user.id)
     
-    // 5. Retourner la réponse
+    // Retourner la réponse
     return {
       success: true,
       user: {
@@ -121,13 +125,14 @@ export class AuthService {
 
   /**
    * Change le mot de passe d'un utilisateur
+   * Utilise Supabase Auth Admin API
    */
   async changePassword(userId: string, oldPassword: string, newPassword: string) {
     try {
-      // 1. Vérifier que l'ancien mot de passe est correct
+      // 1. Récupérer l'utilisateur pour obtenir son email
       const { data: user, error: userError } = await supabase
         .from('users')
-        .select('password_hash')
+        .select('email')
         .eq('id', userId)
         .single()
 
@@ -135,13 +140,7 @@ export class AuthService {
         throw new Error('Utilisateur non trouvé')
       }
 
-      // 2. Comparer l'ancien mot de passe
-      const isValid = await bcrypt.compare(oldPassword, user.password_hash)
-      if (!isValid) {
-        throw new Error('Ancien mot de passe incorrect')
-      }
-
-      // 3. Valider le nouveau mot de passe
+      // 2. Valider le nouveau mot de passe
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
       if (!passwordRegex.test(newPassword)) {
         throw new Error(
@@ -149,21 +148,41 @@ export class AuthService {
         )
       }
 
-      // 4. Hasher le nouveau mot de passe
-      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      // 3. Vérifier l'ancien mot de passe en tentant une connexion
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: oldPassword,
+      })
 
-      // 5. Mettre à jour dans la base de données
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ password_hash: hashedPassword })
-        .eq('id', userId)
+      if (signInError || !signInData.user || !signInData.session) {
+        throw new Error('Ancien mot de passe incorrect')
+      }
+
+      // 4. Mettre à jour le mot de passe avec la session créée
+      // Créer un nouveau client avec la session pour pouvoir utiliser updateUser()
+      // Note: updateUser() nécessite une session utilisateur active
+      const { createClient } = await import('@supabase/supabase-js')
+      const { config } = await import('@/config/environment')
+      
+      // Créer un client temporaire avec la session utilisateur
+      const userClient = createClient(config.supabase.url, config.supabase.anonKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${signInData.session.access_token}`,
+          },
+        },
+      })
+
+      const { error: updateError } = await userClient.auth.updateUser({
+        password: newPassword,
+      })
 
       if (updateError) {
-        throw updateError
+        throw new Error(updateError.message || 'Erreur lors de la mise à jour du mot de passe')
       }
 
       return { success: true, message: 'Mot de passe changé avec succès' }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error changing password:', error)
       throw error
     }

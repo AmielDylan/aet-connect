@@ -54,6 +54,7 @@ export interface User {
   last_name: string
   role: 'alumni' | 'moderator' | 'admin'
   school_id: string | null
+  school_name?: string // ✅ Ajouter cette propriété
   entry_year: string | null
   current_city: string | null
   current_country: string | null
@@ -190,43 +191,18 @@ export interface RefreshTokenResponse {
 // ═══════════════════════════════════════════════════
 
 export interface AdminStats {
-  users: {
-    total: number
-    by_role: {
-      alumni: number
-      moderator: number
-      admin: number
-    }
-    active: number
-    inactive: number
-    by_school?: Array<{
-      school_name: string
-      count: number
-    }>
+  overview: {
+    totalUsers: number
+    newUsers: number
+    totalSchools: number
+    totalCodes: number
+    usedCodes: number
+    pendingRequests: number
+    totalRequests: number
+    approvedRequests: number
   }
-  events: {
-    total: number
-    by_status: {
-      upcoming: number
-      ongoing: number
-      completed: number
-      cancelled: number
-    }
-  }
-  codes: {
-    total_generated: number
-    total_used: number
-    active: number
-  }
-  access_requests: {
-    pending: number
-    approved: number
-    rejected: number
-  }
-  registrations_by_month: Array<{
-    month: string
-    count: number
-  }>
+  roles: Record<string, number>
+  schools: Record<string, number>
 }
 
 // ═══════════════════════════════════════════════════

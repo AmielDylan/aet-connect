@@ -13,7 +13,7 @@ export interface School {
 export interface User {
   id: string
   email: string
-  password_hash: string
+  // password_hash supprimé - géré par Supabase Auth
   first_name: string
   last_name: string
   school_id: string | null
