@@ -21,8 +21,10 @@ export function ShareMenu({ code, schoolName, entryYear }: ShareMenuProps) {
   const { toast } = useToast()
   const [copied, setCopied] = useState(false)
 
-  // Forcer HTTP pour localhost
-  const baseUrl = 'http://localhost:3000'
+  // Utiliser l'URL du frontend depuis window.location ou variable d'environnement
+  const baseUrl = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'
   
   const inviteUrl = `${baseUrl}/register/with-code?code=${code}`
   
