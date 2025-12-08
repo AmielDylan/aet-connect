@@ -182,16 +182,6 @@ export default function LoginPage() {
               S&apos;inscrire
             </Button>
           </div>
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Comptes de test :</p>
-            <p className="mt-1">
-              <strong>Admin :</strong> test.admin@aetconnect.com
-            </p>
-            <p>
-              <strong>Membre :</strong> test.membre@aetconnect.com
-            </p>
-            <p className="mt-1 text-xs">(Mot de passe : TestPass123!)</p>
-          </div>
         </CardContent>
       </Card>
     </div>
