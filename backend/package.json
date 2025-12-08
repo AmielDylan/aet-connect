@@ -37,6 +37,7 @@
     "docs:serve": "cd documentation/backend && gitbook serve",
     "docs:all": "npm run docs:convert && npm run docs:build && npm run docs:serve",
     "admin:create-code": "tsx scripts/create-admin-universal-code.ts",
+    "admin:list-codes": "tsx scripts/list-admin-codes.ts",
     "setup:test-users": "tsx scripts/setup-test-users.ts",
     "lint": "eslint src/**/*.ts",
     "db:setup": "tsx scripts/setup-db.ts",

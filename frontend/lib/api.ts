@@ -738,6 +738,23 @@ class ApiClient {
       total: response.total,
     }
   }
+
+  /**
+   * Get filter years (entry years)
+   * GET /api/users/filters/years
+   */
+  async getFilterYears(schoolId?: string): Promise<{ years: string[] }> {
+    const query = schoolId ? `?school_id=${schoolId}` : ''
+    return this.fetch<{ years: string[] }>(`/api/users/filters/years${query}`)
+  }
+
+  /**
+   * Get filter countries
+   * GET /api/users/filters/countries
+   */
+  async getFilterCountries(): Promise<{ countries: string[] }> {
+    return this.fetch<{ countries: string[] }>('/api/users/filters/countries')
+  }
 }
 
 // ═══════════════════════════════════════════════════

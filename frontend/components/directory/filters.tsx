@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select'
 import { X } from 'lucide-react'
 import { apiClient } from '@/lib/api'
-import { supabase } from '@/lib/supabase'
 import type { DirectoryFilters } from '@/types/directory'
 
 const countryFlags: Record<string, string> = {
@@ -44,34 +43,13 @@ export function Filters({ filters, onFilterChange, onClearFilters }: FiltersProp
   // Charger les promotions (dépend de l'école sélectionnée)
   const { data: yearsData } = useQuery({
     queryKey: ['filter-years', filters.school_id],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/filters/years${filters.school_id ? `?school_id=${filters.school_id}` : ''}`
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to fetch years')
-      return response.json()
-    },
+    queryFn: () => apiClient.getFilterYears(filters.school_id || undefined),
   })
 
   // Charger les pays
   const { data: countriesData } = useQuery({
     queryKey: ['filter-countries'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/filters/countries`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-      })
-      if (!response.ok) throw new Error('Failed to fetch countries')
-      return response.json()
-    },
+    queryFn: () => apiClient.getFilterCountries(),
   })
 
   const schools = schoolsData?.schools || []
