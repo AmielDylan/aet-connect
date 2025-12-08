@@ -20,9 +20,7 @@ const app = express()
 // Security & Parsing
 app.use(helmet())
 app.use(cors({
-  origin: config.nodeEnv === 'development' 
-    ? '*' 
-    : ['https://aetconnect.com'], // Ajuster en production
+  origin: config.frontendUrl,
   credentials: true
 }))
 app.use(express.json())
