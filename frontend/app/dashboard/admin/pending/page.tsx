@@ -393,7 +393,16 @@ export default function AdminPendingPage() {
                   Voici votre code d'invitation : <strong className="font-mono text-lg">{codeDialog.code}</strong>
                 </p>
                 <p className="mt-2">
-                  Rendez-vous sur https://aet-connect.com/register pour créer votre compte.
+                  Rendez-vous sur{' '}
+                  <a 
+                    href={`https://aet-connect.vercel.app/register/with-code?code=${codeDialog.code}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline"
+                  >
+                    https://aet-connect.vercel.app/register/with-code?code={codeDialog.code}
+                  </a>{' '}
+                  pour créer votre compte.
                 </p>
                 <p className="mt-2">
                   Ce code est valable 30 jours et peut être utilisé 1 fois.
@@ -403,7 +412,7 @@ export default function AdminPendingPage() {
                 variant="outline"
                 className="w-full"
                 onClick={() => {
-                  const message = `Bonjour,\n\nVotre demande d'inscription à AET Connect a été approuvée !\n\nVoici votre code d'invitation : ${codeDialog.code}\n\nRendez-vous sur https://aet-connect.com/register pour créer votre compte.\n\nCe code est valable 30 jours et peut être utilisé 1 fois.`
+                  const message = `Bonjour,\n\nVotre demande d'inscription à AET Connect a été approuvée !\n\nVoici votre code d'invitation : ${codeDialog.code}\n\nRendez-vous sur https://aet-connect.vercel.app/register/with-code?code=${codeDialog.code} pour créer votre compte.\n\nCe code est valable 30 jours et peut être utilisé 1 fois.`
                   navigator.clipboard.writeText(message)
                   toast({ title: 'Message complet copié !', description: 'Prêt à être envoyé par email ou WhatsApp' })
                 }}
