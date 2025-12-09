@@ -1,4 +1,5 @@
 import { supabase } from '@/config/database'
+import { logger } from '@/utils/logger'
 // bcrypt supprimé - plus nécessaire avec Supabase Auth
 import {
   CheckSchoolPromoResponse,
@@ -284,21 +285,20 @@ export class RegistrationService {
       throw new Error('Un compte existe déjà avec cet email')
     }
     
-    // 3. Créer l'utilisateur avec signUp standard (PAS d'API Admin)
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // 3. Créer l'utilisateur avec l'API Admin (service role)
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: data.email,
       password: data.password,
-      options: {
-        data: {
-          first_name: data.first_name,
-          last_name: data.last_name,
-          school_id: invCode.school_id,
-          entry_year: invCode.entry_year,
-          role: 'alumni',
-          is_ambassador: false,
-          is_active: true,
-          max_codes_allowed: 3,
-        },
+      email_confirm: true, // Confirmer l'email automatiquement
+      user_metadata: {
+        first_name: data.first_name,
+        last_name: data.last_name,
+        school_id: invCode.school_id,
+        entry_year: invCode.entry_year,
+        role: 'alumni',
+        is_ambassador: false,
+        is_active: true,
+        max_codes_allowed: 3,
       },
     })
     
@@ -306,20 +306,49 @@ export class RegistrationService {
       throw new Error(authError?.message || 'Erreur lors de la création du compte')
     }
 
-    // Le trigger SQL handle_new_user() créera automatiquement l'entrée dans public.users
+    // 4. Créer l'entrée dans public.users (le trigger pourrait ne pas fonctionner avec admin.createUser)
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
+        email: data.email,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        school_id: invCode.school_id,
+        entry_year: invCode.entry_year,
+        role: 'alumni',
+        is_ambassador: false,
+        is_active: true,
+        max_codes_allowed: 3,
+      })
+      .select()
+      .single()
     
-    // 4. Marquer le code comme utilisé AVEC l'utilisateur et la date
+    if (userError) {
+      // Si l'utilisateur existe déjà (cas rare), essayer de le récupérer
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', authData.user.id)
+        .single()
+      
+      if (!existingUser) {
+        throw new Error(`Erreur lors de la création de l'utilisateur: ${userError.message}`)
+      }
+    }
+    
+    // 6. Marquer le code comme utilisé AVEC l'utilisateur et la date
     const { error: updateError } = await supabase
       .from('invitation_codes')
       .update({ 
         current_uses: invCode.current_uses + 1,
-        used_by_user_id: authData.user.id, // ✅ Ajouter
-        used_at: new Date().toISOString(), // ✅ Ajouter
+        used_by_user_id: authData.user.id,
+        used_at: new Date().toISOString(),
       })
       .eq('id', invCode.id)
     
     if (updateError) {
-      console.error('Error updating code usage:', updateError)
+      logger.error('Error updating code usage:', updateError)
       // Ne pas faire échouer l'inscription si l'incrémentation échoue
     }
     
