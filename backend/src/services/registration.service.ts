@@ -306,11 +306,14 @@ export class RegistrationService {
       throw new Error(authError?.message || 'Erreur lors de la création du compte')
     }
 
-    // 4. Créer l'entrée dans public.users (le trigger pourrait ne pas fonctionner avec admin.createUser)
+    // 4. Le trigger handle_new_user() crée automatiquement l'entrée dans public.users
+    // Attendre un peu que le trigger s'exécute, puis mettre à jour avec les données complètes
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // Mettre à jour l'utilisateur créé par le trigger avec toutes les données
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .insert({
-        id: authData.user.id,
+      .update({
         email: data.email,
         first_name: data.first_name,
         last_name: data.last_name,
@@ -321,11 +324,22 @@ export class RegistrationService {
         is_active: true,
         max_codes_allowed: 3,
       })
+      .eq('id', authData.user.id)
       .select()
       .single()
     
     if (userError) {
-      // Si l'utilisateur existe déjà (cas rare), essayer de le récupérer
+      logger.error('Error updating user in database:', {
+        error: userError,
+        code: userError.code,
+        message: userError.message,
+        details: userError.details,
+        hint: userError.hint,
+        userId: authData.user.id,
+        email: data.email
+      })
+      
+      // Vérifier si l'utilisateur existe (créé par le trigger)
       const { data: existingUser } = await supabase
         .from('users')
         .select('id')
@@ -333,7 +347,30 @@ export class RegistrationService {
         .single()
       
       if (!existingUser) {
-        throw new Error(`Erreur lors de la création de l'utilisateur: ${userError.message}`)
+        // Si l'utilisateur n'existe pas, essayer de l'insérer (le trigger n'a peut-être pas fonctionné)
+        const { data: insertedUser, error: insertError } = await supabase
+          .from('users')
+          .insert({
+            id: authData.user.id,
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            school_id: invCode.school_id,
+            entry_year: invCode.entry_year,
+            role: 'alumni',
+            is_ambassador: false,
+            is_active: true,
+            max_codes_allowed: 3,
+          })
+          .select()
+          .single()
+        
+        if (insertError) {
+          throw new Error(`Erreur lors de la création de l'utilisateur: ${insertError.message || 'Erreur inconnue'}`)
+        }
+      } else {
+        // L'utilisateur existe mais la mise à jour a échoué, réessayer
+        throw new Error(`Erreur lors de la mise à jour de l'utilisateur: ${userError.message || 'Erreur inconnue'}`)
       }
     }
     
