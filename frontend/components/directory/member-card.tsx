@@ -22,7 +22,9 @@ export function MemberCard({ member }: MemberCardProps) {
       <CardContent className="p-6">
         <div className="flex flex-col items-center text-center space-y-4">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={member.avatar_url || ''} alt={member.first_name} />
+            {member.avatar_url && (
+              <AvatarImage src={member.avatar_url} alt={member.first_name} />
+            )}
             <AvatarFallback>
               <User className="h-10 w-10" />
             </AvatarFallback>

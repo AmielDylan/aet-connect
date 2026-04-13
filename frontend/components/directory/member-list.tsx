@@ -26,7 +26,9 @@ export function MemberList({ members }: MemberListProps) {
           >
             <div className="flex items-center gap-4">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={member.avatar_url || ''} alt={member.first_name} />
+                {member.avatar_url && (
+                  <AvatarImage src={member.avatar_url} alt={member.first_name} />
+                )}
                 <AvatarFallback>
                   <User className="h-6 w-6" />
                 </AvatarFallback>

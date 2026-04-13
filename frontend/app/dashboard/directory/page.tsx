@@ -22,6 +22,7 @@ export default function DirectoryPage() {
     school_id: null,
     entry_year: null,
     country: null,
+    city: null,
   })
 
   // Debounce search (attendre 500ms après la dernière frappe)
@@ -54,6 +55,7 @@ export default function DirectoryPage() {
       school_id: null,
       entry_year: null,
       country: null,
+      city: null,
     })
     setDebouncedSearch('')
     setPage(1)
@@ -61,13 +63,14 @@ export default function DirectoryPage() {
 
   // Fetch members
   const { data, isLoading, error } = useQuery({
-    queryKey: ['members', debouncedSearch, filters.school_id, filters.entry_year, filters.country, page],
+    queryKey: ['members', debouncedSearch, filters.school_id, filters.entry_year, filters.country, filters.city, page],
     queryFn: () =>
       apiClient.getMembers({
         search: debouncedSearch,
         school_id: filters.school_id || undefined,
         entry_year: filters.entry_year || undefined,
         country: filters.country || undefined,
+        city: filters.city || undefined,
         limit: MEMBERS_PER_PAGE,
         offset: (page - 1) * MEMBERS_PER_PAGE,
       }),
@@ -157,4 +160,6 @@ export default function DirectoryPage() {
     </div>
   )
 }
+
+
 

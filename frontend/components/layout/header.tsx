@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogOut, User, Menu } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -81,7 +81,13 @@ export function Header({ onMenuClick }: HeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-              <Avatar className="h-9 w-9">
+              <Avatar className="h-9 w-9" key={`avatar-${user?.avatar_url || 'no-avatar'}-${user?.id || 'no-user'}`}>
+                {user?.avatar_url ? (
+                  <AvatarImage 
+                    src={user.avatar_url} 
+                    alt={`${user.first_name} ${user.last_name}`} 
+                  />
+                ) : null}
                 <AvatarFallback className="bg-primary text-primary-foreground">
                   {initials}
                 </AvatarFallback>

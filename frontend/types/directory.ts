@@ -3,6 +3,7 @@ export interface DirectoryFilters {
   school_id: string | null
   entry_year: string | null
   country: string | null
+  city: string | null
 }
 
 export interface DirectoryMember {
@@ -20,4 +21,6 @@ export interface DirectoryMember {
 }
 
 export type ViewMode = 'grid' | 'list'
+
+
 
