@@ -3,40 +3,53 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────
+   Cal Sans — display font (weight 600 only)
+   Source : github.com/calcom/font (MIT)
+───────────────────────────────────────── */
+@font-face {
+  font-family: 'Cal Sans';
+  src: url('https://cdn.jsdelivr.net/gh/calcom/font/fonts/CalSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
+  /* Fonts */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-cal: 'Cal Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Roboto Mono', monospace;
+
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -44,79 +57,139 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ── Radius ───────────────────── */
+  --radius: 0.5rem; /* 8px — Cal.com standard */
+
+  /* ── Colors (Cal.com grayscale) ─ */
+  --background:         #ffffff;
+  --foreground:         #111111;
+  --card:               #ffffff;
+  --card-foreground:    #111111;
+  --popover:            #ffffff;
+  --popover-foreground: #111111;
+
+  /* Primary = Charcoal #242424 */
+  --primary:            #242424;
+  --primary-foreground: #ffffff;
+
+  /* Secondary = very light gray */
+  --secondary:            #f5f5f5;
+  --secondary-foreground: #242424;
+
+  /* Muted */
+  --muted:            #f5f5f5;
+  --muted-foreground: #898989;
+
+  /* Accent */
+  --accent:            #f5f5f5;
+  --accent-foreground: #242424;
+
+  /* Destructive */
+  --destructive: #ef4444;
+
+  /* Border / Input / Ring */
+  --border: rgba(34, 42, 53, 0.12);
+  --input:  rgba(34, 42, 53, 0.12);
+  --ring:   rgba(36, 36, 36, 0.3);
+
+  /* Sidebar */
+  --sidebar:                    #ffffff;
+  --sidebar-foreground:         #111111;
+  --sidebar-primary:            #242424;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             #f5f5f5;
+  --sidebar-accent-foreground:  #242424;
+  --sidebar-border:             rgba(34, 42, 53, 0.08);
+  --sidebar-ring:               rgba(36, 36, 36, 0.3);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background:         #111111;
+  --foreground:         #f5f5f5;
+  --card:               #1a1a1a;
+  --card-foreground:    #f5f5f5;
+  --popover:            #1a1a1a;
+  --popover-foreground: #f5f5f5;
+  --primary:            #f5f5f5;
+  --primary-foreground: #111111;
+  --secondary:          #242424;
+  --secondary-foreground: #f5f5f5;
+  --muted:              #242424;
+  --muted-foreground:   #898989;
+  --accent:             #242424;
+  --accent-foreground:  #f5f5f5;
+  --destructive:        #ef4444;
+  --border:             rgba(255, 255, 255, 0.08);
+  --input:              rgba(255, 255, 255, 0.10);
+  --ring:               rgba(255, 255, 255, 0.3);
+  --sidebar:                    #1a1a1a;
+  --sidebar-foreground:         #f5f5f5;
+  --sidebar-primary:            #f5f5f5;
+  --sidebar-primary-foreground: #111111;
+  --sidebar-accent:             #242424;
+  --sidebar-accent-foreground:  #f5f5f5;
+  --sidebar-border:             rgba(255, 255, 255, 0.08);
+  --sidebar-ring:               rgba(255, 255, 255, 0.3);
 }
 
+/* ─────────────────────────────────────────
+   Base styles
+───────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Typography utilities
+───────────────────────────────────────── */
+@layer utilities {
+  .font-cal {
+    font-family: var(--font-cal);
+    font-weight: 600;
+    line-height: 1.10;
+    letter-spacing: 0em;
+  }
+
+  /* Cal Sans at small sizes needs positive tracking */
+  .font-cal-sm {
+    font-family: var(--font-cal);
+    font-weight: 600;
+    line-height: 1.30;
+    letter-spacing: 0.012em;
+  }
+
+  /* ── Cal.com shadow system ─────── */
+  .shadow-cal-card {
+    box-shadow:
+      rgba(19, 19, 22, 0.7) 0px 1px 5px -4px,
+      rgba(34, 42, 53, 0.08) 0px 0px 0px 1px,
+      rgba(34, 42, 53, 0.05) 0px 4px 8px 0px;
+  }
+
+  .shadow-cal-card-hover {
+    box-shadow:
+      rgba(19, 19, 22, 0.7) 0px 2px 8px -4px,
+      rgba(34, 42, 53, 0.10) 0px 0px 0px 1px,
+      rgba(34, 42, 53, 0.08) 0px 6px 12px 0px;
+  }
+
+  .shadow-cal-button {
+    box-shadow:
+      rgba(255, 255, 255, 0.15) 0px 2px 0px inset,
+      rgba(34, 42, 53, 0.20) 0px 1px 3px 0px;
+  }
+
+  .shadow-cal-ring {
+    box-shadow: rgba(34, 42, 53, 0.08) 0px 0px 0px 1px;
   }
 }

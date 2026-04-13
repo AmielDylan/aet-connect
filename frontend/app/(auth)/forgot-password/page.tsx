@@ -1,24 +1,11 @@
 'use client'
 
-// ═══════════════════════════════════════════════════
-// FORGOT PASSWORD PAGE
-// Envoi d'un email de récupération de mot de passe
-// ═══════════════════════════════════════════════════
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createBrowserClient } from '@supabase/ssr'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -28,25 +15,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
-// ═══════════════════════════════════════════════════
-// VALIDATION SCHEMA
-// ═══════════════════════════════════════════════════
-
 const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .min(1, "L'email est requis")
-    .email("Format d'email invalide"),
+  email: z.string().min(1, "L'email est requis").email("Format d'email invalide"),
 })
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
-
-// ═══════════════════════════════════════════════════
-// FORGOT PASSWORD PAGE COMPONENT
-// ═══════════════════════════════════════════════════
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
@@ -66,9 +41,9 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     setIsLoading(true)
     try {
-      const redirectTo = `${window.location.origin}/reset-password`
-      await supabase.auth.resetPasswordForEmail(data.email, { redirectTo })
-      // On affiche toujours le message de succès pour ne pas révéler si l'email existe
+      await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
       setEmailSent(true)
     } finally {
       setIsLoading(false)
@@ -76,99 +51,82 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="mb-2 flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-              <span className="text-2xl font-bold text-primary-foreground">
-                AET
-              </span>
+    <div className="w-full max-w-sm">
+      {/* Logo */}
+      <div className="flex flex-col items-center mb-8">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#242424] mb-4">
+          <span className="text-sm font-bold text-white leading-none">AET</span>
+        </div>
+        <h1 className="font-cal text-[28px] text-[#111111]">Mot de passe oublié</h1>
+        <p className="mt-1.5 text-sm text-[#898989] text-center">
+          Saisissez votre email pour recevoir un lien de réinitialisation
+        </p>
+      </div>
+
+      {/* Card */}
+      <div className="rounded-xl bg-white p-6 shadow-cal-card">
+        {emailSent ? (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-lg bg-[#f5f5f5] p-4">
+              <CheckCircle2 className="h-4 w-4 text-[#242424] shrink-0 mt-0.5" />
+              <p className="text-sm text-[#111111]">
+                Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans les prochaines minutes. Vérifiez vos spams si nécessaire.
+              </p>
             </div>
+            <button
+              onClick={() => router.push('/login')}
+              className="w-full h-9 rounded-lg bg-[#242424] text-sm font-medium text-white transition-opacity hover:opacity-80 flex items-center justify-center gap-2"
+              style={{ boxShadow: 'rgba(255,255,255,0.15) 0px 2px 0px inset, rgba(34,42,53,0.20) 0px 1px 3px 0px' }}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Retour à la connexion
+            </button>
           </div>
-          <CardTitle className="text-center text-2xl">
-            Mot de passe oublié
-          </CardTitle>
-          <CardDescription className="text-center">
-            Saisissez votre email pour recevoir un lien de réinitialisation
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {emailSent ? (
-            <div className="space-y-4">
-              <Alert>
-                <CheckCircle2 className="h-4 w-4" />
-                <AlertDescription>
-                  Si un compte existe avec cet email, vous recevrez un lien de
-                  réinitialisation dans les prochaines minutes. Vérifiez vos
-                  spams si nécessaire.
-                </AlertDescription>
-              </Alert>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push('/login')}
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-[#111111]">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="votre.email@example.com"
+                        autoComplete="email"
+                        disabled={isLoading}
+                        className="h-9 text-sm border-[rgba(34,42,53,0.2)] focus-visible:ring-[#242424]/20"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-9 rounded-lg bg-[#242424] text-sm font-medium text-white transition-opacity hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ boxShadow: 'rgba(255,255,255,0.15) 0px 2px 0px inset, rgba(34,42,53,0.20) 0px 1px 3px 0px' }}
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                {isLoading ? 'Envoi...' : 'Envoyer le lien'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push('/login')}
+                className="w-full text-sm text-[#898989] hover:text-[#111111] transition-colors flex items-center justify-center gap-1.5 pt-1"
+              >
+                <ArrowLeft className="h-3 w-3" />
                 Retour à la connexion
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="votre.email@example.com"
-                            autoComplete="email"
-                            disabled={isLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Envoi en cours...
-                      </>
-                    ) : (
-                      'Envoyer le lien de réinitialisation'
-                    )}
-                  </Button>
-                </form>
-              </Form>
-              <div className="mt-4 text-center">
-                <Button
-                  variant="link"
-                  onClick={() => router.push('/login')}
-                  className="text-sm text-muted-foreground"
-                >
-                  <ArrowLeft className="mr-1 h-3 w-3" />
-                  Retour à la connexion
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+              </button>
+            </form>
+          </Form>
+        )}
+      </div>
     </div>
   )
 }
