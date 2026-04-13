@@ -198,7 +198,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
   }, [avatarUrl])
 
   const handleFileProcess = async (
-    fieldName: string,
+    _fieldName: string,
     file: File,
     metadata: any,
     load: (value: string) => void,
