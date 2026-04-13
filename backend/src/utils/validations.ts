@@ -203,6 +203,10 @@ export const ChangePasswordSchema = z.object({
     .regex(/[@$!%*?&]/, 'Doit contenir un caractère spécial (@$!%*?&)'),
 })
 
+export const RequestDeletionSchema = z.object({
+  reason: z.string().max(500, 'La raison ne doit pas dépasser 500 caractères').optional(),
+})
+
 export const UpdatePrivacySchema = z.object({
   show_email: z.boolean().optional(),
   show_phone: z.boolean().optional(),

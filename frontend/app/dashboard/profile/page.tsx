@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/hooks/use-auth'
+import { useAuthStore } from '@/store/auth-store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -12,20 +13,42 @@ import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { PasswordStrength } from '@/components/profile/password-strength'
-import { 
-  Loader2, 
-  Save, 
-  AlertCircle, 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import {
+  Loader2,
+  Save,
+  AlertCircle,
   CheckCircle2,
   Lock,
+  Trash2,
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
+import { AvatarUpload } from '@/components/profile/avatar-upload'
+import { COUNTRY_FLAGS } from '@/lib/countries'
 import type { UpdateProfileRequest, UpdatePrivacyRequest } from '@/types'
 import type { ChangePasswordData, PasswordValidation } from '@/types/profile'
 
 export default function ProfilePage() {
   const { user } = useAuth()
+  const loadUser = useAuthStore((state) => state.loadUser)
   const queryClient = useQueryClient()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState<UpdateProfileRequest>({
@@ -59,12 +82,22 @@ export default function ProfilePage() {
   })
 
   const { toast } = useToast()
+  const { logout } = useAuth()
+  const [deletionReason, setDeletionReason] = useState('')
+  const [deletionDialogOpen, setDeletionDialogOpen] = useState(false)
 
   // Récupérer le profil
   const { data: profile, isLoading } = useQuery({
     queryKey: ['user', 'profile'],
     queryFn: () => apiClient.getUserProfile(),
   })
+
+  // Récupérer la liste des pays
+  const { data: countriesData } = useQuery({
+    queryKey: ['filter-countries'],
+    queryFn: () => apiClient.getFilterCountries(),
+  })
+  const countries = countriesData?.countries || []
 
   // Récupérer les privacy settings
   const { data: privacyData } = useQuery({
@@ -138,6 +171,29 @@ export default function ProfilePage() {
         hasLowercase: false,
         hasNumber: false,
         hasSpecialChar: false,
+      })
+    },
+  })
+
+  // Mutation demande de suppression de compte
+  const requestDeletionMutation = useMutation({
+    mutationFn: (reason: string) => apiClient.requestAccountDeletion(reason || undefined),
+    onSuccess: async () => {
+      setDeletionDialogOpen(false)
+      toast({
+        title: 'Demande envoyée',
+        description: 'Votre demande de suppression a été transmise aux administrateurs. Vous allez être déconnecté.',
+      })
+      // Attendre un court délai pour que le toast soit visible, puis déconnecter
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await logout()
+      window.location.href = '/login'
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible d\'envoyer la demande de suppression',
+        variant: 'destructive',
       })
     },
   })
@@ -245,9 +301,7 @@ export default function ProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* TEMPORAIREMENT COMMENTÉ - on reviendra dessus plus tard */}
             {/* Avatar */}
-            {/*
             <div>
               <Label>Photo de profil</Label>
               <div className="mt-2">
@@ -255,19 +309,15 @@ export default function ProfilePage() {
                   currentAvatarUrl={profile.avatar_url}
                   userId={user.id}
                   onAvatarUpdate={async () => {
-                    // Invalider les queries React Query
+                    // Invalider les queries React Query pour recharger le profil
                     queryClient.invalidateQueries({ queryKey: ['user', 'profile'] })
-                    // Recharger l'utilisateur depuis le store pour mettre à jour avatar_url
-                    try {
-                      await loadUser()
-                    } catch (error) {
-                      console.error('Error reloading user after avatar update:', error)
-                    }
+                    queryClient.invalidateQueries({ queryKey: ['user'] })
+                    // Recharger l'utilisateur depuis l'API pour mettre à jour le header
+                    await loadUser()
                   }}
                 />
               </div>
             </div>
-            */}
 
             {/* Formulaire */}
             <form onSubmit={handleProfileSubmit} className="space-y-4">
@@ -353,13 +403,29 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="current-country">Pays actuel</Label>
-                  <Input
-                    id="current-country"
+                  <Select
                     value={profileData.current_country || ''}
-                    onChange={(e) => setProfileData({ ...profileData, current_country: e.target.value })}
-                    placeholder="France"
+                    onValueChange={(value) =>
+                      setProfileData({ ...profileData, current_country: value === '__none__' ? '' : value })
+                    }
                     disabled={!isEditing}
-                  />
+                  >
+                    <SelectTrigger id="current-country">
+                      <SelectValue placeholder="Sélectionner un pays">
+                        {profileData.current_country
+                          ? `${COUNTRY_FLAGS[profileData.current_country] || ''} ${profileData.current_country}`.trim()
+                          : 'Sélectionner un pays'}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— Aucun —</SelectItem>
+                      {countries.map((country: string) => (
+                        <SelectItem key={country} value={country}>
+                          {COUNTRY_FLAGS[country] || ''} {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -693,6 +759,78 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Zone dangereuse */}
+      <Card className="border-destructive/40">
+        <CardHeader>
+          <CardTitle className="text-destructive flex items-center gap-2">
+            <Trash2 className="h-5 w-5" />
+            Zone dangereuse
+          </CardTitle>
+          <CardDescription>
+            La suppression de votre compte est définitive et irréversible.
+            Elle sera examinée par un administrateur avant d&apos;être effectuée.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AlertDialog open={deletionDialogOpen} onOpenChange={setDeletionDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="w-full sm:w-auto">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Demander la suppression de mon compte
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmer la demande de suppression</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Votre demande sera transmise aux administrateurs pour validation.
+                  Une fois approuvée, votre compte et toutes vos données seront supprimés définitivement.
+                  Vous serez déconnecté immédiatement après l&apos;envoi de la demande.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="space-y-2 py-2">
+                <Label htmlFor="deletion-reason">
+                  Raison (optionnel)
+                </Label>
+                <Textarea
+                  id="deletion-reason"
+                  placeholder="Expliquez pourquoi vous souhaitez supprimer votre compte..."
+                  value={deletionReason}
+                  onChange={(e) => setDeletionReason(e.target.value)}
+                  maxLength={500}
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                  {deletionReason.length}/500
+                </p>
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={requestDeletionMutation.isPending}>
+                  Annuler
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  disabled={requestDeletionMutation.isPending}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    requestDeletionMutation.mutate(deletionReason)
+                  }}
+                >
+                  {requestDeletionMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Envoi...
+                    </>
+                  ) : (
+                    'Confirmer la demande'
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -2,10 +2,23 @@ import { Router } from 'express'
 import { usersController } from '@/controllers/users.controller'
 import { supabaseAuthMiddleware as authMiddleware } from '@/middleware/supabase-auth.middleware'
 import { validateRequest } from '@/middleware/validation.middleware'
-import { UpdateProfileSchema, UpdatePrivacySchema, ChangePasswordSchema } from '@/utils/validations'
+import { UpdateProfileSchema, UpdatePrivacySchema, ChangePasswordSchema, RequestDeletionSchema } from '@/utils/validations'
 import { supabase } from '@/config/database'
 
 const router = Router()
+
+// Routes publiques (sans authentification)
+// GET /api/users/filters/schools - Liste des écoles avec membres (PUBLIC)
+router.get('/filters/schools', usersController.getFilterSchools.bind(usersController))
+
+// GET /api/users/filters/years - Liste des promotions (PUBLIC)
+router.get('/filters/years', usersController.getFilterYears.bind(usersController))
+
+// GET /api/users/filters/countries - Liste des pays (PUBLIC)
+router.get('/filters/countries', usersController.getFilterCountries.bind(usersController))
+
+// GET /api/users/filters/cities - Liste des villes (PUBLIC)
+router.get('/filters/cities', usersController.getFilterCities.bind(usersController))
 
 // GET /api/users/profile/:id - Profil public (PAS d'authentification requise)
 router.get('/profile/:id', async (req, res) => {
@@ -116,14 +129,12 @@ router.patch(
   usersController.changePassword.bind(usersController)
 )
 
-// GET /api/users/filters/schools - Liste des écoles avec membres
-router.get('/filters/schools', usersController.getFilterSchools.bind(usersController))
-
-// GET /api/users/filters/years - Liste des promotions
-router.get('/filters/years', usersController.getFilterYears.bind(usersController))
-
-// GET /api/users/filters/countries - Liste des pays
-router.get('/filters/countries', usersController.getFilterCountries.bind(usersController))
+// POST /api/users/me/deletion-request (demande de suppression de compte)
+router.post(
+  '/me/deletion-request',
+  validateRequest(RequestDeletionSchema),
+  usersController.requestAccountDeletion.bind(usersController)
+)
 
 // GET /api/users/:id (profil public)
 router.get('/:id', usersController.getUserById.bind(usersController))

@@ -200,9 +200,31 @@ export interface AdminStats {
     pendingRequests: number
     totalRequests: number
     approvedRequests: number
+    pendingDeletions: number
   }
   roles: Record<string, number>
   schools: Record<string, number>
+}
+
+// ═══════════════════════════════════════════════════
+// DELETION REQUEST
+// ═══════════════════════════════════════════════════
+
+export interface DeletionRequest {
+  id: string
+  user_id: string
+  reason: string | null
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  processed_at: string | null
+  processed_by_admin_id: string | null
+  users?: {
+    id: string
+    first_name: string
+    last_name: string
+    email: string
+    schools?: { id: string; name_fr: string; acronym: string | null } | null
+  } | null
 }
 
 // ═══════════════════════════════════════════════════

@@ -112,14 +112,7 @@ function AlumniDashboard() {
               ? `Limite atteinte (${user.codes_generated}/${user.max_codes_allowed})`
               : 'Générer un code'}
           </Button>
-          <Button 
-            variant="outline"
-            onClick={() => window.location.href = '/dashboard/directory'}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Parcourir l&apos;annuaire
-          </Button>
-          <Button 
+          <Button
             variant="outline"
             onClick={() => window.location.href = '/dashboard/profile'}
           >

@@ -357,6 +357,45 @@ class ApiClient {
   }
 
   /**
+   * Request account deletion (authenticated user)
+   * POST /api/users/me/deletion-request
+   */
+  async requestAccountDeletion(reason?: string): Promise<{ success: boolean; message: string }> {
+    return this.fetch<{ success: boolean; message: string }>('/api/users/me/deletion-request', {
+      method: 'POST',
+      body: JSON.stringify({ reason })
+    })
+  }
+
+  /**
+   * Get deletion requests (requires admin role)
+   * GET /api/admin/deletion-requests
+   */
+  async getDeletionRequests(status: string = 'pending'): Promise<any[]> {
+    return this.fetch<any[]>(`/api/admin/deletion-requests?status=${status}`)
+  }
+
+  /**
+   * Approve deletion request (requires admin role)
+   * POST /api/admin/deletion-requests/:id/approve
+   */
+  async approveDeletionRequest(id: string): Promise<{ success: boolean; message: string }> {
+    return this.fetch<{ success: boolean; message: string }>(`/api/admin/deletion-requests/${id}/approve`, {
+      method: 'POST'
+    })
+  }
+
+  /**
+   * Reject deletion request (requires admin role)
+   * POST /api/admin/deletion-requests/:id/reject
+   */
+  async rejectDeletionRequest(id: string): Promise<{ success: boolean; message: string }> {
+    return this.fetch<{ success: boolean; message: string }>(`/api/admin/deletion-requests/${id}/reject`, {
+      method: 'POST'
+    })
+  }
+
+  /**
    * Get public user profile (no auth required)
    * GET /api/users/profile/:id
    */
@@ -702,6 +741,7 @@ class ApiClient {
     school_id?: string
     entry_year?: string
     country?: string
+    city?: string
     limit?: number
     offset?: number
   }): Promise<{ users: DirectoryMember[]; total: number }> {
@@ -711,6 +751,7 @@ class ApiClient {
     if (params.school_id) searchParams.append('school_id', params.school_id)
     if (params.entry_year) searchParams.append('entry_year', params.entry_year)
     if (params.country) searchParams.append('country', params.country)
+    if (params.city) searchParams.append('city', params.city)
     if (params.limit) searchParams.append('limit', params.limit.toString())
     if (params.offset) searchParams.append('offset', params.offset.toString())
 
@@ -749,6 +790,14 @@ class ApiClient {
   }
 
   /**
+   * Get filter cities
+   * GET /api/users/filters/cities
+   */
+  async getFilterCities(): Promise<{ cities: string[] }> {
+    return this.fetch<{ cities: string[] }>('/api/users/filters/cities')
+  }
+
+  /**
    * Get filter countries
    * GET /api/users/filters/countries
    */
@@ -761,5 +810,7 @@ class ApiClient {
 // EXPORT SINGLETON INSTANCE
 // ═══════════════════════════════════════════════════
 
-export const apiClient = new ApiClient()
+const apiClient = new ApiClient()
+
+export { apiClient }
 

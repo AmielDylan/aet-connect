@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { LayoutDashboard, User, School, Users, Ticket, X, BarChart, Clock } from 'lucide-react'
+import { LayoutDashboard, User, School, Users, Ticket, X, BarChart, Clock, Trash2 } from 'lucide-react'
 import { useAuthStore } from '@/store/auth-store'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
@@ -172,6 +172,25 @@ export function Sidebar({ onClose, isMobile }: SidebarProps) {
                     {stats?.overview && 'pendingRequests' in stats.overview && stats.overview.pendingRequests > 0 && (
                       <Badge variant="destructive" className="ml-auto">
                         {stats.overview.pendingRequests}
+                      </Badge>
+                    )}
+                  </Link>
+                </Button>
+                <Button
+                  variant={pathname === '/dashboard/admin/deletions' ? 'secondary' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start',
+                    pathname === '/dashboard/admin/deletions' && 'bg-secondary font-semibold'
+                  )}
+                  asChild
+                  onClick={isMobile ? onClose : undefined}
+                >
+                  <Link href="/dashboard/admin/deletions" className="flex items-center w-full">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <span className="flex-1">Suppressions</span>
+                    {stats?.overview && 'pendingDeletions' in stats.overview && (stats.overview as any).pendingDeletions > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {(stats.overview as any).pendingDeletions}
                       </Badge>
                     )}
                   </Link>

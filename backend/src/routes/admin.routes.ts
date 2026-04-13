@@ -161,6 +161,136 @@ router.post('/access-requests/:id/reject', async (req, res) => {
   }
 })
 
+// ==================== DEMANDES DE SUPPRESSION ====================
+
+// GET /api/admin/deletion-requests - Liste des demandes de suppression
+router.get('/deletion-requests', async (req, res) => {
+  try {
+    const { status = 'pending' } = req.query
+
+    let query = supabase
+      .from('deletion_requests')
+      .select(`
+        *,
+        users!deletion_requests_user_id_fkey(
+          id, first_name, last_name, email,
+          schools(id, name_fr, acronym)
+        )
+      `)
+      .order('created_at', { ascending: false })
+
+    if (status !== 'all') {
+      query = query.eq('status', status as string)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+
+    return res.json(data || [])
+  } catch (error) {
+    console.error('Error fetching deletion requests:', error)
+    return res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+// POST /api/admin/deletion-requests/:id/approve - Approuver (supprimer le compte)
+router.post('/deletion-requests/:id/approve', async (req, res) => {
+  try {
+    const { id } = req.params
+    const adminUser = req.user
+
+    // Récupérer la demande
+    const { data: request, error: fetchError } = await supabase
+      .from('deletion_requests')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (fetchError || !request) {
+      return res.status(404).json({ error: 'Demande non trouvée' })
+    }
+
+    if (request.status !== 'pending') {
+      return res.status(400).json({ error: 'Cette demande a déjà été traitée' })
+    }
+
+    // Récupérer le rôle de l'utilisateur cible
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', request.user_id)
+      .single()
+
+    if (targetUser?.role === 'admin') {
+      return res.status(403).json({
+        error: "Impossible de supprimer un administrateur via ce flux. Retirez-lui d'abord le rôle admin.",
+      })
+    }
+
+    // Marquer la demande comme approuvée
+    const { error: updateError } = await supabase
+      .from('deletion_requests')
+      .update({
+        status: 'approved',
+        processed_at: new Date().toISOString(),
+        processed_by_admin_id: adminUser.id,
+      })
+      .eq('id', id)
+
+    if (updateError) throw updateError
+
+    // Supprimer de auth.users (Supabase Admin)
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(request.user_id)
+    if (authError && authError.message !== 'User not found') {
+      console.error('Auth deletion error (non-blocking):', authError)
+    }
+
+    // Supprimer de public.users (CASCADE supprime les codes, deletion_requests, etc.)
+    const { error: deleteError } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', request.user_id)
+
+    if (deleteError) throw deleteError
+
+    return res.json({ success: true, message: 'Compte supprimé avec succès' })
+  } catch (error) {
+    console.error('Error approving deletion request:', error)
+    return res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+// POST /api/admin/deletion-requests/:id/reject - Rejeter (conserver le compte)
+router.post('/deletion-requests/:id/reject', async (req, res) => {
+  try {
+    const { id } = req.params
+    const adminUser = req.user
+
+    const { data, error } = await supabase
+      .from('deletion_requests')
+      .update({
+        status: 'rejected',
+        processed_at: new Date().toISOString(),
+        processed_by_admin_id: adminUser.id,
+      })
+      .eq('id', id)
+      .eq('status', 'pending')
+      .select()
+      .single()
+
+    if (error) throw error
+
+    if (!data) {
+      return res.status(404).json({ error: 'Demande non trouvée ou déjà traitée' })
+    }
+
+    return res.json({ success: true, message: 'Demande rejetée, compte conservé' })
+  } catch (error) {
+    console.error('Error rejecting deletion request:', error)
+    return res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
 // GET /api/admin/users - Liste tous les utilisateurs avec recherche et filtres
 router.get('/users', async (req, res) => {
   try {

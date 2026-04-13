@@ -12,17 +12,7 @@ import {
 import { X } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import type { DirectoryFilters } from '@/types/directory'
-
-const countryFlags: Record<string, string> = {
-  'Bénin': '🇧🇯',
-  'Burkina Faso': '🇧🇫',
-  'Côte d\'Ivoire': '🇨🇮',
-  'Gabon': '🇬🇦',
-  'Mali': '🇲🇱',
-  'Niger': '🇳🇪',
-  'Sénégal': '🇸🇳',
-  'Togo': '🇹🇬',
-}
+import { COUNTRY_FLAGS } from '@/lib/countries'
 
 interface FiltersProps {
   filters: DirectoryFilters
@@ -32,7 +22,7 @@ interface FiltersProps {
 
 export function Filters({ filters, onFilterChange, onClearFilters }: FiltersProps) {
   const hasActiveFilters = 
-    filters.school_id || filters.entry_year || filters.country
+    filters.school_id || filters.entry_year || filters.country || filters.city
 
   // Charger les écoles
   const { data: schoolsData } = useQuery({
@@ -52,9 +42,16 @@ export function Filters({ filters, onFilterChange, onClearFilters }: FiltersProp
     queryFn: () => apiClient.getFilterCountries(),
   })
 
+  // Charger les villes
+  const { data: citiesData } = useQuery({
+    queryKey: ['filter-cities'],
+    queryFn: () => apiClient.getFilterCities(),
+  })
+
   const schools = schoolsData?.schools || []
   const years = yearsData?.years || []
   const countries = countriesData?.countries || []
+  const cities = citiesData?.cities || []
 
   return (
     <div className="flex flex-wrap gap-4 items-center">
@@ -110,7 +107,7 @@ export function Filters({ filters, onFilterChange, onClearFilters }: FiltersProp
         <SelectTrigger className="w-[200px]">
           <SelectValue>
             {filters.country && filters.country !== 'all' 
-              ? `${countryFlags[filters.country] || ''} ${filters.country}`
+              ? `${COUNTRY_FLAGS[filters.country] || ''} ${filters.country}`
               : 'Tous les pays'
             }
           </SelectValue>
@@ -119,7 +116,27 @@ export function Filters({ filters, onFilterChange, onClearFilters }: FiltersProp
           <SelectItem value="all">Tous les pays</SelectItem>
           {countries.map((country: string) => (
             <SelectItem key={country} value={country}>
-              {countryFlags[country] || ''} {country}
+              {COUNTRY_FLAGS[country] || ''} {country}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Ville */}
+      <Select
+        value={filters.city || 'all'}
+        onValueChange={(value) =>
+          onFilterChange('city', value === 'all' ? null : value)
+        }
+      >
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="Toutes les villes" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Toutes les villes</SelectItem>
+          {cities.map((city: string) => (
+            <SelectItem key={city} value={city}>
+              {city}
             </SelectItem>
           ))}
         </SelectContent>

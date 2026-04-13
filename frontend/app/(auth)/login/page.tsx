@@ -157,6 +157,16 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="h-auto p-0 text-sm text-muted-foreground"
+                  onClick={() => router.push('/forgot-password')}
+                >
+                  Mot de passe oublié ?
+                </Button>
+              </div>
               <Button
                 type="submit"
                 className="w-full"

@@ -155,6 +155,54 @@ export class UsersController {
     }
   }
 
+  /**
+   * Crée une demande de suppression de compte pour l'utilisateur connecté
+   */
+  async requestAccountDeletion(req: Request, res: Response) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Non authentifié' })
+      }
+
+      const { reason } = req.body
+
+      // Vérifier qu'il n'y a pas déjà une demande en attente
+      const { data: existing } = await supabase
+        .from('deletion_requests')
+        .select('id')
+        .eq('user_id', req.user.id)
+        .eq('status', 'pending')
+        .maybeSingle()
+
+      if (existing) {
+        return res.status(409).json({
+          error: 'Une demande de suppression est déjà en cours de traitement',
+        })
+      }
+
+      const { error: insertError } = await supabase
+        .from('deletion_requests')
+        .insert({
+          user_id: req.user.id,
+          reason: reason || null,
+          status: 'pending',
+        })
+
+      if (insertError) throw insertError
+
+      logger.info('Account deletion requested:', { user_id: req.user.id })
+
+      return res.json({
+        success: true,
+        message:
+          'Votre demande de suppression a été transmise aux administrateurs.',
+      })
+    } catch (error: any) {
+      logger.error('Error in requestAccountDeletion:', error)
+      return res.status(500).json({ error: error.message })
+    }
+  }
+
   async getFilterSchools(req: Request, res: Response) {
     try {
       const { data, error } = await supabase
@@ -218,6 +266,47 @@ export class UsersController {
       return res.json({ countries: uniqueCountries })
     } catch (error: any) {
       logger.error('Error fetching countries:', error)
+      return res.status(500).json({ error: 'Erreur serveur' })
+    }
+  }
+
+  async getFilterCities(req: Request, res: Response) {
+    try {
+      // Récupérer toutes les villes distinctes des utilisateurs actifs
+      // qui ont autorisé la visibilité de leur localisation
+      // Utiliser une requête SQL directe pour meilleure performance
+      const { data: users, error } = await supabase
+        .from('users')
+        .select(`
+          current_city,
+          user_privacy_settings!inner (
+            show_current_location
+          )
+        `)
+        .eq('is_active', true)
+        .not('current_city', 'is', null)
+        .neq('current_city', '')
+
+      if (error) throw error
+
+      // Filtrer uniquement les utilisateurs avec show_current_location: true
+      // Note: Supabase ne permet pas facilement de filtrer directement sur une relation imbriquée
+      // donc on filtre après le fetch
+      const citiesWithPrivacy = (users || []).filter((u: any) => {
+        const privacy = Array.isArray(u.user_privacy_settings) 
+          ? u.user_privacy_settings[0] 
+          : u.user_privacy_settings
+        return privacy?.show_current_location === true
+      })
+
+      // Extraire les villes uniques et les trier
+      const uniqueCities = [...new Set(citiesWithPrivacy.map((u: any) => u.current_city))]
+        .filter(Boolean)
+        .sort()
+
+      return res.json({ cities: uniqueCities })
+    } catch (error: any) {
+      logger.error('Error fetching cities:', error)
       return res.status(500).json({ error: 'Erreur serveur' })
     }
   }

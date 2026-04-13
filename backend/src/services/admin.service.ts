@@ -41,6 +41,12 @@ export class AdminService {
       .from('access_requests')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending')
+
+    // Demandes de suppression en attente
+    const { count: pendingDeletionsCount } = await supabase
+      .from('deletion_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'pending')
     
     const { count: totalRequestsCount } = await supabase
       .from('access_requests')
@@ -92,6 +98,7 @@ export class AdminService {
         pendingRequests: pendingRequestsCount || 0,
         totalRequests: totalRequestsCount || 0,
         approvedRequests: approvedRequestsCount || 0,
+        pendingDeletions: pendingDeletionsCount || 0,
       },
       roles,
       schools: topSchools,
