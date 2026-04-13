@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { FilePond, registerPlugin } from 'react-filepond'
+import { FilePond as FilePondBase, registerPlugin } from 'react-filepond'
+
+// Cast pour éviter les erreurs de types sur les props de plugins non déclarés
+const FilePond = FilePondBase as any
 import 'filepond/dist/filepond.min.css'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
@@ -25,7 +28,7 @@ interface AvatarUploadProps {
 export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
   const { user, setUser } = useAuthStore()
   const [isDeleting, setIsDeleting] = useState(false)
-  const pondRef = useRef<FilePond>(null)
+  const pondRef = useRef<FilePondBase>(null)
   const lastAvatarUrlRef = useRef<string | null | undefined>(undefined)
   const isValidatingRef = useRef(false) // Flag pour éviter les validations multiples simultanées
   const invalidUrlsRef = useRef<Set<string>>(new Set()) // Set pour tracker les URLs invalides
@@ -200,11 +203,11 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
   const handleFileProcess = async (
     _fieldName: string,
     file: File,
-    metadata: any,
+    _metadata: any,
     load: (value: string) => void,
     error: (message: string) => void,
     progress: (isLengthComputable: boolean, loaded: number, total: number) => void,
-    abort: () => void
+    _abort: () => void
   ) => {
     if (!user?.id) {
       error('Utilisateur non connecté')
@@ -325,7 +328,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
 
   // Fonction appelée quand l'utilisateur supprime via le bouton X de FilePond
   const handleFileRemoveFromPond = async (
-    uniqueFileId: string,
+    _uniqueFileId: string,
     load: () => void,
     error: (message: string) => void
   ) => {
@@ -411,7 +414,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
   }
 
   // Gérer la suppression d'un fichier
-  const handleRemoveFile = (error: any, file: any) => {
+  const handleRemoveFile = (error: any, _file: any) => {
     // Ne logger que les vraies erreurs (avec un message)
     if (error && error.message) {
       console.error('Error removing file:', error)
@@ -486,29 +489,10 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
           onupdatefiles={handleUpdateFiles}
           onaddfile={handleAddFile}
           onremovefile={handleRemoveFile}
-          onerror={(file, error) => {
+          onerror={(error: any, file: any) => {
             // Si erreur de chargement d'image locale (400, 404, etc.), gérer l'erreur
-            if (file && file.options && file.options.type === 'local') {
+            if (file && (file as any).options && (file as any).options.type === 'local') {
               handleFileLoadError(file, error)
-            }
-          }}
-          onloadfile={(file, error) => {
-            // Intercepter le chargement de fichier pour vérifier si l'URL est invalide
-            if (file && file.source) {
-              const baseUrl = file.source.split('?')[0]
-              if (invalidUrlsRef.current.has(baseUrl)) {
-                console.log('[DEBUG] Preventing load of invalid URL', {baseUrl, fileSource: file.source})
-                // Empêcher FilePond de charger cette image
-                if (pondRef.current) {
-                  try {
-                    pondRef.current.removeFile(file)
-                  } catch (e) {
-                    // Ignorer les erreurs
-                  }
-                }
-                setFiles([])
-                return
-              }
             }
           }}
           allowMultiple={false}
@@ -519,8 +503,8 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
           allowRevert={false}
           allowDrop={true}
           server={{
-            process: handleFileProcess,
-            remove: handleFileRemoveFromPond,
+            process: handleFileProcess as any,
+            remove: handleFileRemoveFromPond as any,
           }}
           name="avatar"
           labelIdle='Glissez-déposez votre photo ou <span class="filepond--label-action">parcourir</span>'
