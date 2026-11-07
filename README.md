@@ -38,30 +38,53 @@ AET-Connect/
 ### Prérequis
 
 - Node.js 20+
-- npm ou yarn
-- Compte Supabase (pour la base de données)
+- Docker (pour la base Supabase locale)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) et [Doppler CLI](https://docs.doppler.com/docs/install-cli), connectés à leurs comptes (`supabase login`, `doppler login`)
 
-### Backend
+### Variables d'environnement : Doppler
+
+Aucun fichier `.env` : toutes les variables viennent du projet Doppler `aet-connect`.
+
+| Config | Usage |
+|---|---|
+| `dev` → `dev_backend`, `dev_frontend` | Développement local, base Supabase locale |
+| `prd` → `prd_backend` | Production backend, synchronisée vers Railway |
+| `prd` → `prd_frontend` | Production frontend, synchronisée vers Vercel |
+| `prd_ops` | Mot de passe Postgres, pour les commandes `supabase db …` |
+
+Les branches héritent des valeurs communes de leur racine (URL Supabase, clé anon). Une seule fois, à la racine du dépôt :
 
 ```bash
-cd backend
-npm install
-cp .env.example .env.local  # Configurer les variables d'environnement
-npm run dev                 # Démarrer en mode développement
+doppler setup --no-interactive   # lit doppler.yaml : backend/ → dev_backend, frontend/ → dev_frontend
 ```
 
-**Backend disponible sur :** http://localhost:3001
-
-### Frontend
+### Base de données locale
 
 ```bash
-cd frontend
-npm install
-cp .env.example .env.local  # Configurer NEXT_PUBLIC_API_URL
-npm run dev                 # Démarrer en mode développement
+supabase start      # démarre Supabase en local et applique supabase/migrations + supabase/seed.sql
+supabase db reset   # repart d'une base propre
 ```
 
-**Frontend disponible sur :** http://localhost:3000
+Le seed contient les 9 écoles réelles et des membres **fictifs** (mot de passe `Motdepasse123!`) :
+`admin@aetconnect.test`, `ambassadeur@aetconnect.test`, `alumni.pmb@aetconnect.test`, `alumni.cachee@aetconnect.test`,
+ainsi que des codes d'invitation dans tous les états (`USER-NEUF05`, `USER-UTIL05`, `USER-EXPI05`, `USER-REVO05`, `ADMIN-TOUS`).
+
+### Lancer les applis
+
+```bash
+cd backend && npm install && npm run dev     # http://localhost:3001 (doppler run inclus)
+cd frontend && npm install && npm run dev    # http://localhost:3000 (doppler run inclus)
+```
+
+### Modifier le schéma
+
+Toujours par migration, jamais par script :
+
+```bash
+supabase migration new <nom>                                          # écrire le SQL
+supabase db reset                                                     # tester en local
+doppler run -c prd_ops -- supabase db push --linked                   # appliquer en production
+```
 
 ---
 
@@ -180,11 +203,13 @@ Toute la documentation est disponible dans le dossier [`documentation/`](./docum
 
 ### Backend
 
+Les tests tournent **uniquement contre la base locale** : `tests/assert-local.ts` refuse de démarrer si l'URL Supabase n'est pas `localhost`. Il faut lancer `supabase start` et le backend (`npm run dev`) avant.
+
 ```bash
 cd backend
 
-# Tous les tests E2E
-npm test
+# Tous les tests E2E (Doppler injecte la config dev_backend)
+doppler run -- npm test
 
 # Tests par module
 npm run test:e2e:registration
@@ -214,16 +239,15 @@ npm run lint
 ```bash
 cd backend
 
-# Setup
-npm run setup:test-users          # Créer utilisateurs de test
-npm run admin:create-code         # Créer code admin universel
+# En local (config dev_backend par défaut)
+doppler run -- npm run admin:create-code     # Créer un code admin universel
+doppler run -- npm run admin:list-codes      # Lister les codes admin
 
-# Migrations DB
-npm run migrate:entry-year        # Migration format entry_year
-npm run db:add-max-codes          # Ajouter colonne max_codes
-npm run db:create-events         # Créer tables événements
-npm run db:add-user-privacy       # Ajouter privacy settings
+# Contre la production : choisir la config explicitement
+doppler run -c prd_backend -- npm run admin:list-codes
 ```
+
+Le schéma ne se modifie plus par script : voir « Modifier le schéma » plus haut.
 
 Voir [`documentation/scripts/`](./documentation/scripts/) pour la liste complète.
 

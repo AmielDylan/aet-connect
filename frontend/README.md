@@ -43,20 +43,11 @@ cd AET-Connect/frontend
 
 # Installer les dépendances
 npm install
-
-# Créer le fichier d'environnement
-cp .env.example .env.local
-
-# Éditer .env.local avec vos variables
 ```
 
 ### Variables d'environnement
 
-Créer `.env.local` avec :
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
+Aucun fichier `.env` : les variables viennent de Doppler (config `dev_frontend`, qui hérite de `dev`) et `npm run dev` lance `doppler run` tout seul. Voir la section « Démarrage rapide » du [README racine](../README.md).
 
 ---
 
@@ -289,7 +280,7 @@ npm i -g vercel
 vercel
 
 # Configurer les variables d'environnement
-vercel env add NEXT_PUBLIC_API_URL
+# Les variables Vercel sont synchronisées depuis Doppler (config prd_frontend), voir DEPLOYMENT.md
 ```
 
 ### Docker

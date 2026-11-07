@@ -1,8 +1,5 @@
-import { config } from 'dotenv'
-import { resolve } from 'path'
 
-// Charger les variables d'environnement AVANT d'importer database
-config({ path: resolve(process.cwd(), '.env.local') })
+// Variables d'environnement injectées par Doppler (doppler run -- …)
 
 import { supabase } from '../src/config/database.js'
 import { RegistrationService } from '../src/services/registration.service.js'

@@ -25,26 +25,9 @@ Ce guide explique comment déployer AET Connect sur Railway (backend) et Vercel 
 
 ### 2. Configurer les variables d'environnement
 
-Dans Railway, allez dans **Variables** et ajoutez :
+Les variables ne se saisissent pas dans Railway : elles viennent de la config Doppler **`prd_backend`** (projet `aet-connect`), via l'intégration Doppler → Railway (dashboard Doppler, *Integrations → Railway*, service `AET-Connect`, environnement `production`).
 
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-anon-key
-SUPABASE_SERVICE_ROLE_KEY=votre-service-role-key
-
-# JWT
-JWT_SECRET=votre-secret-jwt-securise
-
-# Frontend URL (URL de votre frontend Vercel)
-FRONTEND_URL=https://aet-connect.vercel.app
-
-# Port (Railway gère automatiquement)
-PORT=3001
-
-# Environment
-NODE_ENV=production
-```
+Variables attendues : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (héritées de `prd`), `SUPABASE_SERVICE_ROLE_KEY`, `FRONTEND_URL`, `JWT_SECRET`, `RESEND_API_KEY`. Railway fournit `PORT`.
 
 ### 3. Déploiement
 
@@ -71,16 +54,9 @@ Le backend sera disponible sur une URL comme : `https://aet-connect-production.u
 
 ### 2. Configurer les variables d'environnement
 
-Dans Vercel, allez dans **Settings > Environment Variables** et ajoutez :
+Les variables ne se saisissent pas dans Vercel : elles viennent de la config Doppler **`prd_frontend`**, via l'intégration Doppler → Vercel (dashboard Doppler, *Integrations → Vercel*, environnement *Production*).
 
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-anon-key
-
-# Backend API URL (URL Railway du backend)
-NEXT_PUBLIC_API_URL=https://aet-connect-production.up.railway.app
-```
+Variables attendues : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (héritées de `prd`), `NEXT_PUBLIC_API_URL`. La clé `service_role` n'arrive jamais sur Vercel.
 
 ⚠️ **IMPORTANT** : `NEXT_PUBLIC_API_URL` doit pointer vers l'URL Railway de votre backend, **sans** le préfixe `/api`.
 

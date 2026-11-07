@@ -57,3 +57,7 @@ coverage/
 # Scripts temporaires
 *.sh.bak
 *.sh~
+
+# Supabase CLI (local)
+supabase/.branches/
+supabase/.temp/

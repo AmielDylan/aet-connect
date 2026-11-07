@@ -26,21 +26,12 @@ npm install
 
 ### 2. Configuration
 
-Créer `.env.local` :
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-PORT=3001
-NODE_ENV=development
-JWT_SECRET=your-secret-key
-```
+Aucun fichier `.env` : les variables viennent de Doppler (config `dev_backend`). Voir la section « Démarrage rapide » du [README racine](../README.md) (`doppler setup`, `supabase start`).
 
 ### 3. Test connexion base de données
 
 ```bash
-npm run db:test
+doppler run -- npm run db:test
 ```
 
 ### 4. Démarrer le serveur

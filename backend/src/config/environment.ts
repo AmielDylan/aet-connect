@@ -1,12 +1,6 @@
-import dotenv from 'dotenv'
-import path from 'path'
-
-// Charger d'abord .env.shared depuis la racine du projet (variables partagées)
-const rootDir = path.resolve(process.cwd(), '..')
-dotenv.config({ path: path.resolve(rootDir, '.env.shared') })
-
-// Puis charger .env.local du backend (peut surcharger les variables partagées)
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
+// Les variables viennent de Doppler, jamais d'un fichier .env :
+//   - en local : `doppler run -- …` (config dev_backend, voir doppler.yaml)
+//   - en prod  : intégration Doppler → Railway (config prd_backend)
 
 export const config = {
   port: parseInt(process.env.PORT || '3001'),
@@ -40,7 +34,7 @@ export function validateConfig() {
   if (missing.length > 0) {
     console.error('❌ Missing required environment variables:')
     missing.forEach(key => console.error(`   - ${key}`))
-    console.error('\n💡 Copy .env.example to .env.local and fill in your values')
+    console.error('\n💡 Lancez le backend via Doppler : `doppler run -- npm run dev` (voir README)')
     return false
   }
   

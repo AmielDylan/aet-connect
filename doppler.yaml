@@ -1,0 +1,15 @@
+# Doppler : une seule commande à la racine pour configurer les deux applis
+#   doppler setup --no-interactive
+#
+# Projet aet-connect, configs :
+#   dev  → base Supabase locale        prd  → production
+#   ├── dev_backend   (backend/)       ├── prd_backend   → Railway
+#   └── dev_frontend  (frontend/)      ├── prd_frontend  → Vercel
+#                                      └── prd_ops       → CLI Supabase (mot de passe Postgres)
+setup:
+  - project: aet-connect
+    config: dev_backend
+    path: backend/
+  - project: aet-connect
+    config: dev_frontend
+    path: frontend/

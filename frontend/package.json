@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "doppler run -- next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:api": "tsx tests/utils/test-api.ts"
+    "test:api": "doppler run -- tsx tests/utils/test-api.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
