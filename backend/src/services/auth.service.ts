@@ -1,4 +1,4 @@
-import { supabase } from '@/config/database'
+import { supabase, createCredentialsClient } from '@/config/database'
 // bcrypt supprimé - plus nécessaire avec Supabase Auth
 import { JWTUtils } from '@/utils/jwt'
 import { LoginResponse } from '@/models/auth.model'
@@ -10,7 +10,7 @@ export class AuthService {
   // Cette fonction n'est plus utilisée mais conservée pour compatibilité
   async login(email: string, password: string): Promise<LoginResponse> {
     // Utiliser Supabase Auth pour vérifier les identifiants
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await createCredentialsClient().auth.signInWithPassword({
       email,
       password,
     })
@@ -148,32 +148,19 @@ export class AuthService {
         )
       }
 
-      // 3. Vérifier l'ancien mot de passe en tentant une connexion
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      // 3. Vérifier l'ancien mot de passe sur un client jetable
+      //    (jamais sur le client service_role partagé, voir createCredentialsClient)
+      const { data: signInData, error: signInError } = await createCredentialsClient().auth.signInWithPassword({
         email: user.email,
         password: oldPassword,
       })
 
-      if (signInError || !signInData.user || !signInData.session) {
+      if (signInError || !signInData.user || signInData.user.id !== userId) {
         throw new Error('Ancien mot de passe incorrect')
       }
 
-      // 4. Mettre à jour le mot de passe avec la session créée
-      // Créer un nouveau client avec la session pour pouvoir utiliser updateUser()
-      // Note: updateUser() nécessite une session utilisateur active
-      const { createClient } = await import('@supabase/supabase-js')
-      const { config } = await import('@/config/environment')
-      
-      // Créer un client temporaire avec la session utilisateur
-      const userClient = createClient(config.supabase.url, config.supabase.anonKey, {
-        global: {
-          headers: {
-            Authorization: `Bearer ${signInData.session.access_token}`,
-          },
-        },
-      })
-
-      const { error: updateError } = await userClient.auth.updateUser({
+      // 4. Mettre à jour le mot de passe via l'API admin (client service_role)
+      const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
         password: newPassword,
       })
 
