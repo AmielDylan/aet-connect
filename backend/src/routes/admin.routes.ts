@@ -5,12 +5,12 @@ import { validateRequest } from '@/middleware/validation.middleware'
 import { 
   UpdateUserSchema, 
   IncreaseCodeLimitSchema, 
-  SetAmbassadorSchema,
   AccessRequestFiltersSchema,
   UserFiltersSchema,
   UpdateEventSchema
 } from '@/utils/validations'
 import { supabase } from '@/config/database'
+import { invitations, defaultQuota, sendInvitationError } from '@/invitations'
 import { createClient } from '@supabase/supabase-js'
 import { config } from '@/config/environment'
 
@@ -65,67 +65,27 @@ router.get('/access-requests', async (req, res) => {
 })
 
 // POST /api/admin/access-requests/:id/approve - Approuver
+// Émet un code pour la promo de la demande et le transmet au demandeur
+// (delivery.sent=false : l'admin envoie lui-même delivery.text).
 router.post('/access-requests/:id/approve', async (req, res) => {
   try {
-    const { id } = req.params
-    const adminUser = req.user
-    
-    // Récupérer la demande
-    const { data: request, error: fetchError } = await supabase
-      .from('access_requests')
-      .select('*')
-      .eq('id', id)
-      .single()
-    
-    if (fetchError || !request) {
-      return res.status(404).json({ error: 'Demande non trouvée' })
-    }
-    
-    if (request.status !== 'pending') {
-      return res.status(400).json({ error: 'Cette demande a déjà été traitée' })
-    }
-    
-    // Générer un code d'invitation
-    const code = Math.random().toString(36).substring(2, 10).toUpperCase()
-    
-    // Créer le code d'invitation dans la table
-    const { data: invitationCode, error: codeError } = await supabase
-      .from('invitation_codes')
-      .insert({
-        code,
-        created_by_user_id: adminUser.id,
-        school_id: request.school_id,
-        entry_year: request.entry_year,
-        max_uses: 1,
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 jours
-      })
-      .select()
-      .single()
-    
-    if (codeError) throw codeError
-    
-    // Mettre à jour la demande
-    const { error: updateError } = await supabase
-      .from('access_requests')
-      .update({
-        status: 'approved',
-        invitation_code_id: invitationCode.id,
-        processed_at: new Date().toISOString()
-      })
-      .eq('id', id)
-    
-    if (updateError) throw updateError
-    
-    // TODO: Envoyer email avec le code à request.email
-    
-    return res.json({ 
-      success: true, 
-      code,
-      email: request.email 
+    const issued = await invitations.issue(req.user.id, {
+      accessRequestId: req.params.id,
+      grantsAmbassador: req.body?.grants_ambassador === true
+    })
+    return res.json({
+      success: true,
+      code: issued.code,
+      expires_at: issued.expiresAt.toISOString(),
+      email: issued.delivery?.email.to,
+      delivery: issued.delivery && {
+        sent: issued.delivery.sent,
+        subject: issued.delivery.email.subject,
+        text: issued.delivery.email.text
+      }
     })
   } catch (error) {
-    console.error('Error approving request:', error)
-    return res.status(500).json({ error: 'Erreur serveur' })
+    return sendInvitationError(res, error, 'approveAccessRequest')
   }
 })
 
@@ -362,12 +322,6 @@ router.patch(
   adminController.updateUser.bind(adminController)
 )
 
-// POST /api/admin/users/:id/set-ambassador
-router.post(
-  '/users/:id/set-ambassador',
-  validateRequest(SetAmbassadorSchema),
-  adminController.setAmbassador.bind(adminController)
-)
 
 // PATCH /api/admin/users/:id/increase-code-limit
 router.patch(
@@ -423,13 +377,8 @@ router.patch('/users/:id/role', async (req, res) => {
     
     if (fetchError) throw fetchError
     
-    // Déterminer la limite selon le nouveau rôle et le statut ambassadeur
-    let max_codes_allowed = 3 // Par défaut : alumni normal
-    if (role === 'admin') {
-      max_codes_allowed = 999 // Admin : illimité
-    } else if (userData?.is_ambassador) {
-      max_codes_allowed = 15 // Ambassadeur : 15 codes
-    }
+    // Quota par défaut du module Code d'invitation (admin : illimité, stocké 999)
+    const max_codes_allowed = defaultQuota({ role, isAmbassador: !!userData?.is_ambassador }) ?? 999
     
     const { data, error } = await supabase
       .from('users')
@@ -465,13 +414,8 @@ router.patch('/users/:id/ambassador', async (req, res) => {
     
     if (fetchError) throw fetchError
     
-    // Déterminer la limite selon le rôle et le statut ambassadeur
-    let max_codes_allowed = 3 // Par défaut : alumni normal
-    if (userData?.role === 'admin') {
-      max_codes_allowed = 999 // Admin : illimité
-    } else if (is_ambassador) {
-      max_codes_allowed = 15 // Ambassadeur : 15 codes
-    }
+    // Quota par défaut du module Code d'invitation (admin : illimité, stocké 999)
+    const max_codes_allowed = defaultQuota({ role: userData?.role, isAmbassador: !!is_ambassador }) ?? 999
     
     const { data, error } = await supabase
       .from('users')

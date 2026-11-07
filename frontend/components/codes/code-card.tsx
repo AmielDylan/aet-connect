@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Calendar, Users, Trash2 } from 'lucide-react'
+import { Calendar, Users, Ban } from 'lucide-react'
 import type { InvitationCode } from '@/types'
 
 interface CodeCardProps {
@@ -32,9 +32,11 @@ export function CodeCard({ code, schoolName, entryYear }: CodeCardProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const usagePercentage = (code.current_uses / code.max_uses) * 100
-  const isExpired = code.expires_at && new Date(code.expires_at) < new Date()
-  const isFullyUsed = code.current_uses >= code.max_uses
-  const isRevoked = !code.is_active
+  // Statut calculé par le backend : seule source de vérité
+  const isExpired = code.status === 'expired'
+  const isFullyUsed = code.status === 'exhausted'
+  const isRevoked = code.status === 'revoked'
+  const canRevoke = code.status === 'valid' && code.current_uses === 0
 
   const deleteMutation = useMutation({
     mutationFn: () => {
@@ -45,15 +47,15 @@ export function CodeCard({ code, schoolName, entryYear }: CodeCardProps) {
     },
     onSuccess: () => {
       toast({
-        title: 'Code supprimé',
-        description: 'Le code a été supprimé avec succès',
+        title: 'Code révoqué',
+        description: 'Il ne peut plus servir, et votre invitation est de nouveau disponible',
       })
       queryClient.invalidateQueries({ queryKey: ['my-codes'] })
     },
     onError: () => {
       toast({
         title: 'Erreur',
-        description: 'Impossible de supprimer le code',
+        description: 'Impossible de révoquer le code',
         variant: 'destructive',
       })
     },
@@ -80,7 +82,7 @@ export function CodeCard({ code, schoolName, entryYear }: CodeCardProps) {
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <code className="text-lg font-mono font-bold">
+                <code className="text-lg font-mono font-bold whitespace-nowrap">
                   {code.code}
                 </code>
                 {getStatusBadge()}
@@ -98,19 +100,20 @@ export function CodeCard({ code, schoolName, entryYear }: CodeCardProps) {
                 />
               )}
               
-              {/* Bouton supprimer */}
+              {/* Révoquer : seulement un code encore valable et jamais utilisé */}
+              {canRevoke && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="outline" size="sm" aria-label="Révoquer ce code">
+                    <Ban className="h-4 w-4" />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Supprimer ce code ?</AlertDialogTitle>
+                    <AlertDialogTitle>Révoquer ce code ?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Cette action est irréversible. Le code <strong>{code.code}</strong> sera
-                      définitivement supprimé.
+                      Le code <strong>{code.code}</strong> ne pourra plus servir à s&apos;inscrire.
+                      Votre invitation redevient disponible pour un autre code.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -119,11 +122,12 @@ export function CodeCard({ code, schoolName, entryYear }: CodeCardProps) {
                       onClick={() => deleteMutation.mutate()}
                       className="bg-red-600 text-white hover:bg-red-700"
                     >
-                      Supprimer
+                      Révoquer
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              )}
             </div>
           </div>
 

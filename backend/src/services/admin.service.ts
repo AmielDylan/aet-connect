@@ -1,5 +1,5 @@
 import { supabase } from '@/config/database'
-import { AdminStats, AccessRequestFilters, UserFilters, UpdateUserRequest, IncreaseCodeLimitRequest, SetAmbassadorRequest } from '@/models/admin.model'
+import { AdminStats, AccessRequestFilters, UserFilters, UpdateUserRequest, IncreaseCodeLimitRequest } from '@/models/admin.model'
 // bcrypt supprimé - plus nécessaire avec Supabase Auth
 
 export class AdminService {
@@ -163,90 +163,6 @@ export class AdminService {
     return data || []
   }
   
-  // Approuver demande d'accès
-  async approveAccessRequest(request_id: string) {
-    // Récupérer la demande
-    const { data: request, error: fetchError } = await supabase
-      .from('access_requests')
-      .select('*')
-      .eq('id', request_id)
-      .single()
-    
-    if (fetchError || !request) {
-      throw new Error('Demande non trouvée')
-    }
-    
-    if (request.status !== 'pending') {
-      throw new Error('Cette demande a déjà été traitée')
-    }
-    
-    // Vérifier si l'utilisateur existe déjà
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', request.email)
-      .single()
-    
-    if (existingUser) {
-      throw new Error('Un utilisateur avec cet email existe déjà')
-    }
-    
-    // Créer l'utilisateur avec signUp standard (PAS d'API Admin)
-    const tempPassword = this.generateTempPassword()
-    const maxCodesAllowed = request.wants_ambassador ? 20 : 3
-    
-    // Créer l'utilisateur dans Supabase Auth (le trigger créera l'entrée dans public.users)
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: request.email,
-      password: tempPassword,
-      options: {
-        data: {
-          first_name: request.first_name,
-          last_name: request.last_name,
-          school_id: request.school_id,
-          entry_year: request.entry_year,
-          role: 'alumni',
-          is_ambassador: request.wants_ambassador,
-          is_active: true,
-          max_codes_allowed: maxCodesAllowed,
-        },
-        emailRedirectTo: undefined, // Pas de redirection email nécessaire
-      },
-    })
-    
-    if (authError || !authData.user) {
-      throw new Error(authError?.message || 'Erreur lors de la création du compte')
-    }
-
-    // Le trigger SQL handle_new_user() créera automatiquement l'entrée dans public.users
-    // Attendre un peu que le trigger s'exécute, puis récupérer l'utilisateur créé
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', authData.user.id)
-      .single()
-    
-    if (userError || !user) {
-      throw new Error('Erreur lors de la création de l\'utilisateur dans public.users')
-    }
-    
-    // Mettre à jour la demande
-    const { error: updateError } = await supabase
-      .from('access_requests')
-      .update({
-        status: 'approved',
-        processed_at: new Date().toISOString()
-      })
-      .eq('id', request_id)
-    
-    if (updateError) throw updateError
-    
-    // TODO: Envoyer email avec mot de passe temporaire
-    
-    return { user, temp_password: tempPassword }
-  }
   
   // Rejeter demande d'accès
   async rejectAccessRequest(request_id: string) {
@@ -342,25 +258,6 @@ export class AdminService {
     return user
   }
   
-  // Désigner/retirer ambassadeur
-  async setAmbassador(user_id: string, data: SetAmbassadorRequest) {
-    const max_codes_allowed = data.is_ambassador ? 20 : 3
-    
-    const { data: user, error } = await supabase
-      .from('users')
-      .update({
-        is_ambassador: data.is_ambassador,
-        max_codes_allowed,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user_id)
-      .select()
-      .single()
-    
-    if (error) throw error
-    
-    return user
-  }
   
   // Augmenter limite codes
   async increaseCodeLimit(user_id: string, data: IncreaseCodeLimitRequest) {
@@ -379,15 +276,6 @@ export class AdminService {
     return user
   }
   
-  // Générer mot de passe temporaire
-  private generateTempPassword(): string {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
-    let password = ''
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return password + '!'
-  }
   
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // GESTION ÉVÉNEMENTS

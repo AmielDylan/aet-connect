@@ -26,20 +26,11 @@ export default function CodesPage() {
   const allCodes = data?.codes || []
   const history = historyData?.codes || []
   
-  // ✅ Séparer actifs et utilisés
-  const activeCodes = allCodes.filter((code: any) => code.current_uses === 0)
-  const usedCodesCount = allCodes.length - activeCodes.length
-  
-  const codesGenerated = allCodes.length
-  
-  // Calculer la limite effective selon le rôle et le statut ambassadeur
-  const getEffectiveLimit = () => {
-    if (user?.role === 'admin') return 999
-    if (user?.is_ambassador) return 15
-    return 3
-  }
-  
-  const effectiveLimit = getEffectiveLimit()
+  // Statut et quota calculés par le backend (module Code d'invitation)
+  const activeCodes = allCodes.filter((code) => code.status === 'valid')
+  const usedCodesCount = allCodes.filter((code) => code.status === 'exhausted').length
+  const quota = data?.quota
+  const isLimitReached = quota?.remaining === 0
 
   // Mapper les codes actifs pour extraire school_name et entry_year
   const mappedCodes = activeCodes.map((code: any) => {
@@ -64,9 +55,11 @@ export default function CodesPage() {
           <div>
             <h1 className="text-3xl font-bold">Mes codes d'invitation</h1>
             <p className="text-muted-foreground">
-              {effectiveLimit === 999 
-                ? `${codesGenerated} code${codesGenerated > 1 ? 's' : ''} généré${codesGenerated > 1 ? 's' : ''}`
-                : `${codesGenerated} / ${effectiveLimit} codes générés`
+              {!quota
+                ? ''
+                : quota.limit === null
+                  ? `${allCodes.length} code${allCodes.length > 1 ? 's' : ''} émis`
+                  : `${quota.remaining} invitation${(quota.remaining ?? 0) > 1 ? 's' : ''} disponible${(quota.remaining ?? 0) > 1 ? 's' : ''} sur ${quota.limit}`
               }
             </p>
           </div>
@@ -79,18 +72,20 @@ export default function CodesPage() {
           <AlertTitle>Comment ça marche ?</AlertTitle>
           <AlertDescription>
             Générez des codes pour inviter des membres de votre école et promotion.
-            Chaque code peut être utilisé 1 fois (inscription unique). 
+            Chaque code sert à une seule inscription et reste valable 30 jours.
+            Un code expiré ou révoqué sans avoir servi vous rend sa place.
             Partagez-les par email, WhatsApp ou SMS.
           </AlertDescription>
         </Alert>
 
         {/* Limite atteinte */}
-        {codesGenerated >= effectiveLimit && effectiveLimit !== 999 && (
+        {isLimitReached && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Limite atteinte</AlertTitle>
             <AlertDescription>
-              Vous avez atteint votre limite de {effectiveLimit} code{effectiveLimit > 1 ? 's' : ''}.
+              Vos {quota?.limit} invitations sont en cours ou utilisées.
+              Révoquez un code non utilisé, ou attendez qu&apos;un code expire.
               {user?.role === 'alumni' && !user?.is_ambassador && (
                 <> Contactez un administrateur pour devenir ambassadeur et augmenter votre limite.</>
               )}

@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { registrationController } from '@/controllers/registration.controller'
 import { validateRequest } from '@/middleware/validation.middleware'
+import { invitationCodeLimiter } from '@/middleware/rate-limit.middleware'
 import {
   CheckSchoolPromoSchema,
   RequestInitialAccessSchema,
@@ -28,6 +29,7 @@ router.post(
 // POST /api/register/verify-invitation-code
 router.post(
   '/verify-invitation-code',
+  invitationCodeLimiter,
   validateRequest(VerifyInvitationCodeSchema),
   registrationController.verifyInvitationCode.bind(registrationController)
 )
@@ -35,6 +37,7 @@ router.post(
 // POST /api/register/complete-registration
 router.post(
   '/complete-registration',
+  invitationCodeLimiter,
   validateRequest(CompleteRegistrationSchema),
   registrationController.completeRegistration.bind(registrationController)
 )

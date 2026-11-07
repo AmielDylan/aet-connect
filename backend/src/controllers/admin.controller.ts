@@ -36,32 +36,6 @@ export class AdminController {
     }
   }
   
-  async approveAccessRequest(req: Request, res: Response) {
-    try {
-      const { id } = req.params
-      
-      const result = await adminService.approveAccessRequest(id)
-      
-      logger.info('Access request approved:', { request_id: id, user_id: result.user.id })
-      
-      res.json({
-        success: true,
-        user: result.user,
-        temp_password: result.temp_password,
-        message: 'Demande approuvée, utilisateur créé'
-      })
-    } catch (error: any) {
-      logger.error('Error in approveAccessRequest:', error)
-      
-      if (error.message.includes('non trouvée') || 
-          error.message.includes('déjà été traitée') ||
-          error.message.includes('existe déjà')) {
-        res.status(400).json({ error: error.message })
-      } else {
-        res.status(500).json({ error: error.message })
-      }
-    }
-  }
   
   async rejectAccessRequest(req: Request, res: Response) {
     try {
@@ -125,25 +99,6 @@ export class AdminController {
     }
   }
   
-  async setAmbassador(req: Request, res: Response) {
-    try {
-      const { id } = req.params
-      const data = req.body
-      
-      const user = await adminService.setAmbassador(id, data)
-      
-      logger.info('Ambassador status updated:', { user_id: id, is_ambassador: data.is_ambassador })
-      
-      res.json({
-        success: true,
-        user,
-        message: data.is_ambassador ? 'Ambassadeur désigné' : 'Statut ambassadeur retiré'
-      })
-    } catch (error: any) {
-      logger.error('Error in setAmbassador:', error)
-      res.status(500).json({ error: error.message })
-    }
-  }
   
   async increaseCodeLimit(req: Request, res: Response) {
     try {

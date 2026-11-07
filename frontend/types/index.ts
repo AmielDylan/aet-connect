@@ -329,19 +329,26 @@ export interface RequestInitialAccessRequest {
   wants_ambassador: boolean
 }
 
+// La promo vient du code : seul le code est envoyé
 export interface VerifyInvitationCodeRequest {
   code: string
-  school_id: string
-  entry_year: string
 }
+
+export type InvitationCodeStatus = 'valid' | 'revoked' | 'expired' | 'exhausted'
 
 export interface VerifyInvitationCodeResponse {
   valid: boolean
-  code_id?: string
   message: string
-  school_id?: string
-  entry_year?: string
-  school_name?: string
+  /** Si refusé */
+  reason?: 'unknown' | Exclude<InvitationCodeStatus, 'valid'>
+  /** Si valide */
+  code?: string
+  /** Code universel : la personne choisit sa promo */
+  universal?: boolean
+  school_id?: string | null
+  entry_year?: string | null
+  school_name?: string | null
+  grants_ambassador?: boolean
 }
 
 export interface CompleteRegistrationRequest {
@@ -350,6 +357,9 @@ export interface CompleteRegistrationRequest {
   last_name: string
   email: string
   password: string
+  /** Seulement pour un code universel */
+  school_id?: string
+  entry_year?: string
 }
 
 export interface CompleteRegistrationResponse {
@@ -388,17 +398,39 @@ export interface InvitationCode {
   expires_at: string | null
   is_active: boolean
   created_at: string
+  /** Calculé par la base : la seule source de vérité sur la validité */
+  status: InvitationCodeStatus
+  schools?: { name_fr: string } | null
 }
 
 export interface GenerateCodeResponse {
   success: boolean
   code: string
-  codes_remaining: number
+  expires_at: string
+  /** null : pas de limite (admin) */
+  codes_remaining: number | null
+}
+
+export interface ApproveAccessRequestResponse {
+  success: boolean
+  code: string
+  expires_at: string
+  email: string
+  /** sent=false : aucun email n'est parti, l'admin transmet `text` lui-même */
+  delivery: { sent: boolean; subject: string; text: string }
+}
+
+/** null : pas de limite (admin) */
+export interface CodeQuota {
+  limit: number | null
+  used: number
+  remaining: number | null
 }
 
 export interface MyCodesResponse {
   codes: InvitationCode[]
   total: number
+  quota: CodeQuota
 }
 
 // ═══════════════════════════════════════════════════

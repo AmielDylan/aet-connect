@@ -1,120 +1,70 @@
 import { Request, Response } from 'express'
 import { codesService } from '@/services/codes.service'
 import { logger } from '@/utils/logger'
+import { invitations, sendInvitationError, type IssueOptions } from '@/invitations'
+import { toVerifyResponse } from '@/controllers/registration.controller'
 import { supabase } from '@/config/database'
 
 export class CodesController {
   
+  // POST /api/codes/generate
+  // Membre : sa promo, un usage. Admin : school_id + entry_year, ou universal, et max_uses.
   async generateCode(req: Request, res: Response) {
     try {
-      if (!req.user) {
-        return res.status(401).json({ error: 'Non authentifié' })
-      }
-      
-      // Récupérer user_id depuis le token JWT
-      const user_id = req.user.id
-      const { school_id, entry_year } = req.body // Optionnel pour admin
-      
-      const result = await codesService.generateUserCode(user_id, {
-        school_id,
-        entry_year,
-      })
-      
+      if (!req.user) return res.status(401).json({ error: 'Non authentifié' })
+      const { school_id, entry_year, universal, max_uses } = req.body ?? {}
+      const options: IssueOptions = {}
+      if (universal) options.promo = 'universal'
+      else if (school_id && entry_year) options.promo = { schoolId: school_id, entryYear: entry_year }
+      if (max_uses !== undefined) options.maxUses = Number(max_uses)
+
+      const issued = await invitations.issue(req.user.id, options)
+      const quota = await invitations.quota(req.user.id)
+
       res.status(201).json({
         success: true,
-        code: result.code,
-        codes_remaining: result.codes_remaining
+        code: issued.code,
+        expires_at: issued.expiresAt.toISOString(),
+        codes_remaining: quota.remaining
       })
-    } catch (error: any) {
-      logger.error('Error in generateCode:', error)
-      
-      if (error.message.includes('limite')) {
-        res.status(403).json({ error: error.message })
-      } else {
-        res.status(500).json({ error: error.message })
-      }
+    } catch (error) {
+      sendInvitationError(res, error, 'generateCode')
     }
   }
 
+  // DELETE /api/codes/:id : révoque un code non utilisé (il rend sa place dans le quota)
   async deleteCode(req: Request, res: Response) {
     try {
-      if (!req.user) {
-        return res.status(401).json({ error: 'Non authentifié' })
-      }
-
-      const { id } = req.params
-      const userId = req.user.id
-
-      // Vérifier que le code appartient à l'utilisateur
-      const { data: code, error: codeError } = await supabase
-        .from('invitation_codes')
-        .select('created_by_user_id')
-        .eq('id', id)
-        .single()
-
-      if (codeError || !code) {
-        return res.status(404).json({ error: 'Code non trouvé' })
-      }
-
-      if (code.created_by_user_id !== userId) {
-        return res.status(403).json({ error: 'Non autorisé' })
-      }
-
-      // Supprimer le code
-      const { error: deleteError } = await supabase
-        .from('invitation_codes')
-        .delete()
-        .eq('id', id)
-
-      if (deleteError) throw deleteError
-
-      return res.json({ message: 'Code supprimé avec succès' })
-    } catch (error: any) {
-      logger.error('Error deleting code:', error)
-      return res.status(500).json({ error: 'Erreur serveur' })
+      if (!req.user) return res.status(401).json({ error: 'Non authentifié' })
+      await invitations.revoke(req.user.id, req.params.id)
+      return res.json({ message: 'Code révoqué' })
+    } catch (error) {
+      sendInvitationError(res, error, 'deleteCode')
     }
   }
-  
+
+  // GET /api/codes/my-codes : codes émis + quota
   async getMyCodes(req: Request, res: Response) {
     try {
-      if (!req.user) {
-        return res.status(401).json({ error: 'Non authentifié' })
-      }
-      
-      // Récupérer user_id depuis le token JWT
-      const user_id = req.user.id
-      
-      const codes = await codesService.getUserCodes(user_id)
-      
-      res.json({
-        codes,
-        total: codes.length
-      })
-    } catch (error: any) {
-      logger.error('Error in getMyCodes:', error)
-      res.status(500).json({ error: error.message })
+      if (!req.user) return res.status(401).json({ error: 'Non authentifié' })
+      const [codes, quota] = await Promise.all([
+        codesService.getUserCodes(req.user.id),
+        invitations.quota(req.user.id)
+      ])
+      res.json({ codes, total: codes.length, quota })
+    } catch (error) {
+      sendInvitationError(res, error, 'getMyCodes')
     }
   }
 
+  // GET /api/codes/verify/:code (public, limité en débit)
   async verifyCode(req: Request, res: Response) {
     try {
-      const { code } = req.params
-
-      if (!code) {
-        return res.status(400).json({ error: 'Code requis' })
-      }
-
-      const codeInfo = await codesService.verifyCode(code)
-
-      res.json(codeInfo)
-    } catch (error: any) {
-      logger.error('Error in verifyCode:', error)
-      
-      if (error.message.includes('invalide') || error.message.includes('révoqué') || error.message.includes('utilisé') || error.message.includes('expiré')) {
-        res.status(400).json({ error: error.message })
-      } else {
-        res.status(500).json({ error: 'Erreur serveur' })
-      }
+      const result = toVerifyResponse(await invitations.check(req.params.code ?? ''))
+      if (!result.valid) return res.status(400).json({ error: result.message, reason: result.reason })
+      res.json(result)
+    } catch (error) {
+      sendInvitationError(res, error, 'verifyCode')
     }
   }
 

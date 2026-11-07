@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { codesController } from '@/controllers/codes.controller'
 import { supabaseAuthMiddleware as authMiddleware } from '@/middleware/supabase-auth.middleware'
+import { invitationCodeLimiter } from '@/middleware/rate-limit.middleware'
 
 const router = Router()
 
@@ -21,10 +22,11 @@ router.get(
 // GET /api/codes/verify/:code (pas d'authentification requise)
 router.get(
   '/verify/:code',
+  invitationCodeLimiter,
   codesController.verifyCode.bind(codesController)
 )
 
-// DELETE /api/codes/:id - Supprimer un code
+// DELETE /api/codes/:id - Révoquer un code non utilisé
 router.delete(
   '/:id',
   authMiddleware,

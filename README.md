@@ -62,12 +62,12 @@ doppler setup --no-interactive   # lit doppler.yaml : backend/ → dev_backend, 
 
 ```bash
 supabase start      # démarre Supabase en local et applique supabase/migrations + supabase/seed.sql
-supabase db reset   # repart d'une base propre
+supabase db reset && docker restart supabase_kong_aet-connect   # repart d'une base propre (Kong garde sinon l'ancienne adresse d'Auth : erreurs 502)
 ```
 
 Le seed contient les 9 écoles réelles et des membres **fictifs** (mot de passe `Motdepasse123!`) :
 `admin@aetconnect.test`, `ambassadeur@aetconnect.test`, `alumni.pmb@aetconnect.test`, `alumni.cachee@aetconnect.test`,
-ainsi que des codes d'invitation dans tous les états (`USER-NEUF05`, `USER-UTIL05`, `USER-EXPI05`, `USER-REVO05`, `ADMIN-TOUS`).
+ainsi que des codes d'invitation dans tous les états (`AET-NEUF-2345` neuf, `AET-UTIL-2345` utilisé, `AET-EXPR-2345` expiré, `AET-REVQ-2345` révoqué, `AET-TOUS-2345` universel).
 
 ### Lancer les applis
 
@@ -83,8 +83,10 @@ Toujours par migration, jamais par script :
 ```bash
 supabase migration new <nom>                                          # écrire le SQL
 supabase db reset                                                     # tester en local
-doppler run -c prd_ops -- supabase db push --linked                   # appliquer en production
+doppler run -c prd_ops -- sh -c 'supabase db push --db-url "$SUPABASE_DB_URL"'   # appliquer en production
 ```
+
+Les commandes vers la prod passent par `SUPABASE_DB_URL` (config `prd_ops`) : elles ne dépendent d'aucun compte Supabase connecté au CLI.
 
 ---
 

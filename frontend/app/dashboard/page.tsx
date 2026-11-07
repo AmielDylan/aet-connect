@@ -27,6 +27,11 @@ function AlumniDashboard() {
     enabled: !!user,
   })
 
+  const { data: myCodes } = useQuery({
+    queryKey: ['my-codes'],
+    queryFn: () => apiClient.getMyCodes(),
+  })
+
   const { data: recentMembers, isLoading: membersLoading } = useQuery({
     queryKey: ['dashboard', 'recent'],
     queryFn: () => apiClient.getDashboardRecentMembers(),
@@ -41,7 +46,8 @@ function AlumniDashboard() {
     )
   }
 
-  const isLimitReached = (user.codes_generated || 0) >= (user.max_codes_allowed || 3)
+  const quota = myCodes?.quota
+  const isLimitReached = quota?.remaining === 0
 
   return (
     <div className="max-w-4xl space-y-8">
@@ -83,7 +89,7 @@ function AlumniDashboard() {
           >
             <TicketCheck className="h-4 w-4" />
             {isLimitReached
-              ? `Limite atteinte (${user.codes_generated}/${user.max_codes_allowed})`
+              ? `Limite atteinte (${quota?.used}/${quota?.limit})`
               : 'Générer un code'}
           </button>
           <button

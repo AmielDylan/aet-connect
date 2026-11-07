@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Plus, Loader2, AlertCircle } from 'lucide-react'
 
@@ -34,6 +35,9 @@ export function GenerateCodeDialog() {
   const [open, setOpen] = useState(false)
   const [selectedSchool, setSelectedSchool] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
+  // Admin uniquement : code valable pour toutes les écoles, et nombre d'inscriptions
+  const [universal, setUniversal] = useState(false)
+  const [maxUses, setMaxUses] = useState('1')
 
   // Charger les écoles pour admin
   const { data: schoolsData } = useQuery({
@@ -49,17 +53,9 @@ export function GenerateCodeDialog() {
   })
 
   const schools = schoolsData?.schools || []
-  const totalCodes = codesData?.codes?.length || 0
-
-  // Calculer la limite effective selon le rôle et le statut ambassadeur
-  const getEffectiveLimit = () => {
-    if (user?.role === 'admin') return 999
-    if (user?.is_ambassador) return 15
-    return 3
-  }
-
-  const effectiveLimit = getEffectiveLimit()
-  const isLimitReached = totalCodes >= effectiveLimit && effectiveLimit !== 999
+  // Quota calculé par le backend (module Code d'invitation)
+  const quota = codesData?.quota
+  const isLimitReached = quota?.remaining === 0
 
   // Calculer les bornes pour l'input année
   const currentYear = new Date().getFullYear()
@@ -71,12 +67,15 @@ export function GenerateCodeDialog() {
     mutationFn: async () => {
       // Admin : doit sélectionner école + promo
       if (isAdmin) {
+        const max_uses = Math.max(1, Number(maxUses) || 1)
+        if (universal) return apiClient.generateCode({ universal: true, max_uses })
         if (!selectedSchool || !selectedYear) {
           throw new Error('Veuillez sélectionner une école et une promotion')
         }
         return apiClient.generateCode({
           school_id: selectedSchool,
           entry_year: selectedYear,
+          max_uses,
         })
       }
       
@@ -92,6 +91,8 @@ export function GenerateCodeDialog() {
       setOpen(false)
       setSelectedSchool('')
       setSelectedYear('')
+      setUniversal(false)
+      setMaxUses('1')
     },
     onError: (error: any) => {
       toast({
@@ -124,7 +125,15 @@ export function GenerateCodeDialog() {
         <div className="space-y-4 py-4">
           {isAdmin ? (
             <>
-              {/* Admin : sélection manuelle */}
+              {/* Admin : code universel ou promo précise */}
+              <div className="flex items-center gap-2">
+                <Checkbox id="universal" checked={universal} onCheckedChange={(v) => setUniversal(v === true)} />
+                <Label htmlFor="universal" className="font-normal">
+                  Code universel : la personne choisit son école et sa promotion
+                </Label>
+              </div>
+
+              {!universal && (<>
               <div className="space-y-2">
                 <Label htmlFor="school">École</Label>
                 <Select value={selectedSchool} onValueChange={setSelectedSchool}>
@@ -159,6 +168,19 @@ export function GenerateCodeDialog() {
                   </p>
                 )}
               </div>
+              </>)}
+
+              <div className="space-y-2">
+                <Label htmlFor="max-uses">Nombre d&apos;inscriptions possibles</Label>
+                <Input
+                  id="max-uses"
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={maxUses}
+                  onChange={(e) => setMaxUses(e.target.value)}
+                />
+              </div>
             </>
           ) : (
             <>
@@ -170,22 +192,23 @@ export function GenerateCodeDialog() {
             </>
           )}
 
-          <div className="text-sm text-muted-foreground">
-            Ce code pourra être utilisé <strong>1 fois</strong> (inscription unique).
-          </div>
-          
-          <p className="text-sm text-muted-foreground mt-2">
-            {effectiveLimit === 999 
-              ? `${totalCodes} code${totalCodes > 1 ? 's' : ''} généré${totalCodes > 1 ? 's' : ''}`
-              : `${totalCodes} / ${effectiveLimit} codes générés`
-            }
-          </p>
-          
-          {totalCodes >= effectiveLimit && effectiveLimit !== 999 && (
+          {!isAdmin && (
+            <div className="text-sm text-muted-foreground">
+              Ce code servira à <strong>une seule inscription</strong> et restera valable 30 jours.
+            </div>
+          )}
+
+          {quota && quota.limit !== null && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {quota.remaining} invitation{(quota.remaining ?? 0) > 1 ? 's' : ''} disponible{(quota.remaining ?? 0) > 1 ? 's' : ''} sur {quota.limit}
+            </p>
+          )}
+
+          {isLimitReached && (
             <Alert variant="destructive" className="mt-4">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Vous avez atteint votre limite de {effectiveLimit} code{effectiveLimit > 1 ? 's' : ''}.
+                Vos {quota?.limit} invitations sont en cours ou utilisées. Révoquez un code non utilisé pour en libérer une.
               </AlertDescription>
             </Alert>
           )}
@@ -201,7 +224,7 @@ export function GenerateCodeDialog() {
           </Button>
           <Button
             onClick={() => generateMutation.mutate()}
-            disabled={generateMutation.isPending || isLimitReached || (isAdmin && (!selectedSchool || !selectedYear))}
+            disabled={generateMutation.isPending || isLimitReached || (isAdmin && !universal && (!selectedSchool || !selectedYear))}
           >
             {generateMutation.isPending ? (
               <>

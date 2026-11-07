@@ -1,6 +1,30 @@
 import { Request, Response } from 'express'
 import { registrationService } from '@/services/registration.service'
 import { logger } from '@/utils/logger'
+import { invitations, InvitationError, sendInvitationError, type CheckResult } from '@/invitations'
+
+/** Forme de réponse attendue par le frontend (VerifyInvitationCodeResponse). */
+export function toVerifyResponse(result: CheckResult) {
+  if (!result.valid) {
+    const messages = {
+      unknown: 'Code invalide ou inexistant. Vérifiez le code reçu.',
+      revoked: 'Ce code a été révoqué. Demandez-en un nouveau.',
+      expired: 'Ce code a expiré. Demandez-en un nouveau.',
+      exhausted: 'Ce code a déjà été utilisé.'
+    }
+    return { valid: false, reason: result.reason, message: messages[result.reason] }
+  }
+  return {
+    valid: true,
+    code: result.code,
+    message: 'Code valide',
+    universal: result.promo === null,
+    school_id: result.promo?.schoolId ?? null,
+    entry_year: result.promo?.entryYear ?? null,
+    school_name: result.schoolName,
+    grants_ambassador: result.grantsAmbassador
+  }
+}
 
 export class RegistrationController {
   
@@ -38,63 +62,31 @@ export class RegistrationController {
   
   async verifyInvitationCode(req: Request, res: Response) {
     try {
-      const { code, school_id, entry_year } = req.body
-      
-      const result = await registrationService.verifyInvitationCode(
-        code,
-        school_id,
-        entry_year
-      )
-      
-      // Logger les rejets pour analytics
-      if (!result.valid) {
-        logger.warn('Code invitation rejeté:', {
-          code_prefix: code.substring(0, 10) + '...', // Masquer partiellement
-          school_id,
-          entry_year,
-          reason: result.message
-        })
-      } else {
-        logger.info('Code invitation validé:', {
-          code_prefix: code.substring(0, 10) + '...',
-          school_id,
-          entry_year
-        })
-      }
-      
-      res.json(result)
-    } catch (error: any) {
-      logger.error('Error in verifyInvitationCode:', error)
-      res.status(500).json({ 
-        error: 'Erreur lors de la vérification du code. Veuillez réessayer.' 
-      })
+      const result = await invitations.check(req.body.code)
+      res.json(toVerifyResponse(result))
+    } catch (error) {
+      sendInvitationError(res, error, 'verifyInvitationCode')
     }
   }
-  
+
   async completeRegistration(req: Request, res: Response) {
     try {
-      const data = req.body
-      
-      const result = await registrationService.completeRegistration(data)
-      
-      // TODO: Envoyer email de bienvenue
-      
-      res.status(201).json({
-        success: true,
-        user_id: result.user_id,
-        message: 'Inscription réussie'
-      })
+      const { invitation_code, first_name, last_name, email, password, school_id, entry_year } = req.body
+      const choice = school_id && entry_year ? { promo: { schoolId: school_id, entryYear: entry_year } } : {}
+
+      const { memberId } = await invitations.redeem(invitation_code, choice, (grant) =>
+        registrationService.createMemberAccount(grant, { first_name, last_name, email, password })
+      )
+
+      res.status(201).json({ success: true, user_id: memberId, message: 'Inscription réussie' })
     } catch (error: any) {
+      if (error instanceof InvitationError) return sendInvitationError(res, error, 'completeRegistration')
       logger.error('Error in completeRegistration:', error)
-      
-      if (error.message.includes('email')) {
-        res.status(400).json({ error: error.message })
-      } else {
-        res.status(500).json({ error: error.message })
-      }
+      // Erreurs de création de compte (email déjà utilisé…) : le code a été rendu par le module
+      res.status(400).json({ error: error.message || "Erreur lors de l'inscription" })
     }
   }
-  
+
   async requestCodeFromPeer(req: Request, res: Response) {
     try {
       const data = req.body

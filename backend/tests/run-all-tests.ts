@@ -56,11 +56,8 @@ async function runAllTests() {
     // Pause de 2 secondes entre chaque test
     await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // 2. Test inscription avec code
-    await runScript('e2e/workflows/test-workflow-with-code.ts')
-    
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
+    // 2. Inscription avec code : couverte par les tests Vitest (npm run test:unit)
+
     // 3. Test demande d'accès initial
     await runScript('e2e/workflows/test-workflow-request-access.ts')
     

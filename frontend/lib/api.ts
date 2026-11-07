@@ -33,6 +33,7 @@ import type {
   RequestCodeFromPeerRequest,
   RequestCodeFromPeerResponse,
   ApiError,
+  ApproveAccessRequestResponse,
   DashboardStats,
   RecentMember
 } from '@/types'
@@ -339,9 +340,10 @@ class ApiClient {
    * Approve access request (requires admin role)
    * POST /api/admin/access-requests/:id/approve
    */
-  async approveAccessRequest(id: string): Promise<{ success: boolean; code: string; email: string }> {
-    return this.fetch<{ success: boolean; code: string; email: string }>(`/api/admin/access-requests/${id}/approve`, {
-      method: 'POST'
+  async approveAccessRequest(id: string, options: { grants_ambassador?: boolean } = {}): Promise<ApproveAccessRequestResponse> {
+    return this.fetch<ApproveAccessRequestResponse>(`/api/admin/access-requests/${id}/approve`, {
+      method: 'POST',
+      body: JSON.stringify(options),
     })
   }
 
@@ -569,7 +571,7 @@ class ApiClient {
    * Generate invitation code
    * POST /api/codes/generate
    */
-  async generateCode(data?: { school_id?: string; entry_year?: string }): Promise<GenerateCodeResponse> {
+  async generateCode(data?: { school_id?: string; entry_year?: string; universal?: boolean; max_uses?: number }): Promise<GenerateCodeResponse> {
     return this.fetch<GenerateCodeResponse>('/api/codes/generate', {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
@@ -588,15 +590,9 @@ class ApiClient {
    * Verify an invitation code and get its info (no auth required)
    * GET /api/codes/verify/:code
    */
-  async verifyCodeInfo(code: string): Promise<{
-    code: string
-    school_id: string
-    school_name: string
-    entry_year: string
-    valid: boolean
-  }> {
+  async verifyCodeInfo(code: string): Promise<VerifyInvitationCodeResponse> {
     const response = await fetch(
-      `${this.baseURL}/api/codes/verify/${code}`,
+      `${this.baseURL}/api/codes/verify/${encodeURIComponent(code)}`,
       {
         headers: {
           'Content-Type': 'application/json',

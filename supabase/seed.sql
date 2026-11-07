@@ -64,12 +64,12 @@ insert into public.invitation_codes
   (code, school_id, entry_year, created_by_user_id, is_admin_code, max_uses, current_uses, expires_at, is_active, used_by_user_id, used_at)
 values
   -- neuf, émis par l'ambassadeur pour sa promo
-  ('USER-NEUF05', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 0, null, true, null, null),
+  ('AET-NEUF-2345', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 0, null, true, null, null),
   -- déjà utilisé (par Aminata)
-  ('USER-UTIL05', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 1, null, true, 'a0000000-0000-4000-8000-000000000003', now() - interval '30 days'),
+  ('AET-UTIL-2345', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 1, null, true, 'a0000000-0000-4000-8000-000000000003', now() - interval '30 days'),
   -- expiré
-  ('USER-EXPI05', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 0, now() - interval '1 day', true, null, null),
+  ('AET-EXPR-2345', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 0, now() - interval '1 day', true, null, null),
   -- révoqué
-  ('USER-REVO05', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 0, null, false, null, null),
-  -- code admin, valable pour toutes les écoles et promos
-  ('ADMIN-TOUS', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000001', true, 100, 0, null, true, null, null);
+  ('AET-REVQ-2345', '627bff1f-bacc-4a81-b7a5-cf6a0b06bd84', '2005', 'a0000000-0000-4000-8000-000000000002', false, 1, 0, null, false, null, null),
+  -- code admin universel : la personne choisit sa promo à l'inscription
+  ('AET-TOUS-2345', null, null, 'a0000000-0000-4000-8000-000000000001', true, 100, 0, null, true, null, null);

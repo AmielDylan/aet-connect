@@ -33,10 +33,9 @@ export const RequestInitialAccessSchema = z.object({
   wants_ambassador: z.boolean()
 })
 
+// La promo vient du code : seul le code est demandé
 export const VerifyInvitationCodeSchema = z.object({
-  code: z.string().min(5, 'Code invalide'),
-  school_id: z.string().uuid('ID école invalide'),
-  entry_year: z.string().regex(/^\d{4}$/, 'Année invalide')
+  code: z.string().trim().min(5, 'Code invalide').max(40)
 })
 
 export const CompleteRegistrationSchema = z.object({
@@ -48,7 +47,10 @@ export const CompleteRegistrationSchema = z.object({
     .min(8, 'Mot de passe trop court (min 8 caractères)')
     .regex(/[A-Z]/, 'Doit contenir une majuscule')
     .regex(/[a-z]/, 'Doit contenir une minuscule')
-    .regex(/[0-9]/, 'Doit contenir un chiffre')
+    .regex(/[0-9]/, 'Doit contenir un chiffre'),
+  // Seulement pour un code universel : la promo choisie par la personne
+  school_id: z.string().uuid('ID école invalide').optional(),
+  entry_year: z.string().regex(/^\d{4}$/, 'Année invalide').optional()
 })
 
 export const RequestCodeFromPeerSchema = z.object({

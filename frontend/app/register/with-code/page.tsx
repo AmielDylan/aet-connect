@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { RegistrationSteps } from '@/components/registration/registration-steps'
 import { FormField } from '@/components/registration/form-field'
+import { SchoolYearSelector } from '@/components/registration/school-year-selector'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { apiClient } from '@/lib/api'
+import type { VerifyInvitationCodeResponse } from '@/types'
 import { useAuthStore } from '@/store/auth-store'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2, CheckCircle2, Info, AlertCircle } from 'lucide-react'
@@ -45,6 +47,27 @@ export default function RegisterWithCodePage() {
   const [verifiedEntryYear, setVerifiedEntryYear] = useState('')
   const [verifiedSchoolName, setVerifiedSchoolName] = useState('')
   const [codeFromLink, setCodeFromLink] = useState(false) // Indique si le code vient du lien
+  // Code universel (émis par un admin) : la personne choisit son école et son année
+  const [isUniversal, setIsUniversal] = useState(false)
+  const [grantsAmbassador, setGrantsAmbassador] = useState(false)
+  const [promoError, setPromoError] = useState('')
+
+  const { data: schoolsData, isLoading: schoolsLoading } = useQuery({
+    queryKey: ['schools'],
+    queryFn: () => apiClient.getSchools(),
+    enabled: isUniversal,
+  })
+
+  const applyVerifiedCode = (data: VerifyInvitationCodeResponse) => {
+    setInvitationCode(data.code ?? invitationCode)
+    setIsUniversal(!!data.universal)
+    setGrantsAmbassador(!!data.grants_ambassador)
+    setVerifiedSchoolId(data.school_id ?? '')
+    setVerifiedEntryYear(data.entry_year ?? '')
+    setVerifiedSchoolName(data.school_name ?? '')
+    setStep1Error('')
+    setCurrentStep(2)
+  }
 
   // Étape 2 : Informations utilisateur
   const [firstName, setFirstName] = useState('')
@@ -77,15 +100,12 @@ export default function RegisterWithCodePage() {
       setCodeFromLink(true)
       apiClient.verifyCodeInfo(codeFromUrl)
         .then((data) => {
-          setVerifiedSchoolId(data.school_id)
-          setVerifiedEntryYear(data.entry_year)
-          setVerifiedSchoolName(data.school_name)
-          setInvitationCode(data.code)
-          setStep1Error('')
-          setCurrentStep(2) // Passer directement à l'étape 2
+          applyVerifiedCode(data)
           toast({
             title: 'Code valide !',
-            description: `Inscription pour ${data.school_name} - Promo ${data.entry_year}`,
+            description: data.universal
+              ? 'Choisissez votre école et votre promotion'
+              : `Inscription pour ${data.school_name} - Promo ${data.entry_year}`,
           })
         })
         .catch((error) => {
@@ -102,23 +122,11 @@ export default function RegisterWithCodePage() {
   // Mutation vérification code
   const verifyCodeMutation = useMutation({
     mutationFn: () =>
-      apiClient.verifyInvitationCode({
-        code: invitationCode,
-        // Pour la vérification initiale, on utilise des valeurs temporaires
-        // Le backend retournera les vraies valeurs si le code est valide (pour codes admin)
-        // Pour codes membres, il faut que ça corresponde exactement
-        school_id: verifiedSchoolId || '00000000-0000-0000-0000-000000000000',
-        entry_year: verifiedEntryYear || '2000',
-      }),
+      // La promo vient du code : seul le code est envoyé
+      apiClient.verifyInvitationCode({ code: invitationCode }),
     onSuccess: (data) => {
       if (data.valid) {
-        // Stocker les données du code
-        if (data.school_id) setVerifiedSchoolId(data.school_id)
-        if (data.entry_year) setVerifiedEntryYear(data.entry_year)
-        if (data.school_name) setVerifiedSchoolName(data.school_name)
-
-        setStep1Error('')
-        setCurrentStep(2)
+        applyVerifiedCode(data)
         toast({
           title: 'Code valide !',
         })
@@ -150,6 +158,7 @@ export default function RegisterWithCodePage() {
         last_name: lastName,
         email,
         password,
+        ...(isUniversal ? { school_id: verifiedSchoolId, entry_year: verifiedEntryYear } : {}),
       }),
     onSuccess: () => {
       setCurrentStep(3)
@@ -220,6 +229,13 @@ export default function RegisterWithCodePage() {
       hasValidationError = true
     }
     
+    // Code universel : école et promo obligatoires
+    setPromoError('')
+    if (isUniversal && (!verifiedSchoolId || !verifiedEntryYear)) {
+      setPromoError('Choisissez votre école et votre année d\'entrée')
+      hasValidationError = true
+    }
+
     if (hasValidationError) {
       return
     }
@@ -262,7 +278,7 @@ export default function RegisterWithCodePage() {
                 <FormField
                   id="invitation-code"
                   label="Code d'invitation"
-                  placeholder="Entrez votre code (ex: USER-ABC123)"
+                  placeholder="AET-XXXX-XXXX"
                   value={invitationCode}
                   onChange={setInvitationCode}
                   // error supprimé : step1Error est une erreur SYSTÈME, affichée dans Alert uniquement
@@ -345,7 +361,29 @@ export default function RegisterWithCodePage() {
                   </AlertDescription>
                 </Alert>
 
-                {/* Informations pré-remplies (lecture seule) */}
+                {grantsAmbassador && (
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      Vous deviendrez ambassadeur ou ambassadrice de votre promotion : vous pourrez inviter jusqu&apos;à 15 membres.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {isUniversal ? (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Votre école et votre promotion</p>
+                    <SchoolYearSelector
+                      selectedSchoolId={verifiedSchoolId}
+                      selectedYear={verifiedEntryYear}
+                      onSchoolChange={setVerifiedSchoolId}
+                      onYearChange={setVerifiedEntryYear}
+                      schools={schoolsData?.schools || []}
+                      isLoading={schoolsLoading}
+                      error={promoError || null}
+                    />
+                  </div>
+                ) : (
                 <div className="p-4 bg-muted rounded-lg space-y-2">
                   <p className="text-sm font-medium">Informations du code :</p>
                   <div className="space-y-2 text-sm">
@@ -365,6 +403,7 @@ export default function RegisterWithCodePage() {
                     </div>
                   </div>
                 </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField

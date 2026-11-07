@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { Check, X, Eye, Clock, Loader2, Copy } from 'lucide-react'
@@ -51,9 +52,11 @@ export default function AdminPendingPage() {
   
   const [statusFilter, setStatusFilter] = useState('pending')
   const [viewDialog, setViewDialog] = useState<{ open: boolean; request?: any }>({ open: false })
-  const [approveDialog, setApproveDialog] = useState<{ open: boolean; requestId?: string; email?: string }>({ open: false })
+  const [approveDialog, setApproveDialog] = useState<{
+    open: boolean; requestId?: string; email?: string; wantsAmbassador?: boolean; grantsAmbassador?: boolean
+  }>({ open: false })
   const [rejectDialog, setRejectDialog] = useState<{ open: boolean; requestId?: string }>({ open: false })
-  const [codeDialog, setCodeDialog] = useState<{ open: boolean; code?: string; email?: string }>({ open: false })
+  const [codeDialog, setCodeDialog] = useState<{ open: boolean; code?: string; email?: string; message?: string; sent?: boolean }>({ open: false })
   
   // Charger demandes
   const { data: requests, isLoading } = useQuery({
@@ -64,11 +67,12 @@ export default function AdminPendingPage() {
   
   // Mutations
   const approveMutation = useMutation({
-    mutationFn: (id: string) => apiClient.approveAccessRequest(id),
+    mutationFn: ({ id, grantsAmbassador }: { id: string; grantsAmbassador: boolean }) =>
+      apiClient.approveAccessRequest(id, { grants_ambassador: grantsAmbassador }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['access-requests'] })
       setApproveDialog({ open: false })
-      setCodeDialog({ open: true, code: data.code, email: data.email })
+      setCodeDialog({ open: true, code: data.code, email: data.email, message: data.delivery?.text, sent: data.delivery?.sent })
       toast({ title: 'Demande approuvée' })
     },
     onError: (error: any) => {
@@ -213,10 +217,12 @@ export default function AdminPendingPage() {
                               variant="ghost"
                               size="sm"
                               className="text-green-600 hover:text-green-700"
-                              onClick={() => setApproveDialog({ 
-                                open: true, 
+                              onClick={() => setApproveDialog({
+                                open: true,
                                 requestId: request.id,
-                                email: request.email 
+                                email: request.email,
+                                wantsAmbassador: !!request.wants_ambassador,
+                                grantsAmbassador: !!request.wants_ambassador,
                               })}
                             >
                               <Check className="h-4 w-4" />
@@ -302,15 +308,33 @@ export default function AdminPendingPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Approuver cette demande ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Un code d'invitation unique sera généré et affiché. 
-              Vous devrez l'envoyer manuellement à <strong>{approveDialog.email}</strong>.
+              Un code d&apos;invitation valable 30 jours sera généré pour <strong>{approveDialog.email}</strong>,
+              avec le message à lui transmettre.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="grants-ambassador"
+              checked={!!approveDialog.grantsAmbassador}
+              onCheckedChange={(v) => setApproveDialog((d) => ({ ...d, grantsAmbassador: v === true }))}
+            />
+            <div className="grid gap-1">
+              <Label htmlFor="grants-ambassador" className="font-normal leading-snug">
+                Accorder le rôle d&apos;ambassadeur à l&apos;inscription (15 invitations)
+              </Label>
+              {approveDialog.wantsAmbassador && (
+                <p className="text-xs text-muted-foreground">La personne l&apos;a demandé.</p>
+              )}
+            </div>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               className="bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => approveDialog.requestId && approveMutation.mutate(approveDialog.requestId)}
+              onClick={() => approveDialog.requestId && approveMutation.mutate({
+                id: approveDialog.requestId,
+                grantsAmbassador: !!approveDialog.grantsAmbassador,
+              })}
               disabled={approveMutation.isPending}
             >
               {approveMutation.isPending ? (
@@ -381,43 +405,25 @@ export default function AdminPendingPage() {
               </div>
             </div>
             
-            {/* Message complet */}
+            {/* Message complet, rédigé par le backend (même texte que l'email futur) */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Message prêt à envoyer</Label>
-              <div className="p-3 bg-muted rounded-lg text-sm">
-                <p>Bonjour,</p>
-                <p className="mt-2">
-                  Votre demande d'inscription à AET Connect a été approuvée !
+              {!codeDialog.sent && (
+                <p className="text-xs text-muted-foreground">
+                  Aucun email n&apos;est encore envoyé automatiquement : transmettez ce message par email ou WhatsApp.
                 </p>
-                <p className="mt-2">
-                  Voici votre code d'invitation : <strong className="font-mono text-lg">{codeDialog.code}</strong>
-                </p>
-                <p className="mt-2">
-                  Rendez-vous sur{' '}
-                  <a 
-                    href={`https://aet-connect.vercel.app/register/with-code?code=${codeDialog.code}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline"
-                  >
-                    https://aet-connect.vercel.app/register/with-code?code={codeDialog.code}
-                  </a>{' '}
-                  pour créer votre compte.
-                </p>
-                <p className="mt-2">
-                  Ce code est valable 30 jours et peut être utilisé 1 fois.
-                </p>
-              </div>
+              )}
+              <pre className="p-3 bg-muted rounded-lg text-sm whitespace-pre-wrap font-sans">{codeDialog.message}</pre>
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => {
-                  const message = `Bonjour,\n\nVotre demande d'inscription à AET Connect a été approuvée !\n\nVoici votre code d'invitation : ${codeDialog.code}\n\nRendez-vous sur https://aet-connect.vercel.app/register/with-code?code=${codeDialog.code} pour créer votre compte.\n\nCe code est valable 30 jours et peut être utilisé 1 fois.`
-                  navigator.clipboard.writeText(message)
-                  toast({ title: 'Message complet copié !', description: 'Prêt à être envoyé par email ou WhatsApp' })
+                  navigator.clipboard.writeText(codeDialog.message || '')
+                  toast({ title: 'Message copié !', description: 'Prêt à être envoyé par email ou WhatsApp' })
                 }}
               >
-                Copier le message complet
+                <Copy className="mr-2 h-4 w-4" />
+                Copier le message
               </Button>
             </div>
           </div>

@@ -17,6 +17,10 @@ import dashboardRoutes from '@/routes/dashboard.routes'
 
 const app = express()
 
+// Railway place l'app derrière un proxy : sans ça, req.ip serait celle du proxy
+// et la limite de débit s'appliquerait à tout le monde à la fois.
+app.set('trust proxy', 1)
+
 // Security & Parsing
 app.use(helmet())
 app.use(cors({
@@ -121,7 +125,10 @@ process.on('SIGINT', () => {
   process.exit(0)
 })
 
-startServer()
+// Démarre seulement quand le fichier est lancé directement (pas quand un test l'importe)
+if (require.main === module) {
+  startServer()
+}
 
 export default app
 
