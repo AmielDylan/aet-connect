@@ -139,25 +139,6 @@ export const IncreaseCodeLimitSchema = z.object({
   new_limit: z.number().int().min(1).max(1000000)
 })
 
-export const AccessRequestFiltersSchema = z.object({
-  status: z.enum(['pending', 'approved', 'rejected']).optional(),
-  school_id: z.string().uuid().optional(),
-  date_from: z.string().optional(),
-  date_to: z.string().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  offset: z.number().int().min(0).optional()
-})
-
-export const UserFiltersSchema = z.object({
-  role: z.enum(['alumni', 'moderator', 'admin']).optional(),
-  school_id: z.string().uuid().optional(),
-  is_active: z.boolean().optional(),
-  is_ambassador: z.boolean().optional(),
-  search: z.string().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  offset: z.number().int().min(0).optional()
-})
-
 // Users schemas
 export const UpdateProfileSchema = z.object({
   first_name: z.string().min(2).max(100).optional(),

@@ -210,14 +210,12 @@ Les tests tournent **uniquement contre la base locale** : `tests/assert-local.ts
 ```bash
 cd backend
 
-# Tous les tests E2E (Doppler injecte la config dev_backend)
+# Tous les tests (Doppler injecte la config dev_backend)
 doppler run -- npm test
 
-# Tests par module
-npm run test:e2e:registration
-npm run test:e2e:auth
-npm run test:e2e:events
-npm run test:e2e:admin
+# Tests Vitest seuls (modules et routes, sur la base locale), ou en continu
+doppler run -- npm run test:unit
+doppler run -- npm run test:watch
 ```
 
 ### Frontend
