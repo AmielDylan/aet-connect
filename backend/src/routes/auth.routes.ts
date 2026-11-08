@@ -40,14 +40,4 @@ router.get('/me', supabaseAuthMiddleware, async (req, res) => {
   }
 })
 
-/**
- * POST /api/auth/logout
- * Déconnexion (juste pour compatibilité, Supabase gère ça côté client)
- */
-router.post('/logout', (req, res) => {
-  // Avec Supabase Auth, le logout se fait côté client
-  // Cette route existe juste pour compatibilité
-  res.json({ message: 'Déconnexion réussie' })
-})
-
 export default router

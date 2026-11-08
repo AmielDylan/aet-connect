@@ -15,70 +15,9 @@ export class AdminController {
     }
   }
   
-  async getAccessRequests(req: Request, res: Response) {
-    try {
-      const filters: any = {
-        ...req.query,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined
-      }
-      
-      const requests = await adminService.getAccessRequests(filters)
-      
-      const requestsArray = Array.isArray(requests) ? requests : []
-      res.json({
-        requests: requestsArray,
-        total: requestsArray.length
-      })
-    } catch (error: any) {
-      logger.error('Error in getAccessRequests:', error)
-      res.status(500).json({ error: error.message })
-    }
-  }
   
   
-  async rejectAccessRequest(req: Request, res: Response) {
-    try {
-      const { id } = req.params
-      
-      const result = await adminService.rejectAccessRequest(id)
-      
-      logger.info('Access request rejected:', { request_id: id })
-      
-      res.json(result)
-    } catch (error: any) {
-      logger.error('Error in rejectAccessRequest:', error)
-      
-      if (error.message.includes('non trouvée') || error.message.includes('déjà été traitée')) {
-        res.status(400).json({ error: error.message })
-      } else {
-        res.status(500).json({ error: error.message })
-      }
-    }
-  }
   
-  async getUsers(req: Request, res: Response) {
-    try {
-      const filters: any = {
-        ...req.query,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
-        is_active: req.query.is_active !== undefined ? req.query.is_active === 'true' : undefined,
-        is_ambassador: req.query.is_ambassador !== undefined ? req.query.is_ambassador === 'true' : undefined
-      }
-      
-      const users = await adminService.getUsers(filters)
-      
-      const usersArray = Array.isArray(users) ? users : []
-      res.json({
-        users: usersArray,
-        total: usersArray.length
-      })
-    } catch (error: any) {
-      logger.error('Error in getUsers:', error)
-      res.status(500).json({ error: error.message })
-    }
-  }
   
   async updateUser(req: Request, res: Response) {
     try {

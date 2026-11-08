@@ -236,22 +236,14 @@ npm run lint
 
 ## 📦 Scripts utilitaires
 
-### Backend
-
 ```bash
 cd backend
-
-# En local (config dev_backend par défaut)
-doppler run -- npm run admin:create-code     # Créer un code admin universel
-doppler run -- npm run admin:list-codes      # Lister les codes admin
-
-# Contre la production : choisir la config explicitement
-doppler run -c prd_backend -- npm run admin:list-codes
+doppler run -- npm run db:test                    # tester la connexion à la base locale
+doppler run -c prd_backend -- npm run db:test     # … ou à la production
 ```
 
-Le schéma ne se modifie plus par script : voir « Modifier le schéma » plus haut.
-
-Voir [`documentation/scripts/`](./documentation/scripts/) pour la liste complète.
+Les données de test viennent du seed (`supabase/seed.sql`), les codes d'invitation de l'écran admin
+(code universel compris), et le schéma des migrations : aucun script n'écrit directement dans la base.
 
 ---
 
