@@ -61,15 +61,6 @@ export const RequestCodeFromPeerSchema = z.object({
   message: z.string().min(10).max(500)
 })
 
-export const LoginSchema = z.object({
-  email: z.string().email('Email invalide'),
-  password: z.string().min(1, 'Mot de passe requis')
-})
-
-export const RefreshTokenSchema = z.object({
-  refresh_token: z.string().min(10, 'Refresh token invalide')
-})
-
 export const CreateEventSchema = z.object({
   title: z.string().min(5, 'Titre trop court (min 5 caractères)').max(200),
   description: z.string().max(2000).optional(),
@@ -131,18 +122,6 @@ export const UpdateEventSchema = z.object({
   }
 )
 
-export const EventFiltersSchema = z.object({
-  country: z.string().optional(),
-  city: z.string().optional(),
-  date_from: z.string().optional(),
-  date_to: z.string().optional(),
-  status: z.enum(['upcoming', 'ongoing', 'completed', 'cancelled']).optional(),
-  created_by: z.string().uuid().optional(),
-  is_active: z.boolean().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  offset: z.number().int().min(0).optional()
-})
-
 // Admin schemas
 export const UpdateUserSchema = z.object({
   first_name: z.string().min(2).max(100).optional(),
@@ -158,29 +137,6 @@ export const UpdateUserSchema = z.object({
 
 export const IncreaseCodeLimitSchema = z.object({
   new_limit: z.number().int().min(1).max(1000000)
-})
-
-export const SetAmbassadorSchema = z.object({
-  is_ambassador: z.boolean()
-})
-
-export const AccessRequestFiltersSchema = z.object({
-  status: z.enum(['pending', 'approved', 'rejected']).optional(),
-  school_id: z.string().uuid().optional(),
-  date_from: z.string().optional(),
-  date_to: z.string().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  offset: z.number().int().min(0).optional()
-})
-
-export const UserFiltersSchema = z.object({
-  role: z.enum(['alumni', 'moderator', 'admin']).optional(),
-  school_id: z.string().uuid().optional(),
-  is_active: z.boolean().optional(),
-  is_ambassador: z.boolean().optional(),
-  search: z.string().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  offset: z.number().int().min(0).optional()
 })
 
 // Users schemas
