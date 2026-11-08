@@ -212,7 +212,11 @@ export interface AdminStats {
 
 export interface DeletionRequest {
   id: string
-  user_id: string
+  /** null une fois le compte supprimé : la demande reste comme trace */
+  user_id: string | null
+  /** Copie de l'identité au moment de la demande (survit à la suppression) */
+  requester_email: string | null
+  requester_name: string | null
   reason: string | null
   status: 'pending' | 'approved' | 'rejected'
   created_at: string

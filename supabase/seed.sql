@@ -17,7 +17,7 @@ insert into public.schools (id, name_fr, city, country, established_year, is_act
 -- ═══════════════════════════════════════════════════════════════════
 -- Membres FICTIFS (base locale uniquement)
 -- Mot de passe commun : Motdepasse123!
--- Le trigger handle_new_user crée la fiche public.users à partir des metadata.
+-- Le trigger handle_new_user crée la fiche public.users et ses réglages à partir des métadonnées (identité seulement).
 -- ═══════════════════════════════════════════════════════════════════
 
 -- PMB = Prytanée militaire de Bembéréké, promo 2005
@@ -53,9 +53,14 @@ select gen_random_uuid(), id, id::text,
 from auth.users
 where email like '%@aetconnect.test';
 
--- Awa ne veut pas apparaître dans l'annuaire
-insert into public.user_privacy_settings (user_id, show_in_directory)
-values ('a0000000-0000-4000-8000-000000000004', false);
+-- Les droits ne viennent jamais de l'inscription (le trigger crée tout le monde en alumni) :
+-- on les accorde ensuite, comme le ferait un admin.
+update public.users set role = 'admin', max_codes_allowed = 999 where id = 'a0000000-0000-4000-8000-000000000001';
+update public.users set is_ambassador = true, max_codes_allowed = 15 where id = 'a0000000-0000-4000-8000-000000000002';
+
+-- Awa ne veut pas apparaître dans l'annuaire (ses réglages sont créés par le trigger)
+update public.user_privacy_settings set show_in_directory = false
+where user_id = 'a0000000-0000-4000-8000-000000000004';
 
 -- ═══════════════════════════════════════════════════════════════════
 -- Codes d'invitation dans tous les états

@@ -379,102 +379,45 @@ export class UsersService {
     }
   }
   
+  // Réglages de confidentialité : créés par le trigger handle_new_user à l'inscription,
+  // ils existent toujours pour un membre.
+  private toPrivacySettings(row: any): UserPrivacySettings {
+    return {
+      show_email: row.show_email,
+      show_phone: row.show_phone,
+      show_current_location: row.show_current_location,
+      show_bio: row.show_bio,
+      show_linkedin: row.show_linkedin,
+      show_entry_year: row.show_entry_year,
+      show_in_directory: row.show_in_directory
+    }
+  }
+
   // Récupérer mes privacy settings - AUTH REQUIS
   async getMyPrivacy(user_id: string): Promise<UserPrivacySettings> {
-    const { data: privacy, error } = await supabase
+    const { data, error } = await supabase
       .from('user_privacy_settings')
       .select('*')
       .eq('user_id', user_id)
       .single()
-    
-    if (error) {
-      // Si pas de settings, créer avec valeurs par défaut
-      const { data: newPrivacy, error: createError } = await supabase
-        .from('user_privacy_settings')
-        .insert({ user_id })
-        .select()
-        .single()
-      
-      if (createError) throw createError
-      
-      return {
-        show_email: newPrivacy.show_email,
-        show_phone: newPrivacy.show_phone,
-        show_current_location: newPrivacy.show_current_location,
-        show_bio: newPrivacy.show_bio,
-        show_linkedin: newPrivacy.show_linkedin,
-        show_entry_year: newPrivacy.show_entry_year,
-        show_in_directory: newPrivacy.show_in_directory
-      }
-    }
-    
-    return {
-      show_email: privacy.show_email,
-      show_phone: privacy.show_phone,
-      show_current_location: privacy.show_current_location,
-      show_bio: privacy.show_bio,
-      show_linkedin: privacy.show_linkedin,
-      show_entry_year: privacy.show_entry_year,
-      show_in_directory: privacy.show_in_directory
-    }
+
+    if (error) throw error
+    return this.toPrivacySettings(data)
   }
-  
+
   // Modifier mes privacy settings - AUTH REQUIS
   async updateMyPrivacy(user_id: string, data: Partial<UserPrivacySettings>): Promise<UserPrivacySettings> {
-    // Vérifier si settings existent
-    const { data: existing } = await supabase
-      .from('user_privacy_settings')
-      .select('id')
-      .eq('user_id', user_id)
-      .single()
-    
-    if (!existing) {
-      // Créer si n'existe pas
-      const { data: privacy, error } = await supabase
-        .from('user_privacy_settings')
-        .insert({
-          user_id,
-          ...data
-        })
-        .select()
-        .single()
-      
-      if (error) throw error
-      
-      return {
-        show_email: privacy.show_email,
-        show_phone: privacy.show_phone,
-        show_current_location: privacy.show_current_location,
-        show_bio: privacy.show_bio,
-        show_linkedin: privacy.show_linkedin,
-        show_entry_year: privacy.show_entry_year,
-        show_in_directory: privacy.show_in_directory
-      }
-    }
-    
-    // Mettre à jour
     const { data: privacy, error } = await supabase
       .from('user_privacy_settings')
-      .update({
-        ...data,
-        updated_at: new Date().toISOString()
-      })
+      .update({ ...data, updated_at: new Date().toISOString() })
       .eq('user_id', user_id)
       .select()
       .single()
-    
+
     if (error) throw error
-    
-    return {
-      show_email: privacy.show_email,
-      show_phone: privacy.show_phone,
-      show_current_location: privacy.show_current_location,
-      show_bio: privacy.show_bio,
-      show_linkedin: privacy.show_linkedin,
-      show_entry_year: privacy.show_entry_year,
-      show_in_directory: privacy.show_in_directory
-    }
+    return this.toPrivacySettings(privacy)
   }
+
 }
 
 export const usersService = new UsersService()

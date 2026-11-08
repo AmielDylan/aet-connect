@@ -187,7 +187,11 @@ router.post('/deletion-requests/:id/approve', async (req, res) => {
       })
     }
 
-    // Marquer la demande comme approuvée
+    // Supprimer le compte d'abord : la base supprime la fiche, révoque les codes encore
+    // valables et garde cette demande comme trace (voir migration member_lifecycle).
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(request.user_id)
+    if (authError && authError.message !== 'User not found') throw authError
+
     const { error: updateError } = await supabase
       .from('deletion_requests')
       .update({
@@ -198,20 +202,6 @@ router.post('/deletion-requests/:id/approve', async (req, res) => {
       .eq('id', id)
 
     if (updateError) throw updateError
-
-    // Supprimer de auth.users (Supabase Admin)
-    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(request.user_id)
-    if (authError && authError.message !== 'User not found') {
-      console.error('Auth deletion error (non-blocking):', authError)
-    }
-
-    // Supprimer de public.users (CASCADE supprime les codes, deletion_requests, etc.)
-    const { error: deleteError } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', request.user_id)
-
-    if (deleteError) throw deleteError
 
     return res.json({ success: true, message: 'Compte supprimé avec succès' })
   } catch (error) {
@@ -462,20 +452,9 @@ router.delete('/users/:id', async (req, res) => {
       })
     }
     
-    // Supprimer dans auth.users d'abord
+    // Supprimer le compte suffit : la base supprime la fiche et révoque ses codes encore valables
     const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id)
-    
-    if (authError && authError.message !== 'User not found') {
-      throw authError
-    }
-    
-    // Supprimer dans public.users (CASCADE s'occupe des codes)
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id)
-    
-    if (error) throw error
+    if (authError && authError.message !== 'User not found') throw authError
     
     return res.json({ success: true })
   } catch (error) {

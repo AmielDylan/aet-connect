@@ -198,10 +198,11 @@ export default function AdminDeletionsPage() {
                       <TableCell>
                         <div>
                           <p className="font-medium">
-                            {user ? `${user.first_name} ${user.last_name}` : '—'}
+                            {user ? `${user.first_name} ${user.last_name}` : request.requester_name || '—'}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {user?.email || '—'}
+                            {user?.email || request.requester_email || '—'}
+                            {!user && request.status === 'approved' && ' · compte supprimé'}
                           </p>
                         </div>
                       </TableCell>

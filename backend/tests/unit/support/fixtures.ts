@@ -31,13 +31,20 @@ export async function createMember({ promo, role = 'alumni', isAmbassador = fals
       first_name: 'Test',
       last_name: role === 'admin' ? 'Admin' : 'Membre',
       school_id: promo.schoolId,
-      entry_year: promo.entryYear,
-      role,
-      is_ambassador: isAmbassador,
-      ...(maxCodesAllowed !== undefined ? { max_codes_allowed: maxCodesAllowed } : {})
+      entry_year: promo.entryYear
     }
   })
   if (error || !data.user) throw error ?? new Error('createUser sans utilisateur')
+
+  // Les droits ne viennent jamais de l'inscription : on les accorde ensuite, comme un admin le ferait
+  const rights: Record<string, unknown> = {}
+  if (role !== 'alumni') rights.role = role
+  if (isAmbassador) rights.is_ambassador = true
+  if (maxCodesAllowed !== undefined) rights.max_codes_allowed = maxCodesAllowed
+  if (Object.keys(rights).length) {
+    const { error: promoteError } = await supabase.from('users').update(rights).eq('id', data.user.id)
+    if (promoteError) throw promoteError
+  }
   return data.user.id
 }
 

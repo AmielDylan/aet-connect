@@ -1,6 +1,6 @@
 import { supabase } from '@/config/database'
 import { logger } from '@/utils/logger'
-import { QUOTA, type Grant } from '@/invitations'
+import type { Grant } from '@/invitations'
 import { CheckSchoolPromoResponse, AccessRequest } from '@/models/registration.model'
 
 export class RegistrationService {
@@ -144,60 +144,35 @@ export class RegistrationService {
     return request as AccessRequest
   }
   
-  // Créer le compte d'un nouveau membre (appelé par invitations.redeem, qui gère le code)
-  // TODO piste 2 : le trigger handle_new_user doit être le seul à écrire la fiche ;
-  // l'attente et les secours ci-dessous disparaîtront alors.
+  // Créer le compte d'un nouveau membre (appelé par invitations.redeem, qui gère le code).
+  // Le trigger handle_new_user écrit la fiche et les réglages de confidentialité dans la
+  // même transaction : si l'un échoue, aucun compte n'est créé et le module rend le code.
   async createMemberAccount(
     grant: Grant,
     identity: { first_name: string; last_name: string; email: string; password: string }
   ): Promise<string> {
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', identity.email)
-      .maybeSingle()
-    if (existingUser) {
-      throw new Error('Un compte existe déjà avec cet email')
-    }
-
-    const profile = {
-      email: identity.email,
-      first_name: identity.first_name,
-      last_name: identity.last_name,
-      school_id: grant.promo.schoolId,
-      entry_year: grant.promo.entryYear,
-      role: 'alumni',
-      is_ambassador: false, // le module Code d'invitation l'accorde après création si le code le prévoit
-      is_active: true,
-      max_codes_allowed: QUOTA.alumni,
-    }
-
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    const { data, error } = await supabase.auth.admin.createUser({
       email: identity.email,
       password: identity.password,
       email_confirm: true,
-      user_metadata: profile,
+      // Identité seulement : le trigger n'accorde aucun droit depuis les métadonnées
+      user_metadata: {
+        first_name: identity.first_name,
+        last_name: identity.last_name,
+        school_id: grant.promo.schoolId,
+        entry_year: grant.promo.entryYear,
+      },
     })
-    if (authError || !authData.user) {
-      throw new Error(authError?.message || 'Erreur lors de la création du compte')
-    }
 
-    const { error: userError } = await supabase
-      .from('users')
-      .update(profile)
-      .eq('id', authData.user.id)
-
-    if (userError) {
-      logger.error('Error updating user in database:', { error: userError, userId: authData.user.id })
-      const { error: insertError } = await supabase
-        .from('users')
-        .upsert({ id: authData.user.id, ...profile })
-      if (insertError) {
-        throw new Error(`Erreur lors de la création de l'utilisateur: ${insertError.message || 'Erreur inconnue'}`)
+    if (error || !data.user) {
+      if (error?.code === 'email_exists' || /already been registered/i.test(error?.message ?? '')) {
+        throw new Error('Un compte existe déjà avec cet email')
       }
+      logger.error('Error creating member account:', error)
+      throw new Error("Impossible de créer le compte. Vérifiez l'école et l'année choisies, puis réessayez.")
     }
 
-    return authData.user.id
+    return data.user.id
   }
 
   // Demander un code à un ambassadeur/membre
