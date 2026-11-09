@@ -75,22 +75,3 @@ export function adminMiddleware(req: Request, res: Response, next: NextFunction)
   
   next()
 }
-
-/**
- * Middleware pour vérifier le rôle moderator ou admin
- */
-export function moderatorMiddleware(req: Request, res: Response, next: NextFunction) {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Non authentifié' })
-  }
-  
-  if (req.user.role !== 'moderator' && req.user.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Accès interdit',
-      message: 'Vous devez être modérateur ou administrateur'
-    })
-  }
-  
-  next()
-}
-

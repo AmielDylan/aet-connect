@@ -210,14 +210,12 @@ Les tests tournent **uniquement contre la base locale** : `tests/assert-local.ts
 ```bash
 cd backend
 
-# Tous les tests E2E (Doppler injecte la config dev_backend)
+# Tous les tests (Doppler injecte la config dev_backend)
 doppler run -- npm test
 
-# Tests par module
-npm run test:e2e:registration
-npm run test:e2e:auth
-npm run test:e2e:events
-npm run test:e2e:admin
+# Tests Vitest seuls (modules et routes, sur la base locale), ou en continu
+doppler run -- npm run test:unit
+doppler run -- npm run test:watch
 ```
 
 ### Frontend
@@ -236,22 +234,14 @@ npm run lint
 
 ## 📦 Scripts utilitaires
 
-### Backend
-
 ```bash
 cd backend
-
-# En local (config dev_backend par défaut)
-doppler run -- npm run admin:create-code     # Créer un code admin universel
-doppler run -- npm run admin:list-codes      # Lister les codes admin
-
-# Contre la production : choisir la config explicitement
-doppler run -c prd_backend -- npm run admin:list-codes
+doppler run -- npm run db:test                    # tester la connexion à la base locale
+doppler run -c prd_backend -- npm run db:test     # … ou à la production
 ```
 
-Le schéma ne se modifie plus par script : voir « Modifier le schéma » plus haut.
-
-Voir [`documentation/scripts/`](./documentation/scripts/) pour la liste complète.
+Les données de test viennent du seed (`supabase/seed.sql`), les codes d'invitation de l'écran admin
+(code universel compris), et le schéma des migrations : aucun script n'écrit directement dans la base.
 
 ---
 

@@ -18,6 +18,21 @@ export async function tokenFor(email: string, password = PASSWORD): Promise<stri
   return data.session?.access_token ?? null
 }
 
+/** Un compte avec son jeton, prêt pour les appels HTTP. role 'admin' : promu après création, comme dans l'appli. */
+export async function session(role: 'alumni' | 'admin' = 'alumni') {
+  const { supabase } = await import('@/config/database')
+  const { createPromo } = await import('./fixtures')
+  const promo = await createPromo()
+  const email = uniqueEmail(role)
+  const { data, error } = await supabase.auth.admin.createUser({
+    email, password: PASSWORD, email_confirm: true,
+    user_metadata: { first_name: 'Test', last_name: role, school_id: promo.schoolId, entry_year: promo.entryYear }
+  })
+  if (error || !data.user) throw error ?? new Error('createUser sans utilisateur')
+  if (role === 'admin') await supabase.from('users').update({ role: 'admin', max_codes_allowed: 999 }).eq('id', data.user.id)
+  return { id: data.user.id, email, promo, auth: `Bearer ${await tokenFor(email)}` }
+}
+
 export async function register(code: string, email: string, extra: Record<string, unknown> = {}) {
   return api()
     .post('/api/register/complete-registration')

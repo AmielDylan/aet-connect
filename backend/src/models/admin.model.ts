@@ -69,7 +69,3 @@ export interface IncreaseCodeLimitRequest {
   new_limit: number
 }
 
-export interface SetAmbassadorRequest {
-  is_ambassador: boolean
-}
-

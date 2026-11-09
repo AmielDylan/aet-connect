@@ -19,13 +19,6 @@ export interface Event {
   updated_at: string
 }
 
-export interface EventParticipant {
-  id: string
-  event_id: string
-  user_id: string
-  registered_at: string
-}
-
 export interface EventWithDetails extends Event {
   creator?: {
     id: string
