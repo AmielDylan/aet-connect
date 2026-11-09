@@ -6,48 +6,7 @@ import { supabase } from '@/config/database'
 
 export class UsersController {
   
-  async getUsers(req: Request, res: Response) {
-    try {
-      const filters = {
-        school_id: req.query.school_id as string,
-        entry_year: req.query.entry_year as string,
-        country: req.query.country as string,
-        city: req.query.city as string,
-        is_ambassador: req.query.is_ambassador === 'true' ? true : req.query.is_ambassador === 'false' ? false : undefined,
-        search: req.query.search as string,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined
-      }
-      
-      const result = await usersService.getUsers(filters)
-      
-      res.json({
-        users: result.users,
-        total: result.total
-      })
-    } catch (error: any) {
-      logger.error('Error in getUsers:', error)
-      res.status(500).json({ error: error.message })
-    }
-  }
   
-  async getUserById(req: Request, res: Response) {
-    try {
-      const { id } = req.params
-      
-      const user = await usersService.getUserById(id)
-      
-      res.json(user)
-    } catch (error: any) {
-      logger.error('Error in getUserById:', error)
-      
-      if (error.message.includes('non trouvé') || error.message.includes('privé')) {
-        res.status(404).json({ error: error.message })
-      } else {
-        res.status(500).json({ error: error.message })
-      }
-    }
-  }
   
   async getMyProfile(req: Request, res: Response) {
     try {
@@ -203,113 +162,9 @@ export class UsersController {
     }
   }
 
-  async getFilterSchools(req: Request, res: Response) {
-    try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('id, name_fr, country')
-        .order('name_fr')
 
-      if (error) throw error
 
-      return res.json({ schools: data || [] })
-    } catch (error: any) {
-      logger.error('Error fetching schools:', error)
-      return res.status(500).json({ error: 'Erreur serveur' })
-    }
-  }
 
-  async getFilterYears(req: Request, res: Response) {
-    try {
-      const { school_id } = req.query
-
-      let query = supabase
-        .from('users')
-        .select('entry_year')
-        .eq('is_active', true)
-        .order('entry_year', { ascending: false })
-
-      if (school_id) {
-        query = query.eq('school_id', school_id as string)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-
-      // Retourner années uniques
-      const uniqueYears = [...new Set((data || []).map(u => u.entry_year))]
-        .filter(Boolean)
-        .sort((a, b) => b.localeCompare(a))
-
-      return res.json({ years: uniqueYears })
-    } catch (error: any) {
-      logger.error('Error fetching years:', error)
-      return res.status(500).json({ error: 'Erreur serveur' })
-    }
-  }
-
-  async getFilterCountries(req: Request, res: Response) {
-    try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('country')
-        .order('country')
-
-      if (error) throw error
-
-      // Retourner pays uniques
-      const uniqueCountries = [...new Set((data || []).map(s => s.country))]
-        .filter(Boolean)
-        .sort()
-
-      return res.json({ countries: uniqueCountries })
-    } catch (error: any) {
-      logger.error('Error fetching countries:', error)
-      return res.status(500).json({ error: 'Erreur serveur' })
-    }
-  }
-
-  async getFilterCities(req: Request, res: Response) {
-    try {
-      // Récupérer toutes les villes distinctes des utilisateurs actifs
-      // qui ont autorisé la visibilité de leur localisation
-      // Utiliser une requête SQL directe pour meilleure performance
-      const { data: users, error } = await supabase
-        .from('users')
-        .select(`
-          current_city,
-          user_privacy_settings!inner (
-            show_current_location
-          )
-        `)
-        .eq('is_active', true)
-        .not('current_city', 'is', null)
-        .neq('current_city', '')
-
-      if (error) throw error
-
-      // Filtrer uniquement les utilisateurs avec show_current_location: true
-      // Note: Supabase ne permet pas facilement de filtrer directement sur une relation imbriquée
-      // donc on filtre après le fetch
-      const citiesWithPrivacy = (users || []).filter((u: any) => {
-        const privacy = Array.isArray(u.user_privacy_settings) 
-          ? u.user_privacy_settings[0] 
-          : u.user_privacy_settings
-        return privacy?.show_current_location === true
-      })
-
-      // Extraire les villes uniques et les trier
-      const uniqueCities = [...new Set(citiesWithPrivacy.map((u: any) => u.current_city))]
-        .filter(Boolean)
-        .sort()
-
-      return res.json({ cities: uniqueCities })
-    } catch (error: any) {
-      logger.error('Error fetching cities:', error)
-      return res.status(500).json({ error: 'Erreur serveur' })
-    }
-  }
 }
 
 export const usersController = new UsersController()

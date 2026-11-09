@@ -59,8 +59,9 @@ export async function proxy(request: NextRequest) {
   // Récupérer la session
   const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-  // Protéger /dashboard
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !session) {
+  // Protéger /dashboard et les profils des membres (réseau sur invitation)
+  const isPrivate = ['/dashboard', '/profile'].some((p) => request.nextUrl.pathname.startsWith(p))
+  if (isPrivate && !session) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
@@ -77,5 +78,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: ['/dashboard/:path*', '/profile/:path*', '/login'],
 }

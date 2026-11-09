@@ -129,6 +129,7 @@ export interface UserProfile {
   updated_at: string
 }
 
+/** Profil tel que l'annuaire le montre : les champs que le membre cache arrivent à null. */
 export interface PublicUserProfile {
   id: string
   first_name: string
@@ -137,6 +138,8 @@ export interface PublicUserProfile {
     id: string
     name_fr: string
     country: string
+    acronym?: string | null
+    flag?: string | null
   } | null
   entry_year?: string | null
   current_city?: string | null
@@ -147,8 +150,6 @@ export interface PublicUserProfile {
   phone?: string | null
   avatar_url?: string | null
   is_ambassador: boolean
-  events_participated?: number
-  codes_generated?: number
 }
 
 // ═══════════════════════════════════════════════════
