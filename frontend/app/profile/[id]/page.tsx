@@ -17,7 +17,7 @@ export default function PublicProfilePage() {
   
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['public-profile', userId],
-    queryFn: () => apiClient.getPublicProfile(userId),
+    queryFn: () => apiClient.getUserById(userId),
   })
   
   if (isLoading) {
@@ -102,13 +102,13 @@ export default function PublicProfilePage() {
             {/* Informations principales */}
             <div className="space-y-4 mb-6">
               {/* École */}
-              {user.schools && (
+              {user.school && (
                 <div className="flex items-center justify-center gap-2 text-lg">
                   <School className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   <span className="font-medium">
-                    {user.schools.flag} {user.schools.acronym || user.schools.name_fr}
+                    {user.school.flag} {user.school.acronym || user.school.name_fr}
                   </span>
-                  {user.privacy?.show_entry_year !== false && user.entry_year && (
+                  {user.entry_year && (
                     <>
                       <Separator orientation="vertical" className="h-5" />
                       <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -121,7 +121,7 @@ export default function PublicProfilePage() {
               )}
               
               {/* Localisation */}
-              {user.privacy?.show_current_location !== false && user.current_city && (
+              {user.current_city && (
                 <div className="flex items-center justify-center gap-2 text-muted-foreground">
                   <MapPin className="h-4 w-4 flex-shrink-0" />
                   <span>{user.current_city}{user.current_country && `, ${user.current_country}`}</span>
@@ -133,7 +133,7 @@ export default function PublicProfilePage() {
 
             {/* Boutons de contact */}
             <div className="flex flex-wrap gap-3 justify-center mb-6">
-              {user.privacy?.show_email !== false && user.email && (
+              {user.email && (
                 <a href={`mailto:${user.email}`} className="flex-1 min-w-[140px] max-w-[200px]">
                   <Button variant="outline" className="w-full gap-2">
                     <Mail className="h-4 w-4" />
@@ -142,7 +142,7 @@ export default function PublicProfilePage() {
                 </a>
               )}
               
-              {user.privacy?.show_phone !== false && user.phone && (
+              {user.phone && (
                 <a href={`tel:${user.phone}`} className="flex-1 min-w-[140px] max-w-[200px]">
                   <Button variant="outline" className="w-full gap-2">
                     <Phone className="h-4 w-4" />
@@ -151,7 +151,7 @@ export default function PublicProfilePage() {
                 </a>
               )}
               
-              {user.privacy?.show_linkedin !== false && user.linkedin_url && (
+              {user.linkedin_url && (
                 <a
                   href={user.linkedin_url}
                   target="_blank"
@@ -169,7 +169,7 @@ export default function PublicProfilePage() {
         </Card>
         
         {/* Bio */}
-        {user.privacy?.show_bio !== false && user.bio && (
+        {user.bio && (
           <Card className="mt-6 shadow-lg">
             <CardContent className="pt-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">

@@ -4,103 +4,56 @@ import { supabaseAuthMiddleware as authMiddleware } from '@/middleware/supabase-
 import { validateRequest } from '@/middleware/validation.middleware'
 import { UpdateProfileSchema, UpdatePrivacySchema, ChangePasswordSchema, RequestDeletionSchema } from '@/utils/validations'
 import { supabase } from '@/config/database'
+import { listMembers, memberProfile, visibleYears, visibleCities } from '@/services/directory.service'
+import { asyncRoute } from '@/utils/http'
 
 const router = Router()
 
-// Routes publiques (sans authentification)
-// GET /api/users/filters/schools - Liste des écoles avec membres (PUBLIC)
-router.get('/filters/schools', usersController.getFilterSchools.bind(usersController))
-
-// GET /api/users/filters/years - Liste des promotions (PUBLIC)
-router.get('/filters/years', usersController.getFilterYears.bind(usersController))
-
-// GET /api/users/filters/countries - Liste des pays (PUBLIC)
-router.get('/filters/countries', usersController.getFilterCountries.bind(usersController))
-
-// GET /api/users/filters/cities - Liste des villes (PUBLIC)
-router.get('/filters/cities', usersController.getFilterCities.bind(usersController))
-
-// GET /api/users/profile/:id - Profil public (PAS d'authentification requise)
-router.get('/profile/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-    
-    const { data: user, error } = await supabase
-      .from('users')
-      .select(`
-        id,
-        first_name,
-        last_name,
-        email,
-        phone,
-        school_id,
-        entry_year,
-        current_city,
-        current_country,
-        bio,
-        linkedin_url,
-        avatar_url,
-        is_ambassador,
-        schools(
-          id,
-          name_fr,
-          acronym,
-          flag,
-          country
-        ),
-        user_privacy_settings(
-          show_email,
-          show_phone,
-          show_current_location,
-          show_bio,
-          show_linkedin,
-          show_entry_year
-        )
-      `)
-      .eq('id', id)
-      .eq('is_active', true)
-      .single()
-    
-    if (error || !user) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé' })
-    }
-    
-    // Appliquer les privacy settings
-    const privacy = Array.isArray(user.user_privacy_settings) 
-      ? user.user_privacy_settings[0] 
-      : user.user_privacy_settings || {}
-    
-    const school = Array.isArray(user.schools) ? user.schools[0] : user.schools
-    
-    const publicProfile = {
-      id: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: privacy.show_email !== false ? user.email : null,
-      phone: privacy.show_phone !== false ? user.phone : null,
-      entry_year: privacy.show_entry_year !== false ? user.entry_year : null,
-      current_city: privacy.show_current_location !== false ? user.current_city : null,
-      current_country: privacy.show_current_location !== false ? user.current_country : null,
-      bio: privacy.show_bio !== false ? user.bio : null,
-      linkedin_url: privacy.show_linkedin !== false ? user.linkedin_url : null,
-      avatar_url: user.avatar_url,
-      is_ambassador: user.is_ambassador,
-      schools: school,
-      privacy
-    }
-    
-    return res.json(publicProfile)
-  } catch (error) {
-    console.error('Error fetching public profile:', error)
-    return res.status(500).json({ error: 'Erreur serveur' })
-  }
-})
-
-// TOUTES les autres routes users requièrent authentification
+// Toutes les routes users exigent d'être connecté (réseau sur invitation)
 router.use(authMiddleware)
 
-// GET /api/users (annuaire)
-router.get('/', usersController.getUsers.bind(usersController))
+// ==================== ANNUAIRE ====================
+// Visibilité et masquage : vue directory_entries (voir services/directory.service)
+
+// GET /api/users?search=&school_id=&entry_year=&country=&city=&is_ambassador=&limit=&offset=
+router.get('/', asyncRoute(async (req, res) => {
+  const q = req.query as Record<string, string | undefined>
+  res.json(await listMembers({
+    search: q.search,
+    school_id: q.school_id,
+    entry_year: q.entry_year,
+    country: q.country,
+    city: q.city,
+    is_ambassador: q.is_ambassador === 'true' ? true : q.is_ambassador === 'false' ? false : undefined,
+    limit: q.limit ? parseInt(q.limit) : undefined,
+    offset: q.offset ? parseInt(q.offset) : undefined
+  }))
+}))
+
+// GET /api/users/filters/schools
+router.get('/filters/schools', asyncRoute(async (_req, res) => {
+  const { data, error } = await supabase.from('schools').select('id, name_fr, country').order('name_fr')
+  if (error) throw error
+  res.json({ schools: data ?? [] })
+}))
+
+// GET /api/users/filters/years?school_id=
+router.get('/filters/years', asyncRoute(async (req, res) => {
+  res.json({ years: await visibleYears(req.query.school_id as string | undefined) })
+}))
+
+// GET /api/users/filters/countries (pays des écoles)
+router.get('/filters/countries', asyncRoute(async (_req, res) => {
+  const { data, error } = await supabase.from('schools').select('country')
+  if (error) throw error
+  const countries = [...new Set((data ?? []).map((s) => s.country).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'))
+  res.json({ countries })
+}))
+
+// GET /api/users/filters/cities
+router.get('/filters/cities', asyncRoute(async (_req, res) => {
+  res.json({ cities: await visibleCities() })
+}))
 
 // GET /api/users/me (mon profil complet)
 router.get('/me', usersController.getMyProfile.bind(usersController))
@@ -136,8 +89,10 @@ router.post(
   usersController.requestAccountDeletion.bind(usersController)
 )
 
-// GET /api/users/:id (profil public)
-router.get('/:id', usersController.getUserById.bind(usersController))
+// GET /api/users/:id : profil d'un membre tel que l'annuaire le montre (404 s'il est masqué)
+router.get('/:id', asyncRoute(async (req, res) => {
+  res.json(await memberProfile(req.params.id))
+}))
 
 export default router
 

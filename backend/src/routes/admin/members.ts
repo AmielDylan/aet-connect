@@ -5,6 +5,7 @@ import { adminService } from '@/services/admin.service'
 import { validateRequest } from '@/middleware/validation.middleware'
 import { UpdateUserSchema, IncreaseCodeLimitSchema } from '@/utils/validations'
 import { asyncRoute, HttpError } from '@/utils/http'
+import { plainSearchTerm } from '@/utils/search'
 import { logger } from '@/utils/logger'
 
 // Gestion des membres par un admin. Montées sous /api/admin/users.
@@ -28,8 +29,9 @@ router.get('/', asyncRoute(async (req, res) => {
   let query = supabase
     .from('users')
     .select('*, schools(id, name_fr, acronym, country)', { count: 'exact' })
-  // TODO piste 4 : échapper la recherche (virgules et parenthèses changent le filtre or())
-  if (search) query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`)
+  // Texte nettoyé : sans virgule ni parenthèse, il ne peut pas ajouter de condition au or()
+  const term = plainSearchTerm(search)
+  if (term) query = query.or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,email.ilike.%${term}%`)
   if (role && role !== 'all') query = query.eq('role', role)
   if (school_id && school_id !== 'all') query = query.eq('school_id', school_id)
   if (is_ambassador === 'true') query = query.eq('is_ambassador', true)

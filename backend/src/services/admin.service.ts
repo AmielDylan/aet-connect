@@ -1,5 +1,5 @@
 import { supabase } from '@/config/database'
-import { AdminStats, AccessRequestFilters, UserFilters, UpdateUserRequest, IncreaseCodeLimitRequest } from '@/models/admin.model'
+import { AdminStats, UpdateUserRequest, IncreaseCodeLimitRequest } from '@/models/admin.model'
 // bcrypt supprimé - plus nécessaire avec Supabase Auth
 
 export class AdminService {
