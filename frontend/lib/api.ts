@@ -39,6 +39,14 @@ import type {
 } from '@/types'
 import type { DirectoryMember } from '@/types/directory'
 
+/** Erreur renvoyée par le backend, avec son statut HTTP (sert à ne pas réessayer les 4xx). */
+export class HttpError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message)
+    this.name = 'HttpError'
+  }
+}
+
 class ApiClient {
   private baseURL: string
 
@@ -90,7 +98,7 @@ class ApiClient {
           }
         }
         
-        throw new Error(errorData.message || errorData.error || 'Une erreur est survenue')
+        throw new HttpError(response.status, errorData.message || errorData.error || 'Une erreur est survenue')
       }
 
       // Parse JSON response
@@ -111,26 +119,16 @@ class ApiClient {
   // Note: Login/logout/refresh sont maintenant gérés par Supabase Auth côté client
   // Ces méthodes ont été supprimées car Supabase gère l'authentification nativement
 
-  /**
-   * Get current authenticated user
-   * GET /api/auth/me
-   * Returns User with optional school field (singulier, cohérent avec getMyProfile())
-   */
-  async getMe(): Promise<User> {
-    return this.fetch<User>('/api/auth/me')
-  }
-
   // ═══════════════════════════════════════════════════
   // USER ENDPOINTS
   // ═══════════════════════════════════════════════════
 
   /**
-   * Get current user profile (same as getMe but explicit endpoint)
-   * GET /api/users/me
-   * Note: Returns UserProfile which includes privacy: UserPrivacy
+   * Le membre connecté (profil complet, avec son école)
+   * GET /api/users/me — à lire via le hook useCurrentMember, pas directement
    */
-  async getUserProfile(): Promise<UserProfile> {
-    return this.fetch<UserProfile>('/api/users/me')
+  async getMe(): Promise<User> {
+    return this.fetch<User>('/api/users/me')
   }
 
   /**

@@ -2,11 +2,11 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
 
 export function useAdminCheck() {
   const router = useRouter()
-  const user = useAuthStore((state) => state.user)
+  const { user } = useAuth()
   const isAuthenticated = !!user
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/hooks/use-auth'
-import { useAuthStore } from '@/store/auth-store'
+import { useCurrentMember, useMemberCache } from '@/hooks/use-current-member'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -47,8 +47,10 @@ import type { UpdateProfileRequest, UpdatePrivacyRequest } from '@/types'
 import type { ChangePasswordData, PasswordValidation } from '@/types/profile'
 
 export default function ProfilePage() {
-  const { user } = useAuth()
-  const loadUser = useAuthStore((state) => state.loadUser)
+  // Le membre connecté : même source que l'en-tête et la barre latérale
+  const { member: profile, isLoading } = useCurrentMember()
+  const { refresh: refreshMember } = useMemberCache()
+  const user = profile
   const queryClient = useQueryClient()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState<UpdateProfileRequest>({
@@ -86,12 +88,6 @@ export default function ProfilePage() {
   const [deletionReason, setDeletionReason] = useState('')
   const [deletionDialogOpen, setDeletionDialogOpen] = useState(false)
 
-  // Récupérer le profil
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['user', 'profile'],
-    queryFn: () => apiClient.getUserProfile(),
-  })
-
   // Récupérer la liste des pays
   const { data: countriesData } = useQuery({
     queryKey: ['filter-countries'],
@@ -120,7 +116,7 @@ export default function ProfilePage() {
     }
   }, [privacyData])
 
-  // Mettre à jour formData quand profile ou user change
+  // Remplir le formulaire avec le membre connecté
   useEffect(() => {
     if (profile) {
       setProfileData({
@@ -132,25 +128,15 @@ export default function ProfilePage() {
         linkedin_url: profile.linkedin_url || '',
         bio: profile.bio || '',
       })
-    } else if (user) {
-      setProfileData({
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        phone: user.phone || '',
-        current_city: user.current_city || '',
-        current_country: user.current_country || '',
-        linkedin_url: user.linkedin_url || '',
-        bio: user.bio || '',
-      })
     }
-  }, [profile, user])
+  }, [profile])
 
   // Mutation mise à jour profil
   const updateProfileMutation = useMutation({
     mutationFn: (data: UpdateProfileRequest) => apiClient.updateProfile(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'profile'] })
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] })
+      // L'en-tête, la barre latérale et ce formulaire lisent le même cache
+      refreshMember()
       setIsEditing(false)
     },
   })
@@ -308,13 +294,7 @@ export default function ProfilePage() {
                 <AvatarUpload
                   currentAvatarUrl={profile.avatar_url}
                   userId={user.id}
-                  onAvatarUpdate={async () => {
-                    // Invalider les queries React Query pour recharger le profil
-                    queryClient.invalidateQueries({ queryKey: ['user', 'profile'] })
-                    queryClient.invalidateQueries({ queryKey: ['user'] })
-                    // Recharger l'utilisateur depuis l'API pour mettre à jour le header
-                    await loadUser()
-                  }}
+                  onAvatarUpdate={refreshMember}
                 />
               </div>
             </div>

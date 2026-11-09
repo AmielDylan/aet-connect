@@ -72,6 +72,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
+              aria-label="Menu du compte"
               className="relative h-8 w-8 rounded-full p-0 hover:bg-[#f5f5f5]"
             >
               <Avatar

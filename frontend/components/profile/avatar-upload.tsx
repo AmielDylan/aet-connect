@@ -13,7 +13,8 @@ import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { uploadAvatar, deleteAvatar } from '@/lib/supabase-storage'
 import { apiClient } from '@/lib/api'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
+import { useMemberCache } from '@/hooks/use-current-member'
 import { toast } from 'sonner'
 
 // Enregistrer les plugins
@@ -26,7 +27,8 @@ interface AvatarUploadProps {
 }
 
 export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
-  const { user, setUser } = useAuthStore()
+  const { user } = useAuth()
+  const memberCache = useMemberCache()
   const [isDeleting, setIsDeleting] = useState(false)
   const pondRef = useRef<FilePondBase>(null)
   const lastAvatarUrlRef = useRef<string | null | undefined>(undefined)
@@ -108,9 +110,9 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
         console.log('[DEBUG] URL already invalid, skipping', {baseUrl, currentAvatarUrl})
         setFiles([])
         // Mettre à jour le store pour supprimer l'avatar invalide
-        const currentUser = useAuthStore.getState().user
+        const currentUser = memberCache.current()
         if (currentUser && currentUser.avatar_url === currentAvatarUrl) {
-          setUser({ ...currentUser, avatar_url: null })
+          memberCache.patch({ avatar_url: null })
           lastAvatarUrlRef.current = null
         }
         return
@@ -131,7 +133,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
         isValidatingRef.current = false
 
         // Vérifier si l'URL a changé pendant la validation
-        const currentUser = useAuthStore.getState().user
+        const currentUser = memberCache.current()
         const currentBaseUrl = currentUser?.avatar_url?.split('?')[0]
         if (currentBaseUrl !== baseUrl) {
           console.log('[DEBUG] Avatar URL changed during validation, skipping', {baseUrl, currentBaseUrl})
@@ -155,7 +157,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
           
           // Mettre à jour le store pour supprimer l'avatar invalide
           if (currentUser && currentUser.avatar_url) {
-            setUser({ ...currentUser, avatar_url: null })
+            memberCache.patch({ avatar_url: null })
             lastAvatarUrlRef.current = null
           }
         } else {
@@ -165,11 +167,11 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
             console.log('[DEBUG] URL marked as invalid during validation, skipping', {baseUrl})
             setFiles([])
             // Mettre à jour le store pour supprimer l'avatar invalide
-            const currentUser = useAuthStore.getState().user
+            const currentUser = memberCache.current()
             if (currentUser && currentUser.avatar_url) {
               const currentBaseUrl = currentUser.avatar_url.split('?')[0]
               if (currentBaseUrl === baseUrl) {
-                setUser({ ...currentUser, avatar_url: null })
+                memberCache.patch({ avatar_url: null })
                 lastAvatarUrlRef.current = null
               }
             }
@@ -272,7 +274,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
 
   // Fonction de suppression commune
   const performDelete = async () => {
-    const currentUser = useAuthStore.getState().user
+    const currentUser = memberCache.current()
     if (!currentUser?.avatar_url || !currentUser?.id) {
       throw new Error('Utilisateur non connecté')
     }
@@ -304,12 +306,11 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
       // Supprimer dans Storage
       await deleteAvatar(currentUser.id, avatarUrlToDelete)
 
-      // Mettre à jour dans la base
-      await apiClient.updateProfile({ avatar_url: undefined })
-      
-      // Mettre à jour le store immédiatement pour que la navbar se mette à jour
-      const updatedUser = { ...currentUser, avatar_url: null }
-      setUser(updatedUser)
+      // Effacer l'URL en base : null (undefined disparaissait du JSON et rien n'était effacé)
+      await apiClient.updateProfile({ avatar_url: null })
+
+      // Mise à jour immédiate du cache partagé : l'en-tête suit sans attendre
+      memberCache.patch({ avatar_url: null })
       lastAvatarUrlRef.current = null
       
       // Appeler le callback pour recharger l'utilisateur depuis l'API
@@ -349,7 +350,7 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
 
   // Fonction appelée quand l'utilisateur clique sur le bouton externe "Supprimer"
   const handleFileRemove = async () => {
-    const currentUser = useAuthStore.getState().user
+    const currentUser = memberCache.current()
     if (!currentUser?.avatar_url || !currentUser?.id || isDeleting) return
 
     try {
@@ -444,11 +445,11 @@ export function AvatarUpload({ onAvatarUpdate }: AvatarUploadProps) {
         pondRef.current.removeFiles()
         setFiles([])
         // Mettre à jour le store pour supprimer l'avatar invalide
-        const currentUser = useAuthStore.getState().user
+        const currentUser = memberCache.current()
         if (currentUser && currentUser.avatar_url) {
           const currentBaseUrl = currentUser.avatar_url.split('?')[0]
           if (currentBaseUrl === baseUrl) {
-            setUser({ ...currentUser, avatar_url: null })
+            memberCache.patch({ avatar_url: null })
             lastAvatarUrlRef.current = null
           }
         }

@@ -148,7 +148,7 @@ export const UpdateProfileSchema = z.object({
   bio: z.string().max(500).optional(),
   phone: z.string().max(20).optional(),
   linkedin_url: z.string().url().optional(),
-  avatar_url: z.string().url().optional()
+  avatar_url: z.string().url().nullable().optional() // null : effacer l'avatar
 }).passthrough() // Permet les champs supplémentaires (comme email) qui seront ignorés
 
 export const ChangePasswordSchema = z.object({

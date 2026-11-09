@@ -1,45 +1,26 @@
-// ═══════════════════════════════════════════════════
-// useAuth Hook
-// Hook personnalisé pour accéder à l'authentification
-// ═══════════════════════════════════════════════════
-
 'use client'
 
-import { useAuthStore } from '@/store/auth-store'
+import { supabase } from '@/lib/supabase'
+import { useCurrentMember } from '@/hooks/use-current-member'
 
 /**
- * Custom hook to access authentication state and actions
- * 
- * @returns Authentication state and actions
- * 
- * @example
- * ```tsx
- * const { user, isAuthenticated, login, logout } = useAuth();
- * 
- * if (isAuthenticated) {
- *   return <div>Hello {user?.first_name}</div>
- * }
- * ```
+ * Session et membre connecté.
+ * La session appartient à Supabase Auth ; le membre vient de useCurrentMember.
+ * À la déconnexion, SessionSync (app/providers) vide tout le cache.
  */
 export const useAuth = () => {
-  const user = useAuthStore((state) => state.user)
-  const login = useAuthStore((state) => state.login)
-  const logout = useAuthStore((state) => state.logout)
-  const loadUser = useAuthStore((state) => state.loadUser)
-  const setUser = useAuthStore((state) => state.setUser)
-
-  // Calculer isAuthenticated et isLoading depuis user
-  const isAuthenticated = !!user
-  const isLoading = false // Simplifié : pas de state isLoading pour l'instant
+  const { member, isLoading } = useCurrentMember()
 
   return {
-    user,
-    isAuthenticated,
+    user: member,
+    isAuthenticated: !!member,
     isLoading,
-    login,
-    logout,
-    loadUser,
-    setUser,
+    login: async (email: string, password: string) => {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+    },
+    logout: async () => {
+      await supabase.auth.signOut()
+    },
   }
 }
-

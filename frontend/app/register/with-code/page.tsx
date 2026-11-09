@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { RegistrationSteps } from '@/components/registration/registration-steps'
@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { apiClient } from '@/lib/api'
 import type { VerifyInvitationCodeResponse } from '@/types'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2, CheckCircle2, Info, AlertCircle } from 'lucide-react'
 
@@ -21,11 +21,11 @@ const STEPS = [
   { number: 3, title: 'Validation', description: 'Création compte' },
 ]
 
-export default function RegisterWithCodePage() {
+function RegisterWithCodePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const codeFromUrl = searchParams.get('code')
-  const { user, logout } = useAuthStore()
+  const { user, logout } = useAuth()
   const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(1)
 
@@ -551,5 +551,14 @@ export default function RegisterWithCodePage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+// useSearchParams exige une frontière Suspense (sinon le build de production échoue)
+export default function RegisterWithCodePage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterWithCodePageContent />
+    </Suspense>
   )
 }
