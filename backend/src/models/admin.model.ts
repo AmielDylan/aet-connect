@@ -34,25 +34,6 @@ export interface AdminStats {
   }>
 }
 
-export interface AccessRequestFilters {
-  status?: 'pending' | 'approved' | 'rejected'
-  school_id?: string
-  date_from?: string
-  date_to?: string
-  limit?: number
-  offset?: number
-}
-
-export interface UserFilters {
-  role?: 'alumni' | 'moderator' | 'admin'
-  school_id?: string
-  is_active?: boolean
-  is_ambassador?: boolean
-  search?: string
-  limit?: number
-  offset?: number
-}
-
 export interface UpdateUserRequest {
   first_name?: string
   last_name?: string

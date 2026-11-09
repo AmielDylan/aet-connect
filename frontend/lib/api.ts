@@ -397,29 +397,6 @@ class ApiClient {
     })
   }
 
-  /**
-   * Get public user profile (no auth required)
-   * GET /api/users/profile/:id
-   */
-  async getPublicProfile(userId: string): Promise<any> {
-    // Cette route est publique, pas besoin d'authentification
-    const response = await fetch(`${this.baseURL}/api/users/profile/${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('Utilisateur non trouvé')
-      }
-      throw new Error('Erreur lors du chargement du profil')
-    }
-    
-    return response.json()
-  }
-
   // ═══════════════════════════════════════════════════
   // SCHOOLS ENDPOINTS
   // ═══════════════════════════════════════════════════
