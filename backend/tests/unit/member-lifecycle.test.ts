@@ -16,7 +16,7 @@ describe('inscription (POST /api/register/complete-registration)', () => {
     const res = await register(code, email, { role: 'admin', is_ambassador: true })
     expect(res.status).toBe(201)
 
-    const me = await api().get('/api/auth/me').set('Authorization', `Bearer ${await tokenFor(email)}`)
+    const me = await api().get('/api/users/me').set('Authorization', `Bearer ${await tokenFor(email)}`)
     expect(me.body).toMatchObject({
       email,
       first_name: 'Awa',
@@ -67,7 +67,7 @@ describe('création de compte par Supabase Auth (défense en profondeur)', () =>
       }
     })
 
-    const me = await api().get('/api/auth/me').set('Authorization', `Bearer ${await tokenFor(email)}`)
+    const me = await api().get('/api/users/me').set('Authorization', `Bearer ${await tokenFor(email)}`)
 
     expect(me.body).toMatchObject({ role: 'alumni', is_ambassador: false, max_codes_allowed: 3 })
   })
@@ -92,7 +92,7 @@ async function sponsoredMember() {
   const email = uniqueEmail('membre')
   await register(code, email)
   const token = await tokenFor(email)
-  const me = await api().get('/api/auth/me').set('Authorization', `Bearer ${token}`)
+  const me = await api().get('/api/users/me').set('Authorization', `Bearer ${token}`)
   const issued = await invitations.issue(me.body.id)
   return { sponsor, memberId: me.body.id as string, email, token, issuedCode: issued.code }
 }

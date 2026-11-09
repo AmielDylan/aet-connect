@@ -8,7 +8,6 @@ import { requestLogger } from '@/middleware/logger.middleware'
 import { logger } from '@/utils/logger'
 import registrationRoutes from '@/routes/registration.routes'
 import codesRoutes from '@/routes/codes.routes'
-import authRoutes from '@/routes/auth.routes'
 import eventsRoutes from '@/routes/events.routes'
 import adminRoutes from '@/routes/admin'
 import schoolsRoutes from '@/routes/schools.routes'
@@ -44,7 +43,6 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/register', registrationRoutes)
-app.use('/api/auth', authRoutes)
 app.use('/api/codes', codesRoutes)
 app.use('/api/events', eventsRoutes)
 app.use('/api/admin', adminRoutes)

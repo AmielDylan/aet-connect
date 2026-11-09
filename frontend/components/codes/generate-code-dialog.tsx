@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import { useToast } from '@/hooks/use-toast'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,7 @@ import { Plus, Loader2, AlertCircle } from 'lucide-react'
 export function GenerateCodeDialog() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
-  const { user } = useAuthStore()
+  const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
   const [open, setOpen] = useState(false)
   const [selectedSchool, setSelectedSchool] = useState('')

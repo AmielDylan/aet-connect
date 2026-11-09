@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useAdminCheck } from '@/hooks/use-admin-check'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -48,7 +48,7 @@ export default function AdminUsersPage() {
   const { isAdmin } = useAdminCheck()
   const { toast } = useToast()
   const queryClient = useQueryClient()
-  const { user: currentUser } = useAuthStore()
+  const { user: currentUser } = useAuth()
   
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')

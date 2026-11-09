@@ -26,25 +26,12 @@ export class UsersService {
       throw new Error('Utilisateur non trouvé')
     }
     
-    // Compter événements et codes
-    const { count: eventsCount } = await supabase
-      .from('event_participants')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user_id)
-    
-    const { count: codesCount } = await supabase
-      .from('invitation_codes')
-      .select('*', { count: 'exact', head: true })
-      .eq('created_by_user_id', user_id)
-    
     const privacy = Array.isArray(user.privacy) ? user.privacy[0] : user.privacy
     
     return {
       ...user,
       school: Array.isArray(user.school) ? user.school[0] : user.school,
-      privacy: privacy || null,
-      events_participated: eventsCount || 0,
-      codes_generated: codesCount || 0
+      privacy: privacy || null
     }
   }
   

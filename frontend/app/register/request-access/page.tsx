@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { RegistrationSteps } from '@/components/registration/registration-steps'
@@ -22,7 +22,7 @@ const STEPS = [
   { number: 4, title: 'Confirmation', description: 'En attente' },
 ]
 
-export default function RequestAccessPage() {
+function RequestAccessPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState(1)
@@ -419,4 +419,11 @@ export default function RequestAccessPage() {
   )
 }
 
-
+// useSearchParams exige une frontière Suspense (sinon le build de production échoue)
+export default function RequestAccessPage() {
+  return (
+    <Suspense fallback={null}>
+      <RequestAccessPageContent />
+    </Suspense>
+  )
+}
