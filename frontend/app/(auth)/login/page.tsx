@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,10 +25,10 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { login, loadUser } = useAuth()
+  const { login } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const redirectUrl = searchParams.get('redirect') || '/dashboard'
@@ -42,7 +42,6 @@ export default function LoginPage() {
     setIsLoading(true)
     try {
       await login(data.email, data.password)
-      await loadUser()
       toast({ title: 'Connexion réussie', description: 'Redirection en cours...' })
       window.location.href = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
     } catch (error: any) {
@@ -139,5 +138,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// useSearchParams exige une frontière Suspense (sinon le build de production échoue)
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   )
 }

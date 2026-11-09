@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
 import { GenerateCodeDialog } from '@/components/codes/generate-code-dialog'
 import { CodeCard } from '@/components/codes/code-card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Loader2, AlertCircle, Info } from 'lucide-react'
 
 export default function CodesPage() {
-  const { user } = useAuthStore()
+  const { user } = useAuth()
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['my-codes'],

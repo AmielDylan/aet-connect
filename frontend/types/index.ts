@@ -464,7 +464,8 @@ export interface UpdateProfileRequest {
   bio?: string
   phone?: string
   linkedin_url?: string
-  avatar_url?: string
+  /** null : effacer l'avatar */
+  avatar_url?: string | null
 }
 
 export interface UpdatePrivacyRequest {

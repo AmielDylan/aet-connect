@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { X, LayoutDashboard, User, School, Users, Ticket, BarChart, Clock, Trash2 } from 'lucide-react'
-import { useAuthStore } from '@/store/auth-store'
+import { useAuth } from '@/hooks/use-auth'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 
@@ -25,7 +25,7 @@ const navigation = [
 
 export function Sidebar({ onClose, isMobile }: SidebarProps) {
   const pathname = usePathname()
-  const user = useAuthStore((state) => state.user)
+  const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
 
   const { data: stats } = useQuery({

@@ -1,45 +1,42 @@
 'use client'
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { useAuthStore } from '@/store/auth-store'
+import type { AuthChangeEvent } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
+import { createQueryClient } from '@/lib/query-client'
+import { ME_KEY } from '@/hooks/use-current-member'
 import { Toaster as SonnerToaster } from '@/components/ui/sonner'
 import { Toaster } from '@/components/ui/toaster'
 
-const queryClient = new QueryClient()
-
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [isReady, setIsReady] = useState(false)
-  const loadUser = useAuthStore((state) => state.loadUser)
+/**
+ * La session Supabase commande le cache :
+ *  - déconnexion → tout le cache est vidé (rien d'un membre ne survit pour le suivant) ;
+ *  - connexion, jeton renouvelé, compte modifié → le membre connecté est rechargé.
+ */
+function SessionSync() {
+  const queryClient = useQueryClient()
 
   useEffect(() => {
-    // Timeout de sécurité : forcer le chargement après 2 secondes MAX
-    const timeout = setTimeout(() => {
-      setIsReady(true)
-    }, 2000)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
+      if (event === 'SIGNED_OUT') {
+        queryClient.clear()
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        queryClient.invalidateQueries({ queryKey: ME_KEY })
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [queryClient])
 
-    // Essayer de charger l'utilisateur
-    loadUser()
-      .catch((err) => console.error('LoadUser error:', err))
-      .finally(() => {
-        clearTimeout(timeout)
-        setIsReady(true)
-      })
+  return null
+}
 
-    return () => clearTimeout(timeout)
-  }, [loadUser])
-
-  // Loader pendant max 2 secondes
-  if (!isReady) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(createQueryClient)
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SessionSync />
       {children}
       <SonnerToaster />
       <Toaster />

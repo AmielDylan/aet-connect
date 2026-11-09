@@ -220,13 +220,12 @@ doppler run -- npm run test:watch
 
 ### Frontend
 
+Parcours de bout en bout avec Playwright, dans ton Chrome installé, sur la pile locale
+(`supabase start` ; le backend et le frontend sont démarrés par Playwright sur les ports 3001 et 3100) :
+
 ```bash
 cd frontend
-
-# Tests API
-npm run test:api
-
-# Linter
+npm run test:e2e      # Doppler fournit la config dev_backend ; refuse de tourner hors base locale
 npm run lint
 ```
 

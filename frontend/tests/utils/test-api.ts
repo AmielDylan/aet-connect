@@ -61,7 +61,7 @@ async function testApiClient() {
     logSuccess('getMe()', meData)
 
     // Test getUserProfile
-    const profileData = await apiClient.getUserProfile()
+    const profileData = await apiClient.getMe()
     logSuccess('getUserProfile()', profileData)
 
   } catch (error) {
