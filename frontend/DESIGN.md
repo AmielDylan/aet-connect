@@ -195,16 +195,19 @@ Tout est arrondi, sans angle vif. Les photos ont des coins de 24px, et un coin p
 - **Style :** fond blanc, contour trait de 2px, coins de 12px, 48px de haut, texte encre ; les années en chiffres tabulaires.
 - **Focus :** contour vert armée et anneau de focus.
 - **Error :** message en alerte, gras, annoncé (`role="alert"`) et relié au champ (`aria-describedby`, `aria-invalid`).
+- **Formulaire sur l’étoffe :** le formulaire d’entrée est une carte crème posée sur un panneau de motifs vert ; le panneau sert de cadre, jamais de simple décor.
+- **Bouton d’envoi :** il nomme le résultat (« Trouver ma promo »), puis « Vérification… » pendant l’attente.
 
 ### Navigation
 - **Barre du haut :** vert de nuit, une phrase en brume à gauche, l'onglet or à droite (coin bas-gauche arrondi).
-- **Barre principale :** sur crème ; la marque (disque vert et chevrons or, puis le nom), les ancres au soulignement or (à partir de 1024px), « Se connecter » et le bouton principal.
+- **Barre principale :** sur crème ; la marque (disque vert portant deux galons or pointés vers le haut, puis le nom), les ancres au soulignement or (à partir de 1024px), « Se connecter » et le bouton principal.
+- **Lien d’évitement :** « Aller au contenu », visible au focus clavier.
 
 ### Photo frame (signature)
 Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au survol ou au focus, la couleur revient et la photo grossit de 3 % (700ms, cubic-bezier(0.16, 1, 0.3, 1)). Un cadre ne porte jamais de légende ; la provenance est dans les crédits du pied de page.
 
 ### Cards / Containers
-- **Carte de parcours :** vert de carte, 12px de marge intérieure, une photo de 16:10 puis un bloc cerné d'un filet clair ; la carte mise en avant est en or et inverse l'ordre (texte d'abord, photo ensuite).
+- **Carte de parcours :** vert de carte, 12px de marge intérieure, une photo de 16:10 puis le titre, le texte et le lien, sans bloc encadré à l’intérieur ; la carte mise en avant est en or et inverse l’ordre (texte d’abord, photo ensuite).
 - **Fiche d'exemple :** coins de 24px, contour sable, en-tête vert ; toujours étiquetée « Exemple de fiche ».
 
 ### Bogolan
@@ -226,6 +229,8 @@ Sigles et villes des écoles réelles sur le vert, séparés par des signes or. 
 - **Do** garder l'or pour l'accent : texte des boutons verts, motifs, onglet, soulignement.
 - **Do** n'afficher que des chiffres tirés de la base.
 - **Do** donner aux champs un contour trait (#7A887D), jamais sable.
+- **Do** dire chaque action une fois par section, avec le même verbe partout (« Entrer mon code », « Se connecter »).
+- **Do** écrire en typographie française : apostrophe ’, espace insécable avant « : » et « ? ».
 
 ### Don't:
 - **Don't** montrer de mineurs, d'arme pointée ou de scène de combat.
@@ -234,3 +239,6 @@ Sigles et villes des écoles réelles sur le vert, séparés par des signes or. 
 - **Don't** ajouter d'ombre, de dégradé ou de verre.
 - **Don't** recopier une étoffe ou une planche existante : les motifs sont dessinés pour AET Connect.
 - **Don't** inventer de pourcentages ou de statistiques.
+- **Don't** imbriquer une carte dans une carte.
+- **Don't** poser une icône décorative à côté d’un chiffre, ni un ornement flottant sans fonction.
+- **Don't** remplacer un usage concret par une valeur abstraite (« Fraternité », « Confiance ») : dites ce que l’annuaire permet.

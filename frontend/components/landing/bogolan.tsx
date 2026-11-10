@@ -68,6 +68,7 @@ export function BogolanPanel({ className = '', color = 'currentColor' }: { class
 }
 
 const GLYPHS = {
+  galon: <path d="M5 12l7-6 7 6M5 19l7-6 7 6" />,
   chevrons: <path d="M4 4l6 8-6 8M12 4l6 8-6 8" />,
   spirale: <path d="M4 20V4h16v12H9V9h6v3" />,
   echelle: <path d="M6 3v18M12 3v18M18 3v18M6 12h12" />,
