@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { LogIn, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Soleil } from './soleil'
 
@@ -53,7 +53,7 @@ export function SiteHeader() {
           <Brand />
         </Link>
 
-        {/* Grand écran : les ancres, puis la connexion, un lien comme les autres marqué d'une icône */}
+        {/* Grand écran : les ancres, puis la connexion, un lien comme les autres, en semi-gras */}
         <ul className="hidden items-center gap-9 text-base font-medium text-encre lg:flex">
           {NAV.map((item) => (
             <li key={item.href}>
@@ -63,8 +63,7 @@ export function SiteHeader() {
             </li>
           ))}
           <li>
-            <Link href={account.href} className="inline-flex min-h-11 items-center gap-2 font-semibold text-vert transition-colors duration-200 hover:text-terre">
-              <LogIn className="size-[18px]" aria-hidden="true" />
+            <Link href={account.href} className="inline-flex min-h-11 items-center font-semibold text-vert transition-colors duration-200 hover:text-terre">
               {account.label}
             </Link>
           </li>
@@ -105,9 +104,8 @@ export function SiteHeader() {
             <Link
               href={account.href}
               onClick={() => setOpen(false)}
-              className="flex min-h-14 items-center gap-3 rounded-2xl px-4 font-titre text-lg font-semibold tracking-[-0.02em] text-or transition-colors hover:bg-vert-carte"
+              className="flex min-h-14 items-center rounded-2xl px-4 font-titre text-lg font-semibold tracking-[-0.02em] text-or transition-colors hover:bg-vert-carte"
             >
-              <LogIn className="size-5" aria-hidden="true" />
               {account.label}
             </Link>
           </li>

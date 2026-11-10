@@ -183,6 +183,7 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 ### Buttons
 - **Primary :** pilule vert profond, texte crème semi-gras, 48px de haut, flèche à droite qui avance de 4px au survol ; au survol, le fond passe en vert de carte.
 - **Lien fléché** (`LienFleche`) : semi-gras, couleur du texte au repos (encre, ou vert de nuit sur l'or) ; au survol ou au focus, il passe en brun-roux (brun-roux foncé sur l'or) et une flèche glisse en place, sans décaler la mise en page. Un lien n'est jamais pris dans une phrase : il est seul, donc reconnaissable sans soulignement.
+- **Lien secondaire du hero** (« Comment rejoindre ») : encre au repos ; au survol, brun-roux et souligné (2px, décalé de 6px), sans flèche.
 - **Liens du pied de page :** crème au repos ; au survol ou au focus, ils passent en or et se soulignent (or, 2px).
 
 ### Inputs / Fields
@@ -194,8 +195,8 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 - **Bouton d’envoi :** il nomme le résultat (« Trouver ma promo »), puis « Vérification… » pendant l’attente.
 
 ### Navigation
-- **Barre :** posée directement sur la trame du hero, sans fond propre. La marque (le soleil et « AET Connect » en Unbounded) ; à partir de 1024px, les liens « Le réseau », « Comment rejoindre » et « Se connecter » (ou « Mon espace »). Ce dernier est un lien comme les autres, semi-gras et vert, précédé d'une icône de connexion. Tous passent en brun-roux au survol.
-- **Menu mobile (sous 1024px) :** un bouton plein « Menu » / « Fermer » (icône et texte, `aria-expanded`) ouvre un panneau vert aux coins de 24px sous la barre : les ancres en Unbounded, puis « Se connecter » en or avec son icône. Il se ferme par Échap (le focus revient au bouton) ou au choix d’un lien.
+- **Barre :** posée directement sur la trame du hero, sans fond propre. La marque (le soleil et « AET Connect » en Unbounded) ; à partir de 1024px, les liens « Le réseau », « Comment rejoindre » et « Se connecter » (ou « Mon espace »). Ce dernier est un lien comme les autres, sans icône, distingué par le semi-gras et le vert. Tous passent en brun-roux au survol.
+- **Menu mobile (sous 1024px) :** un bouton plein « Menu » / « Fermer » (icône et texte, `aria-expanded`) ouvre un panneau vert aux coins de 24px sous la barre : les ancres en Unbounded, puis « Se connecter » en or. Il se ferme par Échap (le focus revient au bouton) ou au choix d’un lien.
 - **Lien d’évitement :** « Aller au contenu », visible au focus clavier.
 - **« Rejoindre ma promo » :** une seule fois par écran ; dans le premier écran, c'est le bouton du hero.
 
