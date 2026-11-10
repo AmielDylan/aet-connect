@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { PHOTOS } from '@/lib/landing'
-import { BogolanBand } from './bogolan'
 import { Brand } from './site-header'
 
 // La confidentialité : ce que le membre montre, ce qu'il cache. L'exemple est étiqueté comme tel.
@@ -17,7 +16,7 @@ export function VisibilitySection() {
     <section id="visibilite" aria-labelledby="visibilite-titre" className="sur-creme scroll-mt-6 bg-white px-5 py-20 text-encre sm:px-8 lg:py-28">
       <div className="mx-auto grid max-w-[1280px] items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
         <div>
-          <h2 id="visibilite-titre" className="max-w-[16ch] text-[clamp(2rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.012em] text-vert text-balance [font-stretch:90%]">
+          <h2 id="visibilite-titre" className="max-w-[16ch] text-[clamp(1.75rem,3.1vw,2.6rem)] font-bold leading-[1.1] tracking-[-0.025em] text-vert text-balance font-titre">
             Vous choisissez ce que les autres voient
           </h2>
           <p className="mt-5 max-w-[50ch] text-lg leading-relaxed text-olive text-pretty">
@@ -51,8 +50,7 @@ export function VisibilitySection() {
 
 export function SiteFooter() {
   return (
-    <footer className="bg-vert-nuit text-creme">
-      <BogolanBand className="text-or/60" />
+    <footer className="sur-vert trame trame-sur-vert bg-vert-nuit text-creme">
       <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
@@ -60,13 +58,13 @@ export function SiteFooter() {
             <p className="mt-2 text-sm text-brume">Annuaire panafricain des Anciens Enfants de Troupe</p>
           </div>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-sm font-semibold">
-            <a href="#rejoindre" className="inline-flex min-h-11 items-center underline decoration-or decoration-2 underline-offset-[6px] hover:text-or">
+            <a href="#rejoindre" className="inline-flex min-h-11 items-center underline decoration-creme/40 decoration-2 underline-offset-[6px] hover:decoration-creme">
               Rejoindre ma promo
             </a>
-            <Link href="/register/with-code" className="inline-flex min-h-11 items-center underline decoration-or decoration-2 underline-offset-[6px] hover:text-or">
+            <Link href="/register/with-code" className="inline-flex min-h-11 items-center underline decoration-creme/40 decoration-2 underline-offset-[6px] hover:decoration-creme">
               Entrer mon code
             </Link>
-            <Link href="/login" className="inline-flex min-h-11 items-center underline decoration-or decoration-2 underline-offset-[6px] hover:text-or">
+            <Link href="/login" className="inline-flex min-h-11 items-center underline decoration-creme/40 decoration-2 underline-offset-[6px] hover:decoration-creme">
               Se connecter
             </Link>
           </nav>

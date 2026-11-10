@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Archivo } from 'next/font/google'
+import { Familjen_Grotesk, Unbounded } from 'next/font/google'
 import { schoolFacts, type LandingSchool } from '@/lib/landing'
 import { SiteHeader } from '@/components/landing/site-header'
 import { Hero } from '@/components/landing/hero'
@@ -9,8 +9,10 @@ import { WaysIn } from '@/components/landing/ways-in'
 import { JoinSection } from '@/components/landing/join-section'
 import { VisibilitySection, SiteFooter } from '@/components/landing/visibility-and-footer'
 
-// Archivo, avec son axe de largeur : titres semi-condensés, texte courant en largeur normale
-const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo-var', display: 'swap' })
+// Titres : Unbounded, capitales larges et pleines (l'énergie des grands rassemblements) ;
+// texte : Familjen Grotesk, sobre et lisible. Toutes deux auto-hébergées par next/font.
+const titre = Unbounded({ subsets: ['latin'], variable: '--font-titre-var', display: 'swap' })
+const texte = Familjen_Grotesk({ subsets: ['latin'], variable: '--font-texte-var', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'AET Connect · Annuaire panafricain des Anciens Enfants de Troupe',
@@ -39,7 +41,9 @@ export default async function HomePage() {
   const facts = schoolFacts(schools)
 
   return (
-    <div className={`${archivo.variable} esprit bg-creme font-archivo`}>
+    // La trame couvre la page ; les sections à fond plein la recouvrent : elle ne se voit que derrière la
+    // navigation et le hero, sans rupture entre les deux.
+    <div className={`${titre.variable} ${texte.variable} esprit trame trame-sur-creme bg-creme font-texte`}>
       <SiteHeader />
       <main id="contenu">
         <Hero />

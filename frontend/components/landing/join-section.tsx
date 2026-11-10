@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { useJoinPromo } from '@/hooks/use-join-promo'
 import { realSchools, type LandingSchool } from '@/lib/landing'
-import { BogolanPanel } from './bogolan'
 
 const field =
   'min-h-12 w-full rounded-xl border-2 border-trait bg-white px-4 text-base text-encre transition-colors duration-200 hover:border-olive focus-visible:border-vert'
@@ -19,7 +18,7 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
     <section id="rejoindre" aria-labelledby="rejoindre-titre" className="sur-creme scroll-mt-6 bg-creme px-5 py-20 text-encre sm:px-8 lg:py-28">
       <div className="mx-auto grid max-w-[1280px] items-center gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16">
         <div>
-          <h2 id="rejoindre-titre" className="max-w-[16ch] text-[clamp(2rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.012em] text-vert text-balance [font-stretch:90%]">
+          <h2 id="rejoindre-titre" className="max-w-[16ch] text-[clamp(1.75rem,3.1vw,2.6rem)] font-bold leading-[1.1] tracking-[-0.025em] text-vert text-balance font-titre">
             Rejoindre ma promo
           </h2>
           <p className="mt-5 max-w-[40ch] text-lg leading-relaxed text-olive text-pretty">
@@ -29,10 +28,9 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
         </div>
 
         {/* Le formulaire, posé sur l'étoffe */}
-        <div className="relative overflow-hidden rounded-3xl rounded-tl-[72px] bg-vert p-4 sm:p-10">
-          <BogolanPanel className="absolute inset-0 text-creme/45" />
+        <div className="sur-vert trame trame-etoffe overflow-hidden rounded-3xl rounded-tl-[72px] bg-vert p-4 sm:p-10">
           <form
-            className="relative grid gap-5 rounded-2xl bg-creme p-6 sm:max-w-[28rem] sm:p-8"
+            className="sur-creme relative grid gap-5 rounded-2xl bg-creme p-6 sm:max-w-[28rem] sm:p-8"
             onSubmit={(e) => {
               e.preventDefault()
               join(schoolId, entryYear)
@@ -81,7 +79,7 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
             <button
               type="submit"
               disabled={isPending}
-              className="group mt-1 inline-flex min-h-12 items-center justify-center gap-2.5 justify-self-start rounded-full bg-vert px-7 text-base font-semibold text-or transition-colors duration-200 hover:bg-vert-carte disabled:opacity-70"
+              className="group mt-1 inline-flex min-h-12 items-center justify-center gap-2.5 justify-self-start rounded-full bg-vert px-7 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte disabled:opacity-70"
             >
               {isPending ? 'Vérification…' : 'Trouver ma promo'}
               {isPending ? (
