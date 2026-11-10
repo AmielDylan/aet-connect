@@ -17,7 +17,7 @@ export function Hero() {
           <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a
               href="#rejoindre"
-              className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-vert px-6 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte"
+              className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-vert px-6 text-base font-semibold text-or transition-colors duration-200 hover:bg-vert-carte"
             >
               Rejoindre ma promo
               <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />

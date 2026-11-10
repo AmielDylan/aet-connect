@@ -45,15 +45,15 @@ export function WaysIn() {
           {WAYS.map((way) => (
             <li
               key={way.href}
-              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-terre text-creme' : 'flex-col bg-vert-carte'}`}
+              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-or text-vert-nuit' : 'flex-col bg-vert-carte'}`}
             >
               <PhotoFrame photo={way.photo} position={way.position} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] rounded-[20px]" />
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
                 <h3 className="text-lg font-semibold leading-snug tracking-[-0.02em] font-titre">{way.title}</h3>
-                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-creme/90' : 'text-brume'}`}>{way.text}</p>
+                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-vert-nuit/85' : 'text-brume'}`}>{way.text}</p>
                 <Link
                   href={way.href}
-                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold underline decoration-2 underline-offset-[6px] ${way.featured ? 'text-creme decoration-creme/50 hover:decoration-creme' : 'text-creme decoration-terre hover:decoration-creme'}`}
+                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold underline decoration-2 underline-offset-[6px] ${way.featured ? 'text-vert-nuit decoration-vert-nuit/40 hover:decoration-vert-nuit' : 'text-or decoration-or/40 hover:decoration-or'}`}
                 >
                   {way.action}
                   <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />

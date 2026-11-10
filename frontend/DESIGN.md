@@ -1,10 +1,11 @@
 ---
 name: AET Connect
-description: Annuaire panafricain des Anciens Enfants de Troupe ; vraies photos, vert profond, crème et brun-roux, formes organiques.
+description: Annuaire panafricain des Anciens Enfants de Troupe ; vraies photos, vert profond et crème, or pour les actions, brun-roux pour le décor, formes organiques.
 colors:
   vert: "#1D3B2A"
   vert-nuit: "#12261B"
   vert-carte: "#24452F"
+  or: "#FFC000"
   terre: "#8B4A1E"
   creme: "#F4EEE2"
   blanc: "#FFFFFF"
@@ -66,7 +67,7 @@ spacing:
 components:
   button-primary:
     backgroundColor: "{colors.vert}"
-    textColor: "{colors.creme}"
+    textColor: "{colors.or}"
     typography: "{typography.label}"
     rounded: "{rounded.pilule}"
     padding: "0 24px"
@@ -91,8 +92,8 @@ components:
     rounded: "{rounded.carte}"
     padding: "12px"
   card-way-featured:
-    backgroundColor: "{colors.terre}"
-    textColor: "{colors.creme}"
+    backgroundColor: "{colors.or}"
+    textColor: "{colors.vert-nuit}"
     rounded: "{rounded.carte}"
     padding: "12px"
 ---
@@ -103,7 +104,7 @@ components:
 
 **Creative North Star: "Esprit de corps"**
 
-AET Connect montre la fraternité d'armes en vraies photos (soldats, officiers, cérémonies, gestes d'entraide), en noir et blanc, posées sur un monde de formes organiques. Une trame de courbes de niveau, le langage des cartes d'état-major, court en fond tamisé. Un soleil aux neuf pétales, un par école, porte la marque. Le vert profond, le crème et une seule touche brun-roux composent la palette, sans couleur vive.
+AET Connect montre la fraternité d'armes en vraies photos (soldats, officiers, cérémonies, gestes d'entraide), en noir et blanc, posées sur un monde de formes organiques. Une trame de courbes de niveau, le langage des cartes d'état-major, court en fond tamisé. Un soleil aux neuf pétales, un par école, porte la marque. Le vert profond et le crème composent la palette ; l'or marque les actions, le brun-roux le décor.
 
 La composition reprend la planche de référence du client (« must ») : un hero avec le texte à gauche et une mosaïque de photos à droite, un bandeau des écoles, une section avec un collage et des chiffres, une section verte à trois cartes dont celle du milieu est mise en avant, puis le formulaire et la confidentialité. Les formes organiques viennent des deux autres références du client : un soleil en papier découpé et des ondes topographiques.
 
@@ -111,18 +112,19 @@ Les photos sont d'illustration tant que l'association n'a pas fourni les siennes
 
 **Key Characteristics:**
 - Vraies photos en noir et blanc ; la couleur revient au survol.
-- Vert profond, crème et brun-roux : aucune couleur vive.
+- Vert profond et crème ; or pour les actions, brun-roux pour le décor.
 - Trame topographique en fond tamisé ; soleil aux neuf pétales pour la marque.
 - Titres en Unbounded (capitales larges et pleines), texte en Familjen Grotesk.
 - Cadres arrondis à 24 px avec un coin plus arrondi (72 px) ; boutons en pilule.
 
 ## Colors
 
-Une palette de terre et de végétation : vert profond, crème, brun-roux.
+Une palette de terre et de végétation : vert profond et crème, avec deux accents aux rôles séparés, l'or pour agir et le brun-roux pour orner.
 
 ### Primary
 - **Vert profond** (#1D3B2A) : sections profondes, bandeau des écoles, boutons principaux, titres sur fond clair, pétales du soleil sur fond clair.
-- **Brun-roux** (#8B4A1E) : l'accent unique. Cœur du soleil, soulignement des liens sur crème, carte mise en avant, sélection de texte. Le texte brun-roux sur crème a un contraste de 5,87:1, et le crème sur brun-roux aussi. Sur le vert, il ne sert qu'en décor (1,8:1).
+- **Or** (#FFC000) : les actions. Texte des boutons verts (7,48:1), liens d'action sur le vert, carte mise en avant (texte vert de nuit), bouton pause du bandeau.
+- **Brun-roux** (#8B4A1E) : le décor. Cœur du soleil, soulignement des liens sur crème, sélection de texte. Le texte brun-roux sur crème a un contraste de 5,87:1 ; sur le vert, il ne sert qu'en décor (1,8:1).
 
 ### Neutral
 - **Vert de nuit** (#12261B) : pied de page.
@@ -137,7 +139,7 @@ Une palette de terre et de végétation : vert profond, crème, brun-roux.
 - **Alerte** (#9C2A1E) : messages d'erreur sur crème (6,58:1).
 
 ### Named Rules
-**The One Accent Rule.** Le brun-roux est le seul accent : un aplat par écran au plus (la carte mise en avant), sinon de petites touches (cœur du soleil, soulignements).
+**The Two Roles Rule.** L'or signale ce qu'on peut faire, le brun-roux orne. L'or n'est jamais décoratif et le brun-roux jamais une action. Un seul aplat d'or par écran, la carte mise en avant.
 
 **The Real Faces Rule.** Les personnes à l'écran sont de vraies photos, jamais une illustration qui fait semblant. Une photo d'illustration n'est jamais légendée comme un membre.
 
@@ -183,9 +185,9 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 ## Components
 
 ### Buttons
-- **Primary :** pilule vert profond, texte crème semi-gras, 48px de haut, flèche à droite qui avance de 4px au survol ; au survol, le fond passe en vert de carte.
-- **Outline :** pilule cerclée de vert (2px), texte vert ; au survol, elle se remplit de vert et le texte passe en crème. Sert à « Se connecter » dans la navigation.
-- **Text link :** texte souligné de brun-roux (2px, décalé de 6px) sur crème, de crème translucide sur vert.
+- **Primary :** pilule vert profond, texte or semi-gras, 48px de haut, flèche à droite qui avance de 4px au survol ; au survol, le fond passe en vert de carte.
+- **Outline :** pilule cerclée de vert (2px), texte vert ; au survol, elle se remplit de vert et le texte passe en or. Sert à « Se connecter » dans la navigation.
+- **Text link :** sur crème, texte vert souligné de brun-roux (2px, décalé de 6px) ; sur vert, lien d'action en or souligné d'or translucide.
 
 ### Inputs / Fields
 - **Style :** fond blanc, contour trait de 2px, coins de 12px, 48px de haut, texte encre ; les années en chiffres tabulaires.
@@ -203,7 +205,7 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au survol ou au focus, la couleur revient et la photo grossit de 3 % (700ms, cubic-bezier(0.16, 1, 0.3, 1)). Un cadre ne porte jamais de légende ; la provenance est dans les crédits du pied de page.
 
 ### Cards / Containers
-- **Carte de parcours :** vert de carte, 12px de marge intérieure, une photo de 16:10 puis le titre, le texte et le lien, sans bloc encadré à l’intérieur. La carte mise en avant est en brun-roux, texte crème, et inverse l’ordre (texte d’abord, photo ensuite).
+- **Carte de parcours :** vert de carte, 12px de marge intérieure, une photo de 16:10 puis le titre, le texte et le lien, sans bloc encadré à l’intérieur. La carte mise en avant est en or, texte vert de nuit, et inverse l’ordre (texte d’abord, photo ensuite).
 - **Fiche d'exemple :** coins de 24px, contour sable, en-tête vert ; toujours étiquetée « Exemple de fiche ».
 
 ### Soleil aux neuf pétales (signature)
@@ -234,7 +236,7 @@ Sigles et villes des écoles réelles sur le vert, en Unbounded, séparés par d
 ### Do:
 - **Do** montrer de vraies personnes en photo, en noir et blanc, dans des cadres arrondis.
 - **Do** créditer chaque photo de remplacement dans le pied de page, et la remplacer dès que l'association fournit les siennes.
-- **Do** garder le brun-roux comme seul accent.
+- **Do** garder l'or pour les actions et le brun-roux pour le décor, sans les échanger.
 - **Do** poser la trame en fond tamisé, jamais à pleine force derrière du texte.
 - **Do** n'afficher que des chiffres tirés de la base.
 - **Do** donner aux champs un contour trait (#7A887D), jamais sable.
@@ -242,7 +244,7 @@ Sigles et villes des écoles réelles sur le vert, en Unbounded, séparés par d
 - **Do** écrire en typographie française : apostrophe ’, espace insécable avant « : » et « ? ».
 
 ### Don't:
-- **Don't** réintroduire de couleur vive (jaune, or, corail) ni de deuxième accent.
+- **Don't** ajouter une troisième couleur d'accent (corail, bleu, rouge vif).
 - **Don't** répéter un même motif en frise : la trame et le soleil suffisent.
 - **Don't** faire tourner les pétales du soleil dans un même sens.
 - **Don't** montrer de mineurs, d'arme pointée ou de scène de combat.

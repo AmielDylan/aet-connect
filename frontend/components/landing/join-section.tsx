@@ -79,7 +79,7 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
             <button
               type="submit"
               disabled={isPending}
-              className="group mt-1 inline-flex min-h-12 items-center justify-center gap-2.5 justify-self-start rounded-full bg-vert px-7 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte disabled:opacity-70"
+              className="group mt-1 inline-flex min-h-12 items-center justify-center gap-2.5 justify-self-start rounded-full bg-vert px-7 text-base font-semibold text-or transition-colors duration-200 hover:bg-vert-carte disabled:opacity-70"
             >
               {isPending ? 'Vérification…' : 'Trouver ma promo'}
               {isPending ? (
