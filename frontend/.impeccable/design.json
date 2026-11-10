@@ -1,92 +1,92 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-10T17:29:03.177Z",
+  "generatedAt": "2026-11-10T18:36:20.719Z",
   "title": "Design System: AET Connect",
   "extensions": {
     "colorMeta": {
-      "outremer": {
+      "vert": {
         "role": "primary",
-        "displayName": "Outremer",
-        "canonical": "#12307A",
-        "oklch": "oklch(33.9% 0.131 263.9)",
+        "displayName": "Vert armée",
+        "canonical": "#1D3B2A",
+        "oklch": "oklch(32.3% 0.048 157.5)",
         "tonalRamp": [
-          "oklch(15% 0.114 263.9)",
-          "oklch(26% 0.131 263.9)",
-          "oklch(37% 0.131 263.9)",
-          "oklch(48% 0.131 263.9)",
-          "oklch(59% 0.131 263.9)",
-          "oklch(70% 0.131 263.9)",
-          "oklch(82% 0.124 263.9)",
-          "oklch(95% 0.079 263.9)"
+          "oklch(15% 0.048 157.5)",
+          "oklch(26% 0.048 157.5)",
+          "oklch(37% 0.048 157.5)",
+          "oklch(48% 0.048 157.5)",
+          "oklch(59% 0.048 157.5)",
+          "oklch(70% 0.048 157.5)",
+          "oklch(82% 0.048 157.5)",
+          "oklch(95% 0.048 157.5)"
         ]
       },
-      "safran": {
+      "or": {
         "role": "primary",
-        "displayName": "Safran de ligne",
-        "canonical": "#F2A900",
-        "oklch": "oklch(78.5% 0.164 77.6)",
+        "displayName": "Or de galon",
+        "canonical": "#FFC000",
+        "oklch": "oklch(84.2% 0.173 84.6)",
         "tonalRamp": [
-          "oklch(15% 0.114 77.6)",
-          "oklch(26% 0.147 77.6)",
-          "oklch(37% 0.164 77.6)",
-          "oklch(48% 0.164 77.6)",
-          "oklch(59% 0.164 77.6)",
-          "oklch(70% 0.157 77.6)",
-          "oklch(82% 0.124 77.6)",
-          "oklch(95% 0.079 77.6)"
+          "oklch(15% 0.114 84.6)",
+          "oklch(26% 0.147 84.6)",
+          "oklch(37% 0.17 84.6)",
+          "oklch(48% 0.173 84.6)",
+          "oklch(59% 0.173 84.6)",
+          "oklch(70% 0.157 84.6)",
+          "oklch(82% 0.124 84.6)",
+          "oklch(95% 0.079 84.6)"
         ]
       },
-      "corail": {
-        "role": "secondary",
-        "displayName": "Corail d'action",
-        "canonical": "#FF6B4A",
-        "oklch": "oklch(70.7% 0.187 34.1)",
-        "tonalRamp": [
-          "oklch(15% 0.114 34.1)",
-          "oklch(26% 0.147 34.1)",
-          "oklch(37% 0.17 34.1)",
-          "oklch(48% 0.18 34.1)",
-          "oklch(59% 0.175 34.1)",
-          "oklch(70% 0.157 34.1)",
-          "oklch(82% 0.124 34.1)",
-          "oklch(95% 0.079 34.1)"
-        ]
-      },
-      "savane": {
-        "role": "tertiary",
-        "displayName": "Vert savane",
-        "canonical": "#2BA36B",
-        "oklch": "oklch(63.7% 0.134 158)",
-        "tonalRamp": [
-          "oklch(15% 0.114 158)",
-          "oklch(26% 0.134 158)",
-          "oklch(37% 0.134 158)",
-          "oklch(48% 0.134 158)",
-          "oklch(59% 0.134 158)",
-          "oklch(70% 0.134 158)",
-          "oklch(82% 0.124 158)",
-          "oklch(95% 0.079 158)"
-        ]
-      },
-      "outremer-nuit": {
+      "vert-nuit": {
         "role": "neutral",
-        "displayName": "Outremer de nuit",
-        "canonical": "#0C2159",
-        "oklch": "oklch(27.2% 0.105 264.6)",
+        "displayName": "Vert de nuit",
+        "canonical": "#12261B",
+        "oklch": "oklch(24.8% 0.034 158.6)",
         "tonalRamp": [
-          "oklch(15% 0.105 264.6)",
-          "oklch(26% 0.105 264.6)",
-          "oklch(37% 0.105 264.6)",
-          "oklch(48% 0.105 264.6)",
-          "oklch(59% 0.105 264.6)",
-          "oklch(70% 0.105 264.6)",
-          "oklch(82% 0.105 264.6)",
-          "oklch(95% 0.079 264.6)"
+          "oklch(15% 0.034 158.6)",
+          "oklch(26% 0.034 158.6)",
+          "oklch(37% 0.034 158.6)",
+          "oklch(48% 0.034 158.6)",
+          "oklch(59% 0.034 158.6)",
+          "oklch(70% 0.034 158.6)",
+          "oklch(82% 0.034 158.6)",
+          "oklch(95% 0.034 158.6)"
         ]
       },
-      "craie": {
+      "vert-carte": {
         "role": "neutral",
-        "displayName": "Craie",
+        "displayName": "Vert de carte",
+        "canonical": "#24452F",
+        "oklch": "oklch(35.8% 0.055 153.6)",
+        "tonalRamp": [
+          "oklch(15% 0.055 153.6)",
+          "oklch(26% 0.055 153.6)",
+          "oklch(37% 0.055 153.6)",
+          "oklch(48% 0.055 153.6)",
+          "oklch(59% 0.055 153.6)",
+          "oklch(70% 0.055 153.6)",
+          "oklch(82% 0.055 153.6)",
+          "oklch(95% 0.055 153.6)"
+        ]
+      },
+      "creme": {
+        "role": "neutral",
+        "displayName": "Crème",
+        "canonical": "#F4EEE2",
+        "oklch": "oklch(95.1% 0.017 84.6)",
+        "tonalRamp": [
+          "oklch(15% 0.017 84.6)",
+          "oklch(26% 0.017 84.6)",
+          "oklch(37% 0.017 84.6)",
+          "oklch(48% 0.017 84.6)",
+          "oklch(59% 0.017 84.6)",
+          "oklch(70% 0.017 84.6)",
+          "oklch(82% 0.017 84.6)",
+          "oklch(95% 0.017 84.6)"
+        ]
+      },
+      "blanc": {
+        "role": "neutral",
+        "displayName": "Blanc",
         "canonical": "#FFFFFF",
         "oklch": "oklch(100% 0 89.9)",
         "tonalRamp": [
@@ -100,90 +100,150 @@
           "oklch(95% 0 89.9)"
         ]
       },
-      "brume": {
+      "sable": {
         "role": "neutral",
-        "displayName": "Brume",
-        "canonical": "#C9D3F0",
-        "oklch": "oklch(86.8% 0.042 270.4)",
+        "displayName": "Sable",
+        "canonical": "#DDD2BB",
+        "oklch": "oklch(86.7% 0.033 85.5)",
         "tonalRamp": [
-          "oklch(15% 0.042 270.4)",
-          "oklch(26% 0.042 270.4)",
-          "oklch(37% 0.042 270.4)",
-          "oklch(48% 0.042 270.4)",
-          "oklch(59% 0.042 270.4)",
-          "oklch(70% 0.042 270.4)",
-          "oklch(82% 0.042 270.4)",
-          "oklch(95% 0.042 270.4)"
+          "oklch(15% 0.033 85.5)",
+          "oklch(26% 0.033 85.5)",
+          "oklch(37% 0.033 85.5)",
+          "oklch(48% 0.033 85.5)",
+          "oklch(59% 0.033 85.5)",
+          "oklch(70% 0.033 85.5)",
+          "oklch(82% 0.033 85.5)",
+          "oklch(95% 0.033 85.5)"
+        ]
+      },
+      "trait": {
+        "role": "neutral",
+        "displayName": "Trait",
+        "canonical": "#7A887D",
+        "oklch": "oklch(61.2% 0.023 151.9)",
+        "tonalRamp": [
+          "oklch(15% 0.023 151.9)",
+          "oklch(26% 0.023 151.9)",
+          "oklch(37% 0.023 151.9)",
+          "oklch(48% 0.023 151.9)",
+          "oklch(59% 0.023 151.9)",
+          "oklch(70% 0.023 151.9)",
+          "oklch(82% 0.023 151.9)",
+          "oklch(95% 0.023 151.9)"
         ]
       },
       "encre": {
         "role": "neutral",
         "displayName": "Encre",
-        "canonical": "#0B1640",
-        "oklch": "oklch(22.1% 0.081 267.9)",
+        "canonical": "#14211A",
+        "oklch": "oklch(23.3% 0.023 160.4)",
         "tonalRamp": [
-          "oklch(15% 0.081 267.9)",
-          "oklch(26% 0.081 267.9)",
-          "oklch(37% 0.081 267.9)",
-          "oklch(48% 0.081 267.9)",
-          "oklch(59% 0.081 267.9)",
-          "oklch(70% 0.081 267.9)",
-          "oklch(82% 0.081 267.9)",
-          "oklch(95% 0.079 267.9)"
+          "oklch(15% 0.023 160.4)",
+          "oklch(26% 0.023 160.4)",
+          "oklch(37% 0.023 160.4)",
+          "oklch(48% 0.023 160.4)",
+          "oklch(59% 0.023 160.4)",
+          "oklch(70% 0.023 160.4)",
+          "oklch(82% 0.023 160.4)",
+          "oklch(95% 0.023 160.4)"
+        ]
+      },
+      "olive": {
+        "role": "neutral",
+        "displayName": "Olive",
+        "canonical": "#4D5E52",
+        "oklch": "oklch(46.4% 0.028 154.4)",
+        "tonalRamp": [
+          "oklch(15% 0.028 154.4)",
+          "oklch(26% 0.028 154.4)",
+          "oklch(37% 0.028 154.4)",
+          "oklch(48% 0.028 154.4)",
+          "oklch(59% 0.028 154.4)",
+          "oklch(70% 0.028 154.4)",
+          "oklch(82% 0.028 154.4)",
+          "oklch(95% 0.028 154.4)"
+        ]
+      },
+      "brume": {
+        "role": "neutral",
+        "displayName": "Brume",
+        "canonical": "#C3D1C6",
+        "oklch": "oklch(84.7% 0.021 152.1)",
+        "tonalRamp": [
+          "oklch(15% 0.021 152.1)",
+          "oklch(26% 0.021 152.1)",
+          "oklch(37% 0.021 152.1)",
+          "oklch(48% 0.021 152.1)",
+          "oklch(59% 0.021 152.1)",
+          "oklch(70% 0.021 152.1)",
+          "oklch(82% 0.021 152.1)",
+          "oklch(95% 0.021 152.1)"
+        ]
+      },
+      "alerte": {
+        "role": "neutral",
+        "displayName": "Alerte",
+        "canonical": "#9C2A1E",
+        "oklch": "oklch(46.3% 0.152 29.9)",
+        "tonalRamp": [
+          "oklch(15% 0.114 29.9)",
+          "oklch(26% 0.147 29.9)",
+          "oklch(37% 0.152 29.9)",
+          "oklch(48% 0.152 29.9)",
+          "oklch(59% 0.152 29.9)",
+          "oklch(70% 0.152 29.9)",
+          "oklch(82% 0.124 29.9)",
+          "oklch(95% 0.079 29.9)"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Titre du hero, en capitales."
+        "purpose": "Titre du hero."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Titres de section, en capitales."
+        "purpose": "Titres de section."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Chiffres réels, tabulaires."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Actions nommées (terminus), en capitales."
-      },
-      "station": {
-        "displayName": "Station",
-        "purpose": "Sigle d'une école sur le plan."
+        "purpose": "Titres de carte, marque."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Paragraphes, 34 à 52 caractères par ligne."
+        "purpose": "Paragraphes, en olive."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Libellés de champs, liens."
-      },
-      "caption": {
-        "displayName": "Caption",
-        "purpose": "Ville et pays sous une station."
+        "purpose": "Libellés, liens, boutons."
       }
     },
     "shadows": [],
     "motion": [
       {
-        "name": "trace",
-        "value": "1600ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "La ligne se trace une fois à l'arrivée."
+        "name": "mosaique",
+        "value": "1000ms cubic-bezier(0.16, 1, 0.3, 1), +130ms par cadre",
+        "purpose": "Les cadres de la mosaïque s’ouvrent à l’arrivée (clip-path)."
       },
       {
-        "name": "station-on",
-        "value": "420ms cubic-bezier(0.16, 1, 0.3, 1), +150ms par station",
-        "purpose": "Les stations s’allument quand la ligne les atteint."
+        "name": "photo-couleur",
+        "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "La couleur revient au survol, zoom de 3 %."
       },
       {
-        "name": "focus-trace",
-        "value": "500ms ease-out",
-        "purpose": "Le trait blanc parcourt la ligne jusqu'à la station survolée."
+        "name": "bandeau",
+        "value": "45s linear infinite",
+        "purpose": "Défilement des écoles ; pause au survol et par bouton ; immobile en mouvement réduit."
       },
       {
         "name": "state",
         "value": "200ms ease-out",
-        "purpose": "Changements de couleur et flèches qui avancent."
+        "purpose": "Fonds de bouton, flèches qui avancent."
       }
     ],
     "breakpoints": [
@@ -194,12 +254,12 @@
       {
         "name": "md",
         "value": "768px",
-        "purpose": "Le plan dessiné remplace la bande verticale."
+        "purpose": "Cartes de parcours en trois colonnes."
       },
       {
         "name": "lg",
         "value": "1024px",
-        "purpose": "Légende et plan côte à côte."
+        "purpose": "Hero et sections en deux colonnes ; ancres de navigation."
       }
     ]
   },
@@ -208,105 +268,98 @@
       "name": "Bouton principal",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "L'action principale de la vue, seule en corail.",
-      "html": "<button class=\"ds-btn-primary\">Rejoindre ma promo <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
-      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:space-between;gap:12px;min-width:320px;min-height:52px;padding:0 20px;background:#FF6B4A;color:#0B1640;border:0;border-radius:0;font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:1.125rem;font-weight:700;cursor:pointer;transition:background-color .2s ease-out,transform .2s ease-out}.ds-btn-primary svg{transition:transform .2s ease-out}.ds-btn-primary:hover{background:color-mix(in oklab,#FF6B4A,white 12%)}.ds-btn-primary:hover svg{transform:translateX(4px)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:3px solid #F2A900;outline-offset:2px}"
+      "description": "Pilule vert armée, texte or : l’action principale.",
+      "html": "<button class=\"ds-btn\">Rejoindre ma promo <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border:0;border-radius:9999px;background:#1D3B2A;color:#FFC000;font-family:'Archivo', ui-sans-serif, sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:background-color .2s}.ds-btn svg{transition:transform .2s ease-out}.ds-btn:hover{background:#24452F}.ds-btn:hover svg{transform:translateX(4px)}.ds-btn:focus-visible{outline:3px solid #1D3B2A;outline-offset:3px}"
     },
     {
-      "name": "Bouton contour",
+      "name": "Bouton clair",
       "kind": "button",
-      "refersTo": "button-outline",
-      "description": "Accès secondaire dans le cartouche : Se connecter, Mon espace.",
-      "html": "<div class=\"ds-ground\"><a href=\"#\" class=\"ds-btn-outline\">Se connecter</a></div>",
-      "css": ".ds-ground{background:#12307A;padding:24px}.ds-btn-outline{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:2px solid #FFFFFF;color:#FFFFFF;font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:.875rem;font-weight:600;text-decoration:none;transition:background-color .2s,color .2s}.ds-btn-outline:hover{background:#FFFFFF;color:#12307A}.ds-btn-outline:focus-visible{outline:3px solid #F2A900;outline-offset:2px}"
+      "refersTo": "button-light",
+      "description": "Pilule crème sur fond vert.",
+      "html": "<div class=\"ds-vert\"><a href=\"#\" class=\"ds-btn-light\">J’ai déjà un compte</a></div>",
+      "css": ".ds-vert{background:#1D3B2A;padding:24px}.ds-btn-light{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:9999px;background:#F4EEE2;color:#1D3B2A;font-family:'Archivo', ui-sans-serif, sans-serif;font-weight:600;text-decoration:none;transition:background-color .2s}.ds-btn-light:hover{background:#fff}.ds-btn-light:focus-visible{outline:3px solid #FFC000;outline-offset:3px}"
     },
     {
-      "name": "Champ de saisie",
+      "name": "Onglet code",
+      "kind": "nav",
+      "refersTo": "tab-code",
+      "description": "Onglet or de la barre du haut : accès direct par code.",
+      "html": "<div class=\"ds-top\"><a href=\"#\" class=\"ds-tab\">Un ancien vous a envoyé un code ? Entrez-le <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></div>",
+      "css": ".ds-top{display:flex;justify-content:flex-end;background:#12261B}.ds-tab{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-bottom-left-radius:16px;background:#FFC000;color:#12261B;font-family:'Archivo', ui-sans-serif, sans-serif;font-size:.875rem;font-weight:600;text-decoration:none}"
+    },
+    {
+      "name": "Champ",
       "kind": "input",
       "refersTo": "input",
-      "description": "Champ sur fond outremer, contour craie, angles vifs.",
-      "html": "<div class=\"ds-ground\"><label class=\"ds-label\" for=\"ds-annee\">Année d'entrée</label><input id=\"ds-annee\" class=\"ds-input\" inputmode=\"numeric\" placeholder=\"par exemple 2005\"></div>",
-      "css": ".ds-ground{background:#12307A;padding:24px;display:grid;gap:6px}.ds-label{color:#FFFFFF;font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:.875rem;font-weight:600}.ds-input{min-height:48px;width:320px;padding:0 12px;background:#0C2159;color:#FFFFFF;border:2px solid #FFFFFF;border-radius:0;font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:1rem;font-variant-numeric:tabular-nums;caret-color:#F2A900}.ds-input::placeholder{color:#C9D3F0}.ds-input:focus-visible{outline:3px solid #F2A900;outline-offset:2px}"
+      "description": "Champ blanc, contour trait, coins de 12px.",
+      "html": "<div class=\"ds-creme\"><label class=\"ds-label\" for=\"ds-a\">Année d’entrée</label><input id=\"ds-a\" class=\"ds-input\" inputmode=\"numeric\" placeholder=\"par exemple 2005\"></div>",
+      "css": ".ds-creme{background:#F4EEE2;padding:24px;display:grid;gap:8px}.ds-label{color:#1D3B2A;font-family:'Archivo', ui-sans-serif, sans-serif;font-size:.875rem;font-weight:600}.ds-input{min-height:48px;width:320px;padding:0 16px;border:2px solid #7A887D;border-radius:12px;background:#fff;color:#14211A;font-family:'Archivo', ui-sans-serif, sans-serif;font-size:1rem;font-variant-numeric:tabular-nums}.ds-input::placeholder{color:#4D5E52}.ds-input:hover{border-color:#4D5E52}.ds-input:focus-visible{border-color:#1D3B2A;outline:3px solid #1D3B2A;outline-offset:3px}"
     },
     {
-      "name": "Lien souligné",
-      "kind": "nav",
-      "refersTo": "link",
-      "description": "Lien de texte, souligné safran ; passe en safran au survol.",
-      "html": "<div class=\"ds-ground\"><a href=\"#\" class=\"ds-link\">Entrez-le directement</a></div>",
-      "css": ".ds-ground{background:#12307A;padding:24px}.ds-link{color:#FFFFFF;font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:.875rem;font-weight:600;text-decoration:underline;text-decoration-color:#F2A900;text-decoration-thickness:2px;text-underline-offset:4px}.ds-link:hover{color:#F2A900}.ds-link:focus-visible{outline:3px solid #F2A900;outline-offset:2px}"
-    },
-    {
-      "name": "Station",
+      "name": "Cadre photo",
       "kind": "custom",
-      "refersTo": "station",
-      "description": "Une école sur la ligne : disque craie porteur de son motif, safran quand elle est choisie.",
-      "html": "<div class=\"ds-ground ds-map\"><span class=\"ds-line\"></span><button class=\"ds-station\" aria-pressed=\"false\" aria-label=\"PMB, Bembéréké, Bénin\"><svg viewBox=\"0 0 40 40\" width=\"40\" height=\"40\" aria-hidden=\"true\"><g fill=\"currentColor\"><path d=\"M20 6l5 5-5 5-5-5z\"/><path d=\"M11 15l5 5-5 5-5-5z\"/><path d=\"M29 15l5 5-5 5-5-5z\"/><path d=\"M20 24l5 5-5 5-5-5z\"/></g></svg></button><span class=\"ds-name\">PMB<small>Bembéréké, Bénin</small></span></div>",
-      "css": ".ds-map{position:relative;display:flex;align-items:center;gap:16px;background:#12307A;padding:32px}.ds-line{position:absolute;left:0;right:0;top:50%;height:10px;margin-top:-5px;background:#F2A900;width:120px}.ds-station{position:relative;display:grid;place-items:center;width:56px;height:56px;border-radius:9999px;border:4px solid #12307A;background:#FFFFFF;color:#12307A;cursor:pointer;transition:background-color .2s ease-out,color .2s ease-out,scale .2s ease-out;margin-left:60px}.ds-station:hover,.ds-station:focus-visible,.ds-station[aria-pressed=true]{background:#F2A900;color:#0B1640;scale:1.1}.ds-station:focus-visible{outline:3px solid #F2A900;outline-offset:3px}.ds-name{display:grid;color:#FFFFFF;font-family:'Big Shoulders', ui-sans-serif, sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:.03em;text-transform:uppercase;line-height:1}.ds-name small{font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:.75rem;font-weight:600;letter-spacing:0;text-transform:none;color:#C9D3F0}"
+      "refersTo": "photo-frame",
+      "description": "Photo noir et blanc ; la couleur revient au survol.",
+      "html": "<div class=\"ds-photo\"><img src=\"/images/accueil/garde-honneur.jpg\" alt=\"Garde d’honneur burkinabè\"></div>",
+      "css": ".ds-photo{width:320px;height:200px;overflow:hidden;border-radius:24px;border-top-left-radius:72px;background:#DDD2BB}.ds-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.06);transition:filter .7s cubic-bezier(.16,1,.3,1),scale .7s cubic-bezier(.16,1,.3,1)}.ds-photo:hover img{filter:none;scale:1.03}"
     },
     {
-      "name": "Terminus",
-      "kind": "custom",
-      "refersTo": "branch-terminus",
-      "description": "Fin d'une branche de la ligne : l'action se nomme d'abord, sa condition vient dessous.",
-      "html": "<div class=\"ds-night\"><span class=\"ds-term\"></span><a href=\"#\" class=\"ds-term-action\">Entrez votre code <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a><p class=\"ds-term-text\"><strong>Un ancien vous a envoyé un code.</strong> Le code vous rattache à la promo de l'ancien qui vous l'a donné.</p></div>",
-      "css": ".ds-night{background:#0C2159;padding:32px;display:grid;justify-items:center;text-align:center;gap:8px}.ds-term{width:32px;height:32px;border-radius:9999px;border:6px solid #F2A900;background:#FFFFFF;margin-bottom:8px}.ds-term-action{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:#FFFFFF;font-family:'Big Shoulders', ui-sans-serif, sans-serif;font-weight:800;font-size:1.875rem;text-transform:uppercase;letter-spacing:.01em;text-decoration:none}.ds-term-action:hover{color:#F2A900}.ds-term-action svg{transition:transform .2s ease-out}.ds-term-action:hover svg{transform:translateX(4px)}.ds-term-text{max-width:34ch;margin:0;color:#C9D3F0;font-family:'Atkinson Hyperlegible Next', ui-sans-serif, sans-serif;font-size:1rem}.ds-term-text strong{color:#FFFFFF}"
+      "name": "Carte de parcours mise en avant",
+      "kind": "card",
+      "refersTo": "card-way-featured",
+      "description": "Carte or : texte d’abord, photo ensuite.",
+      "html": "<div class=\"ds-vert2\"><div class=\"ds-card\"><div class=\"ds-inner\"><h3>Votre promo est déjà dans l’annuaire</h3><p>Demandez un code à l’ambassadeur de votre promo.</p><a href=\"#\">Demander un code <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></div></div></div>",
+      "css": ".ds-vert2{background:#1D3B2A;padding:24px}.ds-card{width:340px;padding:12px;border-radius:28px;background:#FFC000;color:#12261B;font-family:'Archivo', ui-sans-serif, sans-serif}.ds-inner{padding:20px;border:2px solid rgba(18,38,27,.15);border-radius:20px}.ds-inner h3{margin:0;font-size:1.25rem;font-weight:700;font-stretch:90%}.ds-inner p{margin:8px 0 16px;opacity:.85}.ds-inner a{display:inline-flex;align-items:center;gap:8px;color:#12261B;font-weight:600;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}"
     }
   ],
   "narrative": {
-    "northStar": "La ligne AET",
-    "overview": "AET Connect se dessine comme un plan de réseau : les écoles sont des stations, et une seule ligne safran les relie sur un fond outremer. Le plan ne fait que des segments à 0°, 45° et 90°, ses stations sont des disques blancs, ses noms sont écrits en lettres de signalétique condensées. Tout ce qui n'est pas la ligne, une station ou une action se tait.\n\nLe système est plat, franc et lisible de loin, comme un plan affiché dans une station. Il refuse trois pentes : le registre militaire (insignes, camouflage, galons), le SaaS générique (cartes arrondies, ombres douces, dégradés) et l'institutionnel (blasons, sceaux, bleu-gris administratif). Le motif africain passe par les disques des stations, un motif par école, jamais par un tissu plaqué en fond : le wax est écarté.\n\nLa ligne ne représente qu'un fait vrai : AET Connect réunit ces écoles dans un même réseau. Elle n'invente ni trajet ni liaison entre elles.",
+    "northStar": "Esprit de corps",
+    "overview": "AET Connect montre la fraternité d'armes en vraies photos : des soldats, des officiers, des cérémonies, des gestes d'entraide, en noir et blanc, posés dans des cadres arrondis sur un fond crème. Le vert armée porte les sections profondes et l'action principale ; l'or ne sert qu'à l'accent. Des frises de motifs dessinées dans l'esprit du bogolan relient les sections, comme une bordure d'étoffe.\n\nLa composition reprend la planche de référence du client : une barre du haut sombre avec un onglet d'accent, un hero où le texte est à gauche et une mosaïque de photos à droite, un bandeau défilant, une section avec un collage de photos et des chiffres, puis une section verte avec trois cartes, dont celle du milieu est mise en avant en or. Le système est calme et soigné. L'émotion vient des photos, pas des effets.\n\nLes photos sont d'illustration tant que l'association n'a pas fourni les siennes : de vrais soldats et officiers des pays des écoles, jamais présentés comme des membres.",
     "keyCharacteristics": [
-      "Fond outremer plein, sans texture ni dégradé.",
-      "Une seule ligne safran, octilinéaire, épaisse ; c'est la signature.",
-      "Stations : disques blancs cerclés d'outremer, chacun porteur du motif de son école.",
-      "Lettres de signalétique condensées en capitales pour les noms, humaniste très lisible pour tout le reste.",
-      "Angles vifs partout ; le cercle est réservé aux stations.",
-      "Un seul mouvement : la ligne se trace, les stations s'allument."
+      "Vraies photos en noir et blanc ; la couleur revient au survol.",
+      "Vert armée en fond profond et pour l'action, or en accent, crème en fond clair.",
+      "Cadres arrondis à 24 px, avec un coin plus arrondi (72 px) qui donne le mouvement.",
+      "Une seule famille, Archivo : titres gras semi-condensés, texte en largeur normale.",
+      "Frises et panneaux de motifs en traits, dans l'esprit du bogolan.",
+      "Boutons en pilule."
     ],
     "rules": [
       {
-        "name": "The One Line Rule",
-        "body": "Le safran appartient à la ligne et au chemin vers l'action. Il ne colore jamais un logo, un titre, un fond de section ou une décoration.",
+        "name": "The Gold Accent Rule",
+        "body": "L'or est un accent : texte, motif, onglet, focus. Un seul grand aplat d'or par écran, la carte mise en avant.",
         "section": "colors"
       },
       {
-        "name": "The One Action Rule",
-        "body": "Le corail ne sert qu'à l'action principale de l'écran. S'il apparaît deux fois dans la même vue, l'un des deux est de trop.",
+        "name": "The Real Faces Rule",
+        "body": "Les personnes à l'écran sont de vraies photos, jamais une illustration qui fait semblant. Une photo d'illustration n'est jamais légendée comme un membre.",
         "section": "colors"
       },
       {
-        "name": "The Signage Rule",
-        "body": "Big Shoulders ne s'écrit qu'en capitales et ne descend pas sous 1.25rem ; en dessous, c'est Atkinson.",
+        "name": "The No Eyebrow Rule",
+        "body": "Aucun sur-titre au-dessus d'un titre : le titre parle seul.",
         "section": "typography"
       },
       {
-        "name": "The Flat Map Rule",
-        "body": "Un plan de réseau est imprimé, pas extrudé : pas d'ombre, pas de flou, pas de biseau, pas de verre.",
+        "name": "The Flat Fabric Rule",
+        "body": "Pas d'ombre, de flou ni de verre : les surfaces sont des aplats, comme une étoffe.",
         "section": "elevation"
-      },
-      {
-        "name": "The Octilinear Rule",
-        "body": "Toute ligne dessinée suit 0°, 45° ou 90°. Une courbe libre ou un angle quelconque casse le plan.",
-        "section": "shapes"
       }
     ],
     "dos": [
-      "Do garder le safran pour la ligne, les liens et le focus (The One Line Rule).",
-      "Do réserver le corail à un seul bouton d'action par vue.",
-      "Do dessiner les nouveaux éléments graphiques comme des parties du plan : segments octilinéaires, stations, embranchements, terminus.",
-      "Do écrire les noms en Big Shoulders capitales et tout le reste en Atkinson.",
-      "Do étiqueter tout exemple de donnée comme un exemple.",
-      "Do garder le texte brume pour le secondaire sur outremer, et la craie pour le principal."
+      "Do montrer de vraies personnes en photo, en noir et blanc, dans des cadres arrondis.",
+      "Do créditer chaque photo de remplacement dans le pied de page, et la remplacer dès que l'association fournit les siennes.",
+      "Do garder l'or pour l'accent : texte des boutons verts, motifs, onglet, soulignement.",
+      "Do n'afficher que des chiffres tirés de la base.",
+      "Do donner aux champs un contour trait (#7A887D), jamais sable."
     ],
     "donts": [
-      "Don't utiliser d'insignes, galons, camouflage, blasons ou sceaux, même stylisés.",
-      "Don't plaquer un tissu wax ou un motif en fond de section ; les motifs vivent dans les stations.",
-      "Don't ajouter d'ombre, de dégradé, de verre ou d'angle arrondi hors des stations.",
-      "Don't poser un sur-titre au-dessus d'un titre ; une action se nomme d'abord, sa condition vient dessous.",
-      "Don't marquer un élément d'une barre de couleur sur le côté ; une ligne relie, elle ne souligne pas.",
-      "Don't écrire du texte en vert savane sur outremer.",
-      "Don't présenter une image générée comme une photo réelle d'anciens ou d'école."
+      "Don't montrer de mineurs, d'arme pointée ou de scène de combat.",
+      "Don't légender une photo d'illustration comme un membre d'AET Connect.",
+      "Don't poser un sur-titre au-dessus d'un titre.",
+      "Don't ajouter d'ombre, de dégradé ou de verre.",
+      "Don't recopier une étoffe ou une planche existante : les motifs sont dessinés pour AET Connect.",
+      "Don't inventer de pourcentages ou de statistiques."
     ]
   }
 }

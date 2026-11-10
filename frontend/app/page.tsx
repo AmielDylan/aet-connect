@@ -1,16 +1,21 @@
 import type { Metadata } from 'next'
-import { Big_Shoulders, Atkinson_Hyperlegible_Next } from 'next/font/google'
-import { AetLineHero, type LandingSchool } from '@/components/landing/aet-line-hero'
-import { WaysIn, YourVisibility, LandingFooter } from '@/components/landing/landing-sections'
+import { Archivo } from 'next/font/google'
+import { schoolFacts, type LandingSchool } from '@/lib/landing'
+import { SiteHeader } from '@/components/landing/site-header'
+import { Hero } from '@/components/landing/hero'
+import { SchoolsBand } from '@/components/landing/schools-band'
+import { NetworkSection } from '@/components/landing/network-section'
+import { WaysIn } from '@/components/landing/ways-in'
+import { JoinSection } from '@/components/landing/join-section'
+import { VisibilitySection, SiteFooter } from '@/components/landing/visibility-and-footer'
 
-// Polices du monde « la ligne AET », téléchargées au build et servies par le site
-const display = Big_Shoulders({ subsets: ['latin'], weight: ['800'], variable: '--font-big-shoulders', display: 'swap' })
-const label = Atkinson_Hyperlegible_Next({ subsets: ['latin'], variable: '--font-atkinson', display: 'swap' })
+// Archivo, avec son axe de largeur : titres semi-condensés, texte courant en largeur normale
+const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo-var', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'AET Connect · Annuaire panafricain des Anciens Enfants de Troupe',
   description:
-    'Retrouvez votre promo et les anciens de toutes les écoles militaires préparatoires. Un réseau fermé, où l’on entre sur l’invitation d’un ancien.',
+    'Retrouvez les anciens de votre promo et de toutes les écoles militaires préparatoires. Un réseau fermé, où l’on entre sur l’invitation d’un ancien.',
 }
 
 // Les écoles et leur nombre réel d'anciens, rafraîchis toutes les 5 minutes
@@ -31,13 +36,20 @@ async function loadSchools(): Promise<LandingSchool[]> {
 
 export default async function HomePage() {
   const schools = await loadSchools()
+  const facts = schoolFacts(schools)
 
   return (
-    <main className={`${display.variable} ${label.variable} ligne-aet font-label`}>
-      <AetLineHero schools={schools} />
-      <WaysIn />
-      <YourVisibility />
-      <LandingFooter />
-    </main>
+    <div className={`${archivo.variable} esprit bg-creme font-archivo`}>
+      <SiteHeader />
+      <main>
+        <Hero schools={facts.count} countries={facts.countries} />
+        <SchoolsBand schools={schools} />
+        <NetworkSection facts={facts} />
+        <WaysIn />
+        <JoinSection schools={schools} />
+        <VisibilitySection />
+      </main>
+      <SiteFooter />
+    </div>
   )
 }

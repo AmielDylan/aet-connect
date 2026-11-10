@@ -54,7 +54,11 @@ Ce que ni un groupe WhatsApp ni LinkedIn ne peuvent revendiquer : **la confiance
 ## Evidence on Hand
 
 - Les 9 écoles réelles (nom, ville, pays, année de création, sigle, drapeau) sont en base (`supabase/seed.sql` pour la copie locale).
-- **Aucune photo réelle** d'anciens, de promos ou d'écoles. Des images **générées ou d'illustration** sont acceptées, à condition de ne jamais passer pour de vraies photos : pas de visages présentés comme de vrais anciens, pas de représentation réaliste d'une école précise et identifiable, pas d'insignes ni d'emblèmes militaires en décoration.
+- **Aucune photo de l'association** pour l'instant (anciens, promos, écoles). Le site s'appuie sur de **vraies photos** : l'univers militaire est voulu (soldats, officiers et hiérarchie, cérémonies, entraînement, entraide entre soldats), ainsi que la communauté et l'annuaire numérique.
+  - **Photos de remplacement** sous licence libre (Wikimedia Commons : domaine public ou CC), de soldats et d'officiers des pays des écoles, en noir et blanc. Elles ne sont jamais légendées ni présentées comme des membres d'AET Connect ; leurs crédits figurent en pied de page. Elles seront remplacées par les photos de l'association.
+  - **Images générées** acceptées pour ce que les photos libres ne montrent pas (salle de classe, transmission entre un ancien et un jeune, retrouvailles de promo), sans jamais passer pour de vrais anciens ni représenter de façon réaliste une école précise.
+  - **Adultes seulement** : aucune photo de mineurs, y compris des cadets en défilé public. L'enfance passera par des images générées ou par des photos de l'association avec consentement.
+  - Ni emblèmes de haine ou de suprématie, ni scène de combat ou d'arme pointée : l'armée se montre par la cérémonie, la discipline, l'entraînement et l'entraide.
 - Aucun témoignage, chiffre public, presse ou partenaire à afficher : ne pas en inventer. Les nombres de membres affichés doivent venir de la base.
 
 ## Product Principles
