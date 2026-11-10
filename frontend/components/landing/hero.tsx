@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { PHOTOS } from '@/lib/landing'
 import { PhotoFrame } from './photo-frame'
+import { LienFleche } from './lien-fleche'
 
 export function Hero() {
   return (
@@ -22,12 +23,7 @@ export function Hero() {
               Rejoindre ma promo
               <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />
             </a>
-            <a
-              href="#parcours"
-              className="inline-flex min-h-11 items-center text-base font-semibold text-terre decoration-terre decoration-2 underline-offset-[6px] hover:underline"
-            >
-              Comment rejoindre
-            </a>
+            <LienFleche href="#parcours">Comment rejoindre</LienFleche>
           </div>
         </div>
 

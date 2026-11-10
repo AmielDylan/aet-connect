@@ -7,6 +7,7 @@ colors:
   vert-carte: "#24452F"
   or: "#FFC000"
   terre: "#8B4A1E"
+  terre-fonce: "#6B3613"
   creme: "#F4EEE2"
   blanc: "#FFFFFF"
   sable: "#DDD2BB"
@@ -74,12 +75,6 @@ components:
     height: "48px"
   button-primary-hover:
     backgroundColor: "{colors.vert-carte}"
-  button-nav:
-    backgroundColor: "{colors.vert}"
-    textColor: "{colors.creme}"
-    rounded: "{rounded.pilule}"
-    padding: "0 20px"
-    height: "44px"
   input:
     backgroundColor: "{colors.blanc}"
     textColor: "{colors.encre}"
@@ -92,8 +87,8 @@ components:
     rounded: "{rounded.carte}"
     padding: "12px"
   card-way-featured:
-    backgroundColor: "{colors.terre}"
-    textColor: "{colors.creme}"
+    backgroundColor: "{colors.or}"
+    textColor: "{colors.vert-nuit}"
     rounded: "{rounded.carte}"
     padding: "12px"
 ---
@@ -106,7 +101,7 @@ components:
 
 AET Connect montre la fraternité d'armes en vraies photos (soldats, officiers, cérémonies, gestes d'entraide), en noir et blanc, posées sur un monde de formes organiques. Une trame de courbes de niveau, le langage des cartes d'état-major, court en fond tamisé. Un soleil aux neuf pétales, un par école, porte la marque. Le vert profond et le crème composent la palette ; l'or et le brun-roux ne servent qu'à mettre un texte en valeur ou à orner.
 
-La composition reprend la planche de référence du client (« must ») : un hero avec le texte à gauche et une mosaïque de photos à droite, un bandeau des écoles, une section avec un collage et des chiffres, une section verte à trois cartes dont celle du milieu est mise en avant, puis le formulaire, et un pied de page signé d'« AET Connect » en très grand. Les formes organiques viennent des deux autres références du client : un soleil en papier découpé et des ondes topographiques.
+La composition reprend la planche de référence du client (« must ») : un hero avec le texte à gauche et une mosaïque de photos à droite, un bandeau des écoles, une section « AET un jour, AET toujours » avec un collage et des chiffres, une section verte à trois cartes dont celle du milieu est mise en avant, puis le formulaire, et un pied de page signé d'« AET Connect » en très grand. Les formes organiques viennent des deux autres références du client : un soleil en papier découpé et des ondes topographiques.
 
 Les photos sont d'illustration tant que l'association n'a pas fourni les siennes : de vrais soldats et officiers des pays des écoles, jamais présentés comme des membres.
 
@@ -123,8 +118,9 @@ Une palette de terre et de végétation : vert profond et crème, avec deux acce
 
 ### Primary
 - **Vert profond** (#1D3B2A) : sections profondes, bandeau des écoles, boutons principaux, titres sur fond clair, pétales du soleil sur fond clair.
-- **Or** (#FFC000) : un texte mis en valeur sur le vert, jamais un bouton ni un aplat. Liens du pied de page (soulignement or), « Connect » dans le grand nom du pied de page (7,48:1 sur vert).
-- **Brun-roux** (#8B4A1E) : un texte mis en valeur sur le crème, et le décor. Soulignement des liens sur crème, cœur du soleil, sélection de texte, carte mise en avant (texte crème, 5,87:1). Sur le vert, il ne sert qu'en décor (1,8:1).
+- **Or** (#FFC000) : l'accent des fonds verts. Un texte mis en valeur sur le vert, cœur du soleil sur vert (liens du pied de page et du menu mobile, « Connect » dans le grand nom du pied de page, 7,48:1), et l'aplat de la carte mise en avant (texte vert de nuit, 10:1). Jamais dans un bouton.
+- **Brun-roux** (#8B4A1E) : l'accent des fonds beige. Survol des liens sur crème (5,87:1), cœur du soleil sur beige, sélection de texte. Jamais sur le vert (1,8:1).
+- **Brun-roux foncé** (#6B3613) : le survol d'un lien sur la carte or (5,92:1 ; le brun-roux n'y ferait que 4,13:1).
 
 ### Neutral
 - **Vert de nuit** (#12261B) : pied de page.
@@ -139,7 +135,7 @@ Une palette de terre et de végétation : vert profond et crème, avec deux acce
 - **Alerte** (#9C2A1E) : messages d'erreur sur crème (6,58:1).
 
 ### Named Rules
-**The Highlight Rule.** L'or et le brun-roux mettent un texte en valeur (un lien, un mot) : l'or sur le vert, le brun-roux sur le crème. Les boutons restent vert et crème ; aucun aplat d'or.
+**The Highlight Rule.** L'accent dépend du fond : or sur le vert, brun-roux sur le beige. Les liens ont la couleur du texte au repos ; au survol, ils prennent l'accent du fond et une flèche apparaît. Les boutons restent vert et crème ; un seul aplat d'or, la carte mise en avant, posée sur le vert.
 
 **The Real Faces Rule.** Les personnes à l'écran sont de vraies photos, jamais une illustration qui fait semblant. Une photo d'illustration n'est jamais légendée comme un membre.
 
@@ -186,8 +182,8 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 
 ### Buttons
 - **Primary :** pilule vert profond, texte crème semi-gras, 48px de haut, flèche à droite qui avance de 4px au survol ; au survol, le fond passe en vert de carte.
-- **Navigation :** « Se connecter » est un bouton plein, comme le principal (vert, texte crème), en plus compact (44px). Pas de bouton à contour.
-- **Text link :** en couleur d'accent au repos, souligné seulement au survol (2px, décalé de 6px) : brun-roux sur crème, or sur vert, crème sur la carte brun-roux. Un lien n'est jamais pris dans une phrase : il est seul, gras, souvent suivi d'une flèche, donc reconnaissable sans soulignement.
+- **Lien fléché** (`LienFleche`) : semi-gras, couleur du texte au repos (encre, ou vert de nuit sur l'or) ; au survol ou au focus, il passe en brun-roux (brun-roux foncé sur l'or) et une flèche glisse en place, sans décaler la mise en page. Un lien n'est jamais pris dans une phrase : il est seul, donc reconnaissable sans soulignement.
+- **Liens du pied de page :** or sur vert de nuit, soulignés au survol.
 
 ### Inputs / Fields
 - **Style :** fond blanc, contour trait de 2px, coins de 12px, 48px de haut, texte encre ; les années en chiffres tabulaires.
@@ -198,8 +194,8 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 - **Bouton d’envoi :** il nomme le résultat (« Trouver ma promo »), puis « Vérification… » pendant l’attente.
 
 ### Navigation
-- **Barre :** posée directement sur la trame du hero, sans fond propre. La marque (le soleil et « AET Connect » en Unbounded) ; à partir de 1024px, les ancres « Le réseau » et « Comment rejoindre » et le bouton plein « Se connecter » (ou « Mon espace »).
-- **Menu mobile (sous 1024px) :** un bouton plein « Menu » / « Fermer » (icône et texte, `aria-expanded`) ouvre un panneau vert aux coins de 24px sous la barre : les ancres en Unbounded, puis « Se connecter » en pilule crème. Il se ferme par Échap (le focus revient au bouton) ou au choix d’un lien.
+- **Barre :** posée directement sur la trame du hero, sans fond propre. La marque (le soleil et « AET Connect » en Unbounded) ; à partir de 1024px, les liens « Le réseau », « Comment rejoindre » et « Se connecter » (ou « Mon espace »). Ce dernier est un lien comme les autres, semi-gras et vert, précédé d'une icône de connexion. Tous passent en brun-roux au survol.
+- **Menu mobile (sous 1024px) :** un bouton plein « Menu » / « Fermer » (icône et texte, `aria-expanded`) ouvre un panneau vert aux coins de 24px sous la barre : les ancres en Unbounded, puis « Se connecter » en or avec son icône. Il se ferme par Échap (le focus revient au bouton) ou au choix d’un lien.
 - **Lien d’évitement :** « Aller au contenu », visible au focus clavier.
 - **« Rejoindre ma promo » :** une seule fois par écran ; dans le premier écran, c'est le bouton du hero.
 
@@ -207,7 +203,7 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au survol ou au focus, la couleur revient et la photo grossit de 3 % (700ms, cubic-bezier(0.16, 1, 0.3, 1)). Un cadre ne porte jamais de légende ; la provenance est dans les crédits du pied de page.
 
 ### Cards / Containers
-- **Carte de parcours :** crème sur le fond vert (jamais vert sur vert), 12px de marge intérieure, une photo de 16:10 puis le titre vert, le texte olive et le lien, sans bloc encadré à l’intérieur. La carte mise en avant est en brun-roux, texte crème, et inverse l’ordre (texte d’abord, photo ensuite).
+- **Carte de parcours :** crème sur le fond vert (jamais vert sur vert), 12px de marge intérieure, une photo de 16:10 puis le titre vert, le texte olive et le lien, sans bloc encadré à l’intérieur. La carte mise en avant est en or, texte vert de nuit, et inverse l’ordre (texte d’abord, photo ensuite).
 
 ### Soleil aux neuf pétales (signature)
 - **Le dessin :** neuf pétales, un par école, symétriques, qui s'élargissent vers l'extérieur et ondulent chacun à sa façon. Aucune rotation d'ensemble : le soleil ne doit jamais évoquer une roue tournante. Le cœur est légèrement irrégulier, comme découpé aux ciseaux. Il est généré par `scripts/motifs.mjs` dans `lib/soleil.ts`.
@@ -215,7 +211,7 @@ Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au 
   - la marque, à 36px ;
   - les séparateurs du bandeau des écoles, à 24px (pétales crème à 70 %) ;
   - un grand aplat dans le collage de la section « réseau », en crème sur vert.
-- **Les couleurs :** cœur toujours brun-roux ; pétales verts sur fond clair, crème sur fond sombre.
+- **Les couleurs :** sur fond beige, pétales verts et cœur brun-roux ; sur fond vert, pétales crème et cœur or.
 
 ### Trame topographique
 - **Le dessin :** des courbes de niveau en larges bandes, raccordables sans couture (tuile de 1200px), générées par `scripts/motifs.mjs` dans `public/motifs/topo-*.svg`.
@@ -258,6 +254,6 @@ Sigles et villes des écoles réelles sur le vert, en Unbounded, séparés par d
 - **Don't** imbriquer une carte dans une carte, ni poser une icône décorative à côté d'un chiffre.
 - **Don't** poser des cartes vertes sur un fond vert, ni mettre du texte or dans un bouton.
 - **Don't** séparer les éléments d'une section par des filets : l'espace suffit.
-- **Don't** souligner un lien au repos, ni utiliser un bouton à contour.
+- **Don't** souligner un lien au repos, ni faire de « Se connecter » un bouton (plein ou à contour).
 - **Don't** recopier une image ou une étoffe existante : les motifs sont dessinés pour AET Connect.
 - **Don't** inventer de pourcentages ou de statistiques.

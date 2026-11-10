@@ -8,7 +8,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1280px] px-5 pb-8 pt-16 sm:px-8 sm:pt-20">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <p className="flex items-center gap-3 text-base text-brume">
-            <Soleil className="size-8" petales="fill-creme" coeur="fill-terre" />
+            <Soleil className="size-8" petales="fill-creme" coeur="fill-or" />
             Annuaire panafricain des Anciens Enfants de Troupe
           </p>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-sm font-semibold">

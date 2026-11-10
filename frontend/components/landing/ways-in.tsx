@@ -1,7 +1,6 @@
-import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
 import { PHOTOS, type Photo } from '@/lib/landing'
 import { PhotoFrame } from './photo-frame'
+import { LienFleche } from './lien-fleche'
 
 type Way = { title: string; text: string; action: string; href: string; photo: Photo; position: string; featured?: boolean }
 
@@ -45,19 +44,15 @@ export function WaysIn() {
           {WAYS.map((way) => (
             <li
               key={way.href}
-              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-terre text-creme' : 'sur-creme flex-col bg-creme text-encre'}`}
+              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-or text-vert-nuit' : 'sur-creme flex-col bg-creme text-encre'}`}
             >
               <PhotoFrame photo={way.photo} position={way.position} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] rounded-[20px]" />
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
                 <h3 className={`text-lg font-semibold leading-snug tracking-[-0.02em] font-titre ${way.featured ? '' : 'text-vert'}`}>{way.title}</h3>
-                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-creme/90' : 'text-olive'}`}>{way.text}</p>
-                <Link
-                  href={way.href}
-                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold decoration-2 underline-offset-[6px] hover:underline ${way.featured ? 'text-creme decoration-creme' : 'text-terre decoration-terre'}`}
-                >
+                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-vert-nuit/85' : 'text-olive'}`}>{way.text}</p>
+                <LienFleche href={way.href} surOr={way.featured} className="mt-4 self-start">
                   {way.action}
-                  <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />
-                </Link>
+                </LienFleche>
               </div>
             </li>
           ))}
