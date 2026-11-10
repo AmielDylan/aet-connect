@@ -11,22 +11,22 @@ export function Hero() {
             Retrouvez les anciens de votre promo
           </h1>
           <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-olive text-pretty">
-            L’annuaire des Anciens Enfants de Troupe, de toutes les écoles militaires préparatoires. On y entre par sa
-            promo, sur l’invitation d’un ancien.
+            Le réseau des Anciens Enfants de Troupe, toutes écoles militaires préparatoires confondues. On le rejoint
+            par sa promo, sur l’invitation d’un ancien.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a
               href="#rejoindre"
-              className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-vert px-6 text-base font-semibold text-or transition-colors duration-200 hover:bg-vert-carte"
+              className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-vert px-6 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte"
             >
               Rejoindre ma promo
               <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />
             </a>
             <a
               href="#parcours"
-              className="inline-flex min-h-11 items-center text-base font-semibold text-vert underline decoration-terre decoration-2 underline-offset-[6px] hover:decoration-vert"
+              className="inline-flex min-h-11 items-center text-base font-semibold text-terre decoration-terre decoration-2 underline-offset-[6px] hover:underline"
             >
-              Comment entrer
+              Comment rejoindre
             </a>
           </div>
         </div>

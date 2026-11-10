@@ -36,7 +36,7 @@ export function SchoolsBand({ schools }: { schools: LandingSchool[] }) {
         type="button"
         onClick={() => setPaused((p) => !p)}
         aria-label={paused ? 'Reprendre le défilement des écoles' : 'Mettre en pause le défilement des écoles'}
-        className="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-vert-nuit text-or ring-2 ring-vert transition-colors hover:bg-vert-carte motion-reduce:hidden"
+        className="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-vert-nuit text-creme ring-2 ring-vert transition-colors hover:bg-vert-carte motion-reduce:hidden"
       >
         {paused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
       </button>
