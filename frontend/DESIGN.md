@@ -1,231 +1,236 @@
 ---
 name: AET Connect
-description: Annuaire panafricain des Anciens Enfants de Troupe, dessiné comme un plan de réseau.
+description: Annuaire panafricain des Anciens Enfants de Troupe ; vraies photos, vert armée et or.
 colors:
-  outremer: "#12307A"
-  outremer-nuit: "#0C2159"
-  safran: "#F2A900"
-  corail: "#FF6B4A"
-  savane: "#2BA36B"
-  craie: "#FFFFFF"
-  brume: "#C9D3F0"
-  encre: "#0B1640"
+  vert: "#1D3B2A"
+  vert-nuit: "#12261B"
+  vert-carte: "#24452F"
+  or: "#FFC000"
+  creme: "#F4EEE2"
+  blanc: "#FFFFFF"
+  sable: "#DDD2BB"
+  trait: "#7A887D"
+  encre: "#14211A"
+  olive: "#4D5E52"
+  brume: "#C3D1C6"
+  alerte: "#9C2A1E"
 typography:
   display:
-    fontFamily: "Big Shoulders, ui-sans-serif, sans-serif"
-    fontSize: "clamp(3rem, 7vw, 5.75rem)"
-    fontWeight: 800
-    lineHeight: 0.88
-    letterSpacing: "-0.01em"
+    fontFamily: "Archivo, ui-sans-serif, sans-serif"
+    fontSize: "clamp(2.5rem, 5.2vw, 4.25rem)"
+    fontWeight: 700
+    lineHeight: 1.02
+    letterSpacing: "-0.012em"
+    fontVariation: "'wdth' 90"
   headline:
-    fontFamily: "Big Shoulders, ui-sans-serif, sans-serif"
-    fontSize: "clamp(2.25rem, 4.5vw, 4rem)"
-    fontWeight: 800
-    lineHeight: 0.9
+    fontFamily: "Archivo, ui-sans-serif, sans-serif"
+    fontSize: "clamp(2rem, 3.8vw, 3.25rem)"
+    fontWeight: 700
+    lineHeight: 1.05
+    letterSpacing: "-0.012em"
+    fontVariation: "'wdth' 90"
+  figure:
+    fontFamily: "Archivo, ui-sans-serif, sans-serif"
+    fontSize: "2.75rem"
+    fontWeight: 700
+    lineHeight: 1
+    fontVariation: "'wdth' 90"
   title:
-    fontFamily: "Big Shoulders, ui-sans-serif, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "0.01em"
-  station:
-    fontFamily: "Big Shoulders, ui-sans-serif, sans-serif"
+    fontFamily: "Archivo, ui-sans-serif, sans-serif"
     fontSize: "1.25rem"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "0.03em"
+    fontWeight: 700
+    lineHeight: 1.25
+    fontVariation: "'wdth' 90"
   body:
-    fontFamily: "Atkinson Hyperlegible Next, ui-sans-serif, sans-serif"
+    fontFamily: "Archivo, ui-sans-serif, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 400
-    lineHeight: 1.375
+    lineHeight: 1.625
   label:
-    fontFamily: "Atkinson Hyperlegible Next, ui-sans-serif, sans-serif"
+    fontFamily: "Archivo, ui-sans-serif, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 600
-    lineHeight: 1.25
-  caption:
-    fontFamily: "Atkinson Hyperlegible Next, ui-sans-serif, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 600
-    lineHeight: 1.33
+    lineHeight: 1.4
 rounded:
-  none: "0px"
-  station: "9999px"
+  champ: "12px"
+  carte-interieure: "20px"
+  photo: "24px"
+  carte: "28px"
+  coin-marque: "72px"
+  pilule: "9999px"
 spacing:
-  unit: "8px"
+  unit: "4px"
   gutter-mobile: "20px"
   gutter: "32px"
   section-mobile: "80px"
   section: "112px"
-  container: "1440px"
+  container: "1280px"
 components:
   button-primary:
-    backgroundColor: "{colors.corail}"
-    textColor: "{colors.encre}"
-    typography: "{typography.body}"
-    rounded: "{rounded.none}"
-    padding: "0 20px"
-    height: "52px"
-  button-outline:
-    backgroundColor: "{colors.outremer}"
-    textColor: "{colors.craie}"
+    backgroundColor: "{colors.vert}"
+    textColor: "{colors.or}"
     typography: "{typography.label}"
-    rounded: "{rounded.none}"
-    padding: "0 16px"
-    height: "44px"
-  button-outline-hover:
-    backgroundColor: "{colors.craie}"
-    textColor: "{colors.outremer}"
-  input:
-    backgroundColor: "{colors.outremer-nuit}"
-    textColor: "{colors.craie}"
-    rounded: "{rounded.none}"
-    padding: "0 12px"
+    rounded: "{rounded.pilule}"
+    padding: "0 24px"
     height: "48px"
-  station:
-    backgroundColor: "{colors.craie}"
-    textColor: "{colors.outremer}"
-    rounded: "{rounded.station}"
-    size: "56px"
-  station-active:
-    backgroundColor: "{colors.safran}"
+  button-primary-hover:
+    backgroundColor: "{colors.vert-carte}"
+  button-light:
+    backgroundColor: "{colors.creme}"
+    textColor: "{colors.vert}"
+    rounded: "{rounded.pilule}"
+    padding: "0 20px"
+    height: "44px"
+  tab-code:
+    backgroundColor: "{colors.or}"
+    textColor: "{colors.vert-nuit}"
+    padding: "0 20px"
+    height: "44px"
+  input:
+    backgroundColor: "{colors.blanc}"
     textColor: "{colors.encre}"
+    rounded: "{rounded.champ}"
+    padding: "0 16px"
+    height: "48px"
+  card-way:
+    backgroundColor: "{colors.vert-carte}"
+    textColor: "{colors.creme}"
+    rounded: "{rounded.carte}"
+    padding: "12px"
+  card-way-featured:
+    backgroundColor: "{colors.or}"
+    textColor: "{colors.vert-nuit}"
+    rounded: "{rounded.carte}"
+    padding: "12px"
 ---
 
 # Design System: AET Connect
 
 ## Overview
 
-**Creative North Star: "La ligne AET"**
+**Creative North Star: "Esprit de corps"**
 
-AET Connect se dessine comme un plan de réseau : les écoles sont des stations, et une seule ligne safran les relie sur un fond outremer. Le plan ne fait que des segments à 0°, 45° et 90°, ses stations sont des disques blancs, ses noms sont écrits en lettres de signalétique condensées. Tout ce qui n'est pas la ligne, une station ou une action se tait.
+AET Connect montre la fraternité d'armes en vraies photos : des soldats, des officiers, des cérémonies, des gestes d'entraide, en noir et blanc, posés dans des cadres arrondis sur un fond crème. Le vert armée porte les sections profondes et l'action principale ; l'or ne sert qu'à l'accent. Des frises de motifs dessinées dans l'esprit du bogolan relient les sections, comme une bordure d'étoffe.
 
-Le système est plat, franc et lisible de loin, comme un plan affiché dans une station. Il refuse trois pentes : le registre militaire (insignes, camouflage, galons), le SaaS générique (cartes arrondies, ombres douces, dégradés) et l'institutionnel (blasons, sceaux, bleu-gris administratif). Le motif africain passe par les disques des stations, un motif par école, jamais par un tissu plaqué en fond : le wax est écarté.
+La composition reprend la planche de référence du client : une barre du haut sombre avec un onglet d'accent, un hero où le texte est à gauche et une mosaïque de photos à droite, un bandeau défilant, une section avec un collage de photos et des chiffres, puis une section verte avec trois cartes, dont celle du milieu est mise en avant en or. Le système est calme et soigné. L'émotion vient des photos, pas des effets.
 
-La ligne ne représente qu'un fait vrai : AET Connect réunit ces écoles dans un même réseau. Elle n'invente ni trajet ni liaison entre elles.
+Les photos sont d'illustration tant que l'association n'a pas fourni les siennes : de vrais soldats et officiers des pays des écoles, jamais présentés comme des membres.
 
 **Key Characteristics:**
-- Fond outremer plein, sans texture ni dégradé.
-- Une seule ligne safran, octilinéaire, épaisse ; c'est la signature.
-- Stations : disques blancs cerclés d'outremer, chacun porteur du motif de son école.
-- Lettres de signalétique condensées en capitales pour les noms, humaniste très lisible pour tout le reste.
-- Angles vifs partout ; le cercle est réservé aux stations.
-- Un seul mouvement : la ligne se trace, les stations s'allument.
+- Vraies photos en noir et blanc ; la couleur revient au survol.
+- Vert armée en fond profond et pour l'action, or en accent, crème en fond clair.
+- Cadres arrondis à 24 px, avec un coin plus arrondi (72 px) qui donne le mouvement.
+- Une seule famille, Archivo : titres gras semi-condensés, texte en largeur normale.
+- Frises et panneaux de motifs en traits, dans l'esprit du bogolan.
+- Boutons en pilule.
 
 ## Colors
 
-Une palette de plan de réseau : un fond profond, une couleur de ligne, une couleur d'action, et des neutres froids.
+Vert armée, or et crème, sans autre couleur vive.
 
 ### Primary
-- **Outremer** (#12307A) : le fond du plan, du hero et du pied de page ; la couleur du texte sur fond blanc. C'est le monde.
-- **Safran de ligne** (#F2A900) : la ligne et le chemin vers l'action, c'est-à-dire le tracé du plan, les embranchements, le soulignement des liens, l'anneau de focus et la station sélectionnée. Contraste 6,0 sur outremer.
-
-### Secondary
-- **Corail d'action** (#FF6B4A) : uniquement le fond du bouton d'action principal, avec un texte encre (contraste 6,2).
-
-### Tertiary
-- **Vert savane** (#2BA36B) : signe « visible » dans les réglages de confidentialité, sur fond blanc uniquement. Jamais pour du texte sur outremer (contraste 3,8).
+- **Vert armée** (#1D3B2A) : fonds des sections profondes, bandeau des écoles, boutons principaux, titres sur fond clair.
+- **Or de galon** (#FFC000) : l'accent. Texte des boutons verts, onglet « Entrez votre code », motifs et repères, soulignement des liens, anneau de focus sur fond vert. En grand fond, seulement pour la carte mise en avant.
 
 ### Neutral
-- **Outremer de nuit** (#0C2159) : sections secondaires et fond des champs de saisie ; donne la profondeur sans ombre.
-- **Craie** (#FFFFFF) : texte principal sur outremer, disques des stations, sections claires.
-- **Brume** (#C9D3F0) : texte secondaire sur outremer (villes, descriptions, aides de champ). Contraste 8,1.
-- **Encre** (#0B1640) : texte posé sur safran ou corail.
+- **Vert de nuit** (#12261B) : barre du haut et pied de page.
+- **Vert de carte** (#24452F) : cartes posées sur le vert armée ; survol des boutons verts.
+- **Crème** (#F4EEE2) : fond clair principal.
+- **Blanc** (#FFFFFF) : sections claires alternées, champs, fiche d'exemple.
+- **Sable** (#DDD2BB) : filets, séparateurs, fond des cadres pendant le chargement. Jamais le contour d'un champ.
+- **Trait** (#7A887D) : contour des champs (3,2:1 sur crème, 3,7:1 sur blanc).
+- **Encre** (#14211A) : texte principal sur crème et blanc.
+- **Olive** (#4D5E52) : texte secondaire sur crème (5,98:1).
+- **Brume** (#C3D1C6) : texte secondaire sur vert (7,75:1).
+- **Alerte** (#9C2A1E) : messages d'erreur sur crème (6,58:1).
 
 ### Named Rules
-**The One Line Rule.** Le safran appartient à la ligne et au chemin vers l'action. Il ne colore jamais un logo, un titre, un fond de section ou une décoration.
+**The Gold Accent Rule.** L'or est un accent : texte, motif, onglet, focus. Un seul grand aplat d'or par écran, la carte mise en avant.
 
-**The One Action Rule.** Le corail ne sert qu'à l'action principale de l'écran. S'il apparaît deux fois dans la même vue, l'un des deux est de trop.
+**The Real Faces Rule.** Les personnes à l'écran sont de vraies photos, jamais une illustration qui fait semblant. Une photo d'illustration n'est jamais légendée comme un membre.
 
 ## Typography
 
-**Display Font:** Big Shoulders 800 (avec ui-sans-serif)
-**Body Font:** Atkinson Hyperlegible Next (avec ui-sans-serif)
+**Display Font:** Archivo (avec ui-sans-serif), axe de largeur à 90 %
+**Body Font:** Archivo, largeur normale
 
-**Character:** des lettres de signalétique condensées, pour les noms de stations et les titres, face à une humaniste conçue pour la lisibilité. La première se lit de loin, la seconde se lit sans effort.
-
-Les deux polices sont téléchargées au build et servies par le site (next/font).
+**Character:** une grotesque robuste, un peu industrielle. Semi-condensée et grasse, elle a la tenue d'un uniforme ; en largeur normale, elle reste chaleureuse et très lisible.
 
 ### Hierarchy
-- **Display** (800, clamp(3rem, 7vw, 5.75rem), 0.88) : le titre du hero, en capitales, équilibré (`text-wrap: balance`).
-- **Headline** (800, clamp(2.25rem, 4.5vw, 4rem), 0.9) : titres de section, en capitales, 14 à 16 caractères par ligne au plus.
-- **Title** (800, 1.875rem, 1) : actions nommées, comme les terminus des trois parcours, en capitales.
-- **Station** (800, 1.25rem, 1, +0.03em) : sigle d'une école sur le plan, en capitales.
-- **Body** (400, 1.125rem, 1.375) : paragraphes, entre 34 et 52 caractères par ligne (`text-wrap: pretty`).
-- **Label** (600, 0.875rem) : libellés de champs, liens d'en-tête et de pied de page.
-- **Caption** (600, 0.75rem) : ville et pays sous un nom de station.
+- **Display** (700, clamp(2.5rem, 5.2vw, 4.25rem), 1.02) : le titre du hero, 16 caractères par ligne au plus, équilibré.
+- **Headline** (700, clamp(2rem, 3.8vw, 3.25rem), 1.05) : titres de section.
+- **Figure** (700, 2.75rem, 1) : chiffres réels, en chiffres tabulaires.
+- **Title** (700, 1.25rem) : titres de carte, marque.
+- **Body** (400, 1.125rem, 1.625) : paragraphes en olive, 44 à 52 caractères par ligne.
+- **Label** (600, 0.875–1rem) : libellés de champs, liens, boutons.
 
 ### Named Rules
-**The Signage Rule.** Big Shoulders ne s'écrit qu'en capitales et ne descend pas sous 1.25rem ; en dessous, c'est Atkinson.
+**The No Eyebrow Rule.** Aucun sur-titre au-dessus d'un titre : le titre parle seul.
 
 ## Layout
 
-Grille de 8px. Conteneur de 1440px de large au plus, avec des gouttières de 20px sur mobile et 32px à partir de 640px ; toutes les sections partagent ce bord. Les sections respirent : 80px de marge verticale sur mobile, 112px sur grand écran.
+Conteneur de 1280px de large au plus, avec des gouttières de 20px sur mobile et 32px à partir de 640px. Les sections alternent crème, blanc et vert armée, avec 80px de marge verticale sur mobile et 112px sur grand écran.
 
-Le hero occupe au moins toute la hauteur de l'écran. Sur grand écran (1024px et plus), une colonne de légende de 320 à 400px porte l'offre et le formulaire, et le plan occupe le reste. Le plan dessiné s'affiche à partir de 768px ; en dessous, il devient une bande verticale : une barre safran continue, les stations en liste, les noms à droite.
-
-Le plan est positionné en pourcentages d'un repère de 1000 × 660 : chaque station est un point sans taille, son disque et son étiquette s'y ancrent à distance fixe.
+Le hero est en deux colonnes (5/12 de texte, 7/12 de mosaïque) à partir de 1024px. La mosaïque garde une grille fixe : un grand portrait à gauche, abaissé de 64px, et trois cadres empilés à droite, entre 420 et 600px de haut. Les sections à collage et les formulaires sont en deux colonnes égales à partir de 1024px. Les cartes de parcours sont en trois colonnes à partir de 768px. Sur mobile, tout passe en une colonne, le texte avant l'image.
 
 ## Elevation & Depth
 
-Aucune ombre. La profondeur vient de deux bleus (outremer et outremer de nuit) et de l'ordre d'empilement : la ligne est sous les stations, les stations sous les étiquettes. Un élément au premier plan se signale par sa couleur (safran) et une légère mise à l'échelle (1.1), jamais par une ombre.
+Aucune ombre. La profondeur vient de l'alternance des fonds (crème, blanc, vert, vert de nuit), de cartes vert de carte posées sur le vert, et de petites cartes crème posées sur un panneau de motifs.
 
 ### Named Rules
-**The Flat Map Rule.** Un plan de réseau est imprimé, pas extrudé : pas d'ombre, pas de flou, pas de biseau, pas de verre.
+**The Flat Fabric Rule.** Pas d'ombre, de flou ni de verre : les surfaces sont des aplats, comme une étoffe.
 
 ## Shapes
 
-Angles vifs (0px) sur les boutons, champs, fiches et sections. Le cercle (9999px) est réservé aux stations et aux terminus des embranchements. Les traits sont épais et pleins : 2px pour les contours de champs et de boutons, 4px pour le cercle d'une station et le cadre d'une fiche, 10 unités pour la ligne. Les segments de ligne ne sont que horizontaux, verticaux ou à 45°, avec des coudes arrondis.
-
-### Named Rules
-**The Octilinear Rule.** Toute ligne dessinée suit 0°, 45° ou 90°. Une courbe libre ou un angle quelconque casse le plan.
+Tout est arrondi, sans angle vif. Les photos ont des coins de 24px, et un coin par cadre passe à 72px : en haut à gauche ou en bas à droite dans la mosaïque, en bas à gauche ou en haut à droite dans les collages. Les cartes ont des coins de 28px et leurs blocs intérieurs de 20px ; les champs, de 12px ; les boutons sont des pilules. Les filets font 2px, en sable.
 
 ## Components
 
 ### Buttons
-- **Shape:** angles vifs (0px).
-- **Primary:** fond corail, texte encre gras en 1.125rem, 52px de haut, 20px de marge intérieure, flèche à droite. Un seul par vue.
-- **Hover / Focus:** le corail s'éclaircit de 12 %, la flèche avance de 4px (200ms, ease-out) ; au clic, le bouton descend d'1px. Focus : anneau safran de 3px.
-- **Outline:** contour craie de 2px, texte label, 44px de haut ; au survol, il se remplit de craie et le texte passe en outremer. Sert à « Se connecter » / « Mon espace ».
+- **Primary :** pilule vert armée, texte or semi-gras, 48px de haut, flèche à droite qui avance de 4px au survol ; au survol, le fond passe en vert de carte.
+- **Light :** pilule crème au texte vert, sur fond vert (« J'ai déjà un compte »).
+- **Text link :** texte vert ou crème souligné d'or (2px, décalé de 6px).
 
 ### Inputs / Fields
-- **Style:** fond outremer de nuit, contour craie de 2px, angles vifs, 48px de haut, texte craie, indication en brume. Les années s'écrivent en chiffres tabulaires.
-- **Select:** même champ, chevron safran dessiné à droite.
-- **Focus:** anneau safran de 3px.
-- **Error:** message en safran, gras, annoncé (`role="alert"`) et relié au champ.
+- **Style :** fond blanc, contour trait de 2px, coins de 12px, 48px de haut, texte encre ; les années en chiffres tabulaires.
+- **Focus :** contour vert armée et anneau de focus.
+- **Error :** message en alerte, gras, annoncé (`role="alert"`) et relié au champ (`aria-describedby`, `aria-invalid`).
 
 ### Navigation
-- **Style:** un cartouche de plan. Le nom « AET Connect » en Big Shoulders à gauche, en craie ; le bouton outline à droite. Pas de menu.
-- **Liens:** texte craie souligné safran (2px, décalé de 4px) ; au survol, le texte passe en safran. Zone de clic de 44px.
+- **Barre du haut :** vert de nuit, une phrase en brume à gauche, l'onglet or à droite (coin bas-gauche arrondi).
+- **Barre principale :** sur crème ; la marque (disque vert et chevrons or, puis le nom), les ancres au soulignement or (à partir de 1024px), « Se connecter » et le bouton principal.
+
+### Photo frame (signature)
+Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au survol ou au focus, la couleur revient et la photo grossit de 3 % (700ms, cubic-bezier(0.16, 1, 0.3, 1)). Un cadre ne porte jamais de légende ; la provenance est dans les crédits du pied de page.
 
 ### Cards / Containers
-- **Exemple de fiche:** cadre outremer de 4px, angles vifs, en-tête outremer qui dit ce qu'est l'exemple, lignes séparées par un filet de 2px. Un exemple est toujours étiqueté comme tel.
+- **Carte de parcours :** vert de carte, 12px de marge intérieure, une photo de 16:10 puis un bloc cerné d'un filet clair ; la carte mise en avant est en or et inverse l'ordre (texte d'abord, photo ensuite).
+- **Fiche d'exemple :** coins de 24px, contour sable, en-tête vert ; toujours étiquetée « Exemple de fiche ».
 
-### Station (signature)
-Disque craie de 56px, cerclé de 4px d'outremer, qui porte le motif de son école en outremer. Au survol, au focus ou une fois sélectionné, il passe en safran et grandit de 10 %, et un trait blanc parcourt la ligne depuis la première station jusqu'à lui (500ms, ease-out) ; l'étiquette révèle alors l'année de création et le nombre d'anciens. Toucher une station choisit l'école dans le formulaire. L'étiquette se place du côté qui ne couvre pas la ligne.
+### Bogolan
+Frises de 32px de haut (zigzag, échelle, points, chevrons, spirale carrée) en or sur le vert, au haut et au bas des sections vertes et au haut du pied de page. Panneaux pleins (rangées de motifs) en or ou en crème translucide sur le vert. Trait rond de 3px, une seule couleur. Signes isolés (chevrons, losange, échelle, spirale) comme repères et séparateurs.
 
-### Embranchement
-La ligne se divise en branches à angle droit, chacune terminée par un disque craie cerclé de safran ; chaque terminus est une action. Sur mobile, les branches deviennent une ligne verticale continue qui relie leurs terminus.
+### Bandeau des écoles
+Sigles et villes des écoles réelles sur le vert, séparés par des signes or. Il défile en boucle (45s), se met en pause au survol et par un bouton (WCAG 2.2.2). Avec le mouvement réduit activé, il est immobile et montre toutes les écoles sur plusieurs lignes.
 
 ### Motion
-Un seul mouvement d'entrée : la ligne se trace en 1600ms (cubic-bezier(0.16, 1, 0.3, 1)), puis les stations s'allument une à une, à 150ms d'intervalle. Uniquement sans préférence de mouvement réduit ; sinon tout est visible d'emblée.
+- Le moment d'entrée : les cadres de la mosaïque s'ouvrent du bas vers le haut (clip-path, 1000ms, 130ms d'écart).
+- Sinon, seulement des réponses au survol.
+- Tout reste visible d'emblée quand le mouvement réduit est activé.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** garder le safran pour la ligne, les liens et le focus (The One Line Rule).
-- **Do** réserver le corail à un seul bouton d'action par vue.
-- **Do** dessiner les nouveaux éléments graphiques comme des parties du plan : segments octilinéaires, stations, embranchements, terminus.
-- **Do** écrire les noms en Big Shoulders capitales et tout le reste en Atkinson.
-- **Do** étiqueter tout exemple de donnée comme un exemple.
-- **Do** garder le texte brume pour le secondaire sur outremer, et la craie pour le principal.
+- **Do** montrer de vraies personnes en photo, en noir et blanc, dans des cadres arrondis.
+- **Do** créditer chaque photo de remplacement dans le pied de page, et la remplacer dès que l'association fournit les siennes.
+- **Do** garder l'or pour l'accent : texte des boutons verts, motifs, onglet, soulignement.
+- **Do** n'afficher que des chiffres tirés de la base.
+- **Do** donner aux champs un contour trait (#7A887D), jamais sable.
 
 ### Don't:
-- **Don't** utiliser d'insignes, galons, camouflage, blasons ou sceaux, même stylisés.
-- **Don't** plaquer un tissu wax ou un motif en fond de section ; les motifs vivent dans les stations.
-- **Don't** ajouter d'ombre, de dégradé, de verre ou d'angle arrondi hors des stations.
-- **Don't** poser un sur-titre au-dessus d'un titre ; une action se nomme d'abord, sa condition vient dessous.
-- **Don't** marquer un élément d'une barre de couleur sur le côté ; une ligne relie, elle ne souligne pas.
-- **Don't** écrire du texte en vert savane sur outremer.
-- **Don't** présenter une image générée comme une photo réelle d'anciens ou d'école.
+- **Don't** montrer de mineurs, d'arme pointée ou de scène de combat.
+- **Don't** légender une photo d'illustration comme un membre d'AET Connect.
+- **Don't** poser un sur-titre au-dessus d'un titre.
+- **Don't** ajouter d'ombre, de dégradé ou de verre.
+- **Don't** recopier une étoffe ou une planche existante : les motifs sont dessinés pour AET Connect.
+- **Don't** inventer de pourcentages ou de statistiques.

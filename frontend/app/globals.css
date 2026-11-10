@@ -20,19 +20,21 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-cal: 'Cal Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, 'Roboto Mono', monospace;
-  /* Monde « la ligne AET » : titres de signalétique, étiquettes lisibles (next/font, auto-hébergées) */
-  --font-display: var(--font-big-shoulders), ui-sans-serif, sans-serif;
-  --font-label: var(--font-atkinson), ui-sans-serif, sans-serif;
+  /* Monde « esprit de corps » (page d'accueil) : une seule famille, Archivo (next/font, auto-hébergée) */
+  --font-archivo: var(--font-archivo-var), ui-sans-serif, sans-serif;
 
-  /* Monde « la ligne AET » : chaque couleur a un seul rôle */
-  --color-outremer: var(--aet-outremer);
-  --color-outremer-nuit: var(--aet-outremer-nuit);
-  --color-safran: var(--aet-safran);
-  --color-corail: var(--aet-corail);
-  --color-savane: var(--aet-savane);
-  --color-craie: var(--aet-craie);
-  --color-brume: var(--aet-brume);
-  --color-encre: var(--aet-encre);
+  /* Monde « esprit de corps » : chaque couleur a un rôle */
+  --color-vert: var(--esp-vert);
+  --color-vert-nuit: var(--esp-vert-nuit);
+  --color-vert-carte: var(--esp-vert-carte);
+  --color-or: var(--esp-or);
+  --color-creme: var(--esp-creme);
+  --color-sable: var(--esp-sable);
+  --color-trait: var(--esp-trait);
+  --color-encre: var(--esp-encre);
+  --color-olive: var(--esp-olive);
+  --color-brume: var(--esp-brume);
+  --color-alerte: var(--esp-alerte);
 
   /* Colors */
   --color-background: var(--background);
@@ -70,20 +72,23 @@
 }
 
 :root {
-  /* ── Monde « la ligne AET » ─────
-     outremer : le fond du plan ; outremer-nuit : sections profondes et pied de page
-     safran : la ligne AET et le chemin vers l'action, rien d'autre
-     corail : l'action principale, rien d'autre
-     savane : les ambassadeurs et ce qui est confirmé
-     craie : texte et stations ; brume : texte secondaire sur outremer ; encre : texte sur safran/corail */
-  --aet-outremer:      #12307A;
-  --aet-outremer-nuit: #0C2159;
-  --aet-safran:        #F2A900;
-  --aet-corail:        #FF6B4A;
-  --aet-savane:        #2BA36B;
-  --aet-craie:         #FFFFFF;
-  --aet-brume:         #C9D3F0;
-  --aet-encre:         #0B1640;
+  /* ── Monde « esprit de corps » ───
+     vert : le vert armée, fonds profonds et action principale ; vert-nuit : barre du haut et pied de page
+     vert-carte : cartes posées sur le vert ; or : l'accent (texte d'action, motifs, focus), jamais un grand fond
+     sauf la carte mise en avant ; creme : le fond clair ; sable : filets et motifs sur crème
+     encre : texte sur crème ; olive : texte secondaire sur crème (5,98:1) ; brume : texte secondaire sur vert (7,75:1)
+     alerte : erreurs sur crème (6,58:1) */
+  --esp-vert:       #1D3B2A;
+  --esp-vert-nuit:  #12261B;
+  --esp-vert-carte: #24452F;
+  --esp-or:         #FFC000;
+  --esp-creme:      #F4EEE2;
+  --esp-sable:      #DDD2BB;
+  --esp-trait:      #7A887D; /* contour des champs : 3,2:1 sur crème, 3,7:1 sur blanc */
+  --esp-encre:      #14211A;
+  --esp-olive:      #4D5E52;
+  --esp-brume:      #C3D1C6;
+  --esp-alerte:     #9C2A1E;
 
   /* ── Radius ───────────────────── */
   --radius: 0.5rem; /* 8px — Cal.com standard */
@@ -223,43 +228,59 @@
 }
 
 /* ─────────────────────────────────────────
-   Monde « la ligne AET » (page d'accueil)
+   Monde « esprit de corps » (page d'accueil)
 ───────────────────────────────────────── */
-.ligne-aet {
-  caret-color: var(--aet-safran);
+.esprit {
+  caret-color: var(--esp-vert);
 }
-.ligne-aet ::selection {
-  background: var(--aet-safran);
-  color: var(--aet-encre);
+.esprit ::selection {
+  background: var(--esp-or);
+  color: var(--esp-encre);
 }
-.ligne-aet :focus-visible {
-  outline: 3px solid var(--aet-safran);
+.esprit :focus-visible {
+  outline: 3px solid var(--esp-or);
   outline-offset: 3px;
+  border-radius: 6px;
 }
-.ligne-aet select option {
-  background: var(--aet-outremer-nuit);
-  color: var(--aet-craie);
+.esprit .sur-creme :focus-visible {
+  outline-color: var(--esp-vert);
 }
 
-/* Le seul mouvement : la ligne se trace une fois, les stations s'allument quand elle les atteint.
+/* Photographies : noir et blanc ; la couleur revient au survol */
+.photo-nb {
+  filter: grayscale(1) contrast(1.06);
+  transition: filter 700ms cubic-bezier(0.16, 1, 0.3, 1), scale 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.photo-cadre:hover .photo-nb,
+.photo-cadre:focus-within .photo-nb {
+  filter: grayscale(0) contrast(1);
+  scale: 1.03;
+}
+
+/* Le moment d'entrée : les cadres de la mosaïque s'ouvrent l'un après l'autre.
    Sans préférence de mouvement réduit uniquement ; sinon tout est visible d'emblée. */
 @media (prefers-reduced-motion: no-preference) {
-  .ligne-aet-trace {
-    stroke-dasharray: var(--len);
-    stroke-dashoffset: var(--len);
-    animation: ligne-aet-trace 1600ms cubic-bezier(0.16, 1, 0.3, 1) 150ms forwards;
+  .mosaique-cadre {
+    animation: mosaique-ouvre 1000ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(120ms + var(--i, 0) * 130ms);
   }
-  .ligne-aet-station {
-    opacity: 0;
-    animation: ligne-aet-station 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    animation-delay: calc(250ms + var(--i, 0) * 150ms);
+  .defile-ecoles {
+    animation: defile-ecoles 45s linear infinite;
+  }
+  .defile-ecoles:hover {
+    animation-play-state: paused;
   }
 }
-@keyframes ligne-aet-trace {
-  to { stroke-dashoffset: 0; }
+@keyframes mosaique-ouvre {
+  from { clip-path: inset(100% 0 0 0 round 24px); }
+  to { clip-path: inset(0 0 0 0 round 24px); }
 }
-@keyframes ligne-aet-station {
-  from { opacity: 0; transform: scale(0.85); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes defile-ecoles {
+  to { transform: translateX(-50%); }
 }
-
+/* Mouvement réduit : le bandeau ne défile pas, toutes les écoles s'affichent sur plusieurs lignes */
+@media (prefers-reduced-motion: reduce) {
+  .defile-ecoles { width: auto; justify-content: center; }
+  .defile-ecoles > ul { flex-wrap: wrap; justify-content: center; row-gap: 0.75rem; }
+  .defile-ecoles > ul[aria-hidden='true'] { display: none; }
+}
