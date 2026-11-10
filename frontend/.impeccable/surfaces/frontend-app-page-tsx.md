@@ -15,16 +15,16 @@ Historique : une première direction, « la ligne AET » (plan de réseau schém
 
 THESIS : la fraternité d'armes se montre en vraies photos. Des soldats, des officiers, des cérémonies et de l'entraide, en noir et blanc, encadrent un réseau sobre où l'on retrouve sa promo.
 
-OWN-WORLD : la référence imposée est la planche « must » du client (`~/Downloads/AET Connect/must.jpg`), prise dans son ensemble.
-- Palette : vert armée #1D3B2A et vert de nuit #12261B pour les fonds profonds et l'action principale ; or #FFC000 en accent (texte des boutons, motifs, onglet, focus), en grand fond seulement sur la carte mise en avant ; crème #F4EEE2 et blanc pour les fonds clairs.
-- Photos : vraies photos en noir et blanc, dans des cadres arrondis à 24 px, chacun avec un coin plus arrondi (72 px). La couleur revient au survol.
-- Motifs : frises et panneaux dessinés dans l'esprit du bogolan, d'après les planches du client (crème sur vert, brun sur crème), sans les recopier.
-- Typographie : une seule famille, Archivo ; titres en gras semi-condensés (90 %), en minuscules et majuscules ; texte courant en largeur normale.
-- Boutons : arrondis pleins (pilule).
+OWN-WORLD : la planche « must » du client pour la composition ; deux autres références du client (un soleil en papier découpé, des ondes topographiques vert profond sur crème) pour la matière et la palette.
+- Palette : vert profond #1D3B2A, crème #F4EEE2 et un seul accent, le brun-roux #8B4A1E (choix du client : plus d'or).
+- Photos : vraies photos en noir et blanc, dans des cadres arrondis à 24 px avec un coin à 72 px.
+- Motifs : une trame topographique en fond tamisé (6 %) et le soleil aux neuf pétales, un par école, comme marque. Tous deux sont dessinés pour AET Connect (`scripts/motifs.mjs`).
+- Typographie (choix du client, essai « C · Le défilé ») : Unbounded pour les titres, Familjen Grotesk pour le texte.
+- Navigation : pas de barre au-dessus ; « Se connecter » en bouton cerclé. « Rejoindre ma promo » n'apparaît qu'une fois dans le premier écran.
 
 STORY : l'ancien voit des visages et des uniformes qui lui parlent. Il lit qu'on retrouve sa promo, voit défiler les écoles et les vrais chiffres, comprend les trois façons d'entrer, choisit son école et son année, et entre. Le membre se connecte en un geste.
 
-FIRST VIEWPORT : en haut, une barre vert de nuit, avec à droite un onglet or « Un ancien vous a envoyé un code ? Entrez-le ». Dessous, la navigation : marque, ancres, « Se connecter » et le bouton « Rejoindre ma promo ». À gauche, le titre « Retrouvez les anciens de votre promo », une phrase et deux actions ; à droite, une mosaïque de quatre photos en noir et blanc, un grand portrait et trois cadres empilés. Sur mobile, le texte vient d'abord, puis la mosaïque. Moment signature : les cadres de la mosaïque s'ouvrent l'un après l'autre ; au survol, une photo reprend sa couleur.
+FIRST VIEWPORT : la navigation posée sur la trame (le soleil et « AET Connect », les ancres, « Se connecter »). À gauche, le titre « Retrouvez les anciens de votre promo », une phrase et deux actions ; à droite, une mosaïque de quatre photos en noir et blanc, un grand portrait et trois cadres empilés. Sur mobile, le texte vient d'abord, puis la mosaïque. Moment signature : les cadres de la mosaïque s'ouvrent l'un après l'autre ; au survol, une photo reprend sa couleur.
 
 FORM : planche « must » imposée par le client (« le hero section me convient parfaitement », puis « toute la planche peut être inspirante, il suffit de bien harmoniser »). Il n'y a pas eu de tirage de concept : la référence est un choix du client, pas un tirage. Écarts voulus :
 - la petite phrase au-dessus du titre (« Elevate your brand ») est retirée, car interdite par les règles de qualité ;

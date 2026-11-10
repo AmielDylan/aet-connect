@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { PHOTOS, type Photo } from '@/lib/landing'
-import { BogolanBand } from './bogolan'
 import { PhotoFrame } from './photo-frame'
 
 type Way = { title: string; text: string; action: string; href: string; photo: Photo; position: string; featured?: boolean }
@@ -36,10 +35,9 @@ const WAYS: Way[] = [
 
 export function WaysIn() {
   return (
-    <section id="parcours" aria-labelledby="parcours-titre" className="scroll-mt-6 bg-vert text-creme">
-      <BogolanBand className="text-or/80" />
+    <section id="parcours" aria-labelledby="parcours-titre" className="sur-vert trame trame-sur-vert scroll-mt-6 bg-vert text-creme">
       <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 lg:py-24">
-        <h2 id="parcours-titre" className="max-w-[18ch] text-[clamp(2rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.012em] text-balance [font-stretch:90%]">
+        <h2 id="parcours-titre" className="max-w-[18ch] text-[clamp(1.75rem,3.1vw,2.6rem)] font-bold leading-[1.1] tracking-[-0.025em] text-balance font-titre">
           Trois façons de rejoindre votre promo
         </h2>
 
@@ -47,15 +45,15 @@ export function WaysIn() {
           {WAYS.map((way) => (
             <li
               key={way.href}
-              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-or text-vert-nuit' : 'flex-col bg-vert-carte'}`}
+              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-terre text-creme' : 'flex-col bg-vert-carte'}`}
             >
               <PhotoFrame photo={way.photo} position={way.position} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] rounded-[20px]" />
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
-                <h3 className="text-xl font-bold leading-tight tracking-[-0.01em] [font-stretch:90%]">{way.title}</h3>
-                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-vert-nuit/85' : 'text-brume'}`}>{way.text}</p>
+                <h3 className="text-lg font-semibold leading-snug tracking-[-0.02em] font-titre">{way.title}</h3>
+                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-creme/90' : 'text-brume'}`}>{way.text}</p>
                 <Link
                   href={way.href}
-                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold underline decoration-2 underline-offset-[6px] ${way.featured ? 'text-vert-nuit decoration-vert-nuit/40 hover:decoration-vert-nuit' : 'text-or decoration-or/40 hover:decoration-or'}`}
+                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold underline decoration-2 underline-offset-[6px] ${way.featured ? 'text-creme decoration-creme/50 hover:decoration-creme' : 'text-creme decoration-terre hover:decoration-creme'}`}
                 >
                   {way.action}
                   <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />
@@ -65,7 +63,6 @@ export function WaysIn() {
           ))}
         </ul>
       </div>
-      <BogolanBand className="text-or/80" />
     </section>
   )
 }

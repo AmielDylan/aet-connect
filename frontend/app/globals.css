@@ -20,14 +20,15 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-cal: 'Cal Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, 'Roboto Mono', monospace;
-  /* Monde « esprit de corps » (page d'accueil) : une seule famille, Archivo (next/font, auto-hébergée) */
-  --font-archivo: var(--font-archivo-var), ui-sans-serif, sans-serif;
+  /* Monde « esprit de corps » (page d'accueil) : une police de titre, une police de texte (next/font, auto-hébergées) */
+  --font-titre: var(--font-titre-var), ui-sans-serif, sans-serif;
+  --font-texte: var(--font-texte-var), ui-sans-serif, sans-serif;
 
   /* Monde « esprit de corps » : chaque couleur a un rôle */
   --color-vert: var(--esp-vert);
   --color-vert-nuit: var(--esp-vert-nuit);
   --color-vert-carte: var(--esp-vert-carte);
-  --color-or: var(--esp-or);
+  --color-terre: var(--esp-terre);
   --color-creme: var(--esp-creme);
   --color-sable: var(--esp-sable);
   --color-trait: var(--esp-trait);
@@ -74,14 +75,15 @@
 :root {
   /* ── Monde « esprit de corps » ───
      vert : le vert armée, fonds profonds et action principale ; vert-nuit : barre du haut et pied de page
-     vert-carte : cartes posées sur le vert ; or : l'accent (texte d'action, motifs, focus), jamais un grand fond
-     sauf la carte mise en avant ; creme : le fond clair ; sable : filets et motifs sur crème
+     vert-carte : cartes posées sur le vert ; terre : l'accent brun-roux (cœur du soleil, soulignements, carte mise
+     en avant, sélection) ; texte terre sur crème 5,87:1, crème sur terre 5,87:1 ; jamais en texte sur le vert
+     creme : le fond clair ; sable : filets sur crème
      encre : texte sur crème ; olive : texte secondaire sur crème (5,98:1) ; brume : texte secondaire sur vert (7,75:1)
      alerte : erreurs sur crème (6,58:1) */
   --esp-vert:       #1D3B2A;
   --esp-vert-nuit:  #12261B;
   --esp-vert-carte: #24452F;
-  --esp-or:         #FFC000;
+  --esp-terre:      #8B4A1E;
   --esp-creme:      #F4EEE2;
   --esp-sable:      #DDD2BB;
   --esp-trait:      #7A887D; /* contour des champs : 3,2:1 sur crème, 3,7:1 sur blanc */
@@ -231,20 +233,42 @@
    Monde « esprit de corps » (page d'accueil)
 ───────────────────────────────────────── */
 .esprit {
-  caret-color: var(--esp-vert);
+  caret-color: var(--esp-terre);
 }
 .esprit ::selection {
-  background: var(--esp-or);
-  color: var(--esp-encre);
+  background: var(--esp-terre);
+  color: var(--esp-creme);
 }
 .esprit :focus-visible {
-  outline: 3px solid var(--esp-or);
+  outline: 3px solid var(--esp-vert);
   outline-offset: 3px;
   border-radius: 6px;
+}
+.esprit .sur-vert :focus-visible {
+  outline-color: var(--esp-creme);
 }
 .esprit .sur-creme :focus-visible {
   outline-color: var(--esp-vert);
 }
+
+/* La trame topographique : courbes de niveau en larges bandes (scripts/motifs.mjs), posées en fond tamisé.
+   Le motif vit dans un pseudo-élément pour régler son opacité sans toucher au contenu. */
+.trame {
+  position: relative;
+  isolation: isolate;
+}
+.trame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--trame-motif) 0 0 / var(--trame-taille, 1100px) repeat;
+  opacity: var(--trame-opacite);
+}
+.trame-sur-creme { --trame-motif: url('/motifs/topo-vert.svg'); --trame-opacite: 0.06; }
+.trame-sur-vert { --trame-motif: url('/motifs/topo-creme.svg'); --trame-opacite: 0.06; }
+.trame-etoffe { --trame-motif: url('/motifs/topo-creme.svg'); --trame-opacite: 0.16; --trame-taille: 700px; }
 
 /* Photographies : noir et blanc ; la couleur revient au survol */
 .photo-nb {
