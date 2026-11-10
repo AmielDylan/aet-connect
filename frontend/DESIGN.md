@@ -183,7 +183,7 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 ### Buttons
 - **Primary :** pilule vert profond, texte crème semi-gras, 48px de haut, flèche à droite qui avance de 4px au survol ; au survol, le fond passe en vert de carte.
 - **Lien fléché** (`LienFleche`) : semi-gras, couleur du texte au repos (encre, ou vert de nuit sur l'or) ; au survol ou au focus, il passe en brun-roux (brun-roux foncé sur l'or) et une flèche glisse en place, sans décaler la mise en page. Un lien n'est jamais pris dans une phrase : il est seul, donc reconnaissable sans soulignement.
-- **Liens du pied de page :** or sur vert de nuit, soulignés au survol.
+- **Liens du pied de page :** crème au repos ; au survol ou au focus, ils passent en or et se soulignent (or, 2px).
 
 ### Inputs / Fields
 - **Style :** fond blanc, contour trait de 2px, coins de 12px, 48px de haut, texte encre ; les années en chiffres tabulaires.
@@ -221,7 +221,7 @@ Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au 
   - 16 % pour l'étoffe du formulaire.
 
 ### Pied de page
-Vert de nuit avec la trame. En haut, le soleil, la phrase « Annuaire panafricain des Anciens Enfants de Troupe » et les liens en or. Au milieu, « AET Connect » en Unbounded sur toute la largeur du conteneur (clamp(1.75rem, 11.2vw, 9.7rem), 93 à 99 % de la largeur, sans débordement dès 320px), « Connect » en or. Dessous, les crédits photo repliés.
+Vert de nuit avec la trame. En haut, le soleil, la phrase « Annuaire panafricain des Anciens Enfants de Troupe » et les liens, crème au repos, or et soulignés au survol. Au milieu, « AET Connect » en Unbounded sur toute la largeur du conteneur (clamp(1.75rem, 11.2vw, 9.7rem), 93 à 99 % de la largeur, sans débordement dès 320px), « Connect » en or. Dessous, les crédits photo repliés.
 
 ### Bandeau des écoles
 Sigles et villes des écoles réelles sur le vert, en Unbounded, séparés par de petits soleils. Il défile en boucle (45s), se met en pause au survol et par un bouton (WCAG 2.2.2). Avec le mouvement réduit activé, il est immobile et montre toutes les écoles sur plusieurs lignes.

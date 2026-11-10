@@ -12,13 +12,13 @@ export function SiteFooter() {
             Annuaire panafricain des Anciens Enfants de Troupe
           </p>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-sm font-semibold">
-            <a href="#rejoindre" className="inline-flex min-h-11 items-center text-or decoration-or decoration-2 underline-offset-[6px] hover:underline">
+            <a href="#rejoindre" className="inline-flex min-h-11 items-center text-creme decoration-or decoration-2 underline-offset-[6px] transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or">
               Rejoindre ma promo
             </a>
-            <Link href="/register/with-code" className="inline-flex min-h-11 items-center text-or decoration-or decoration-2 underline-offset-[6px] hover:underline">
+            <Link href="/register/with-code" className="inline-flex min-h-11 items-center text-creme decoration-or decoration-2 underline-offset-[6px] transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or">
               Entrer mon code
             </Link>
-            <Link href="/login" className="inline-flex min-h-11 items-center text-or decoration-or decoration-2 underline-offset-[6px] hover:underline">
+            <Link href="/login" className="inline-flex min-h-11 items-center text-creme decoration-or decoration-2 underline-offset-[6px] transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or">
               Se connecter
             </Link>
           </nav>
@@ -45,7 +45,7 @@ export function SiteFooter() {
           <ul className="mt-4 grid gap-3">
             {Object.values(PHOTOS).map((p) => (
               <li key={p.src} className="grid">
-                <a href={p.page} className="justify-self-start font-semibold text-or underline-offset-4 hover:underline" rel="noopener noreferrer" target="_blank">
+                <a href={p.page} className="justify-self-start font-semibold text-creme decoration-or underline-offset-4 transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or" rel="noopener noreferrer" target="_blank">
                   {p.alt}
                 </a>
                 <span>
