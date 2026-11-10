@@ -41,8 +41,8 @@ export default async function HomePage() {
   return (
     <div className={`${archivo.variable} esprit bg-creme font-archivo`}>
       <SiteHeader />
-      <main>
-        <Hero schools={facts.count} countries={facts.countries} />
+      <main id="contenu">
+        <Hero />
         <SchoolsBand schools={schools} />
         <NetworkSection facts={facts} />
         <WaysIn />

@@ -28,16 +28,16 @@ export function useJoinPromo(schools: SchoolLike[]) {
 
   const validationError = (schoolId: string, entryYear: string): string | null => {
     if (!schoolId) return 'Choisissez votre école.'
-    if (!/^\d{4}$/.test(entryYear)) return "Indiquez votre année d'entrée sur quatre chiffres, par exemple 2005."
+    if (!/^\d{4}$/.test(entryYear)) return 'Indiquez votre année d’entrée sur quatre chiffres, par exemple 2005.'
     const year = parseInt(entryYear, 10)
     const school = schools.find((s) => s.id === schoolId)
     const min = school?.established_year ?? 1950
     if (year < min) {
       return school?.established_year
-        ? `Cette école a ouvert en ${min} : l'année d'entrée commence à ${min}.`
-        : `L'année d'entrée commence à ${min}.`
+        ? `Cette école a ouvert en ${min} : l’année d’entrée commence à ${min}.`
+        : `L’année d’entrée commence à ${min}.`
     }
-    if (year > new Date().getFullYear() + 1) return `L'année d'entrée va jusqu'à ${new Date().getFullYear() + 1}.`
+    if (year > new Date().getFullYear() + 1) return `L’année d’entrée va jusqu’à ${new Date().getFullYear() + 1}.`
     return null
   }
 

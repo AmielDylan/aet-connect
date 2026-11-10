@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { PHOTOS } from '@/lib/landing'
-import { BogolanBand, Glyph } from './bogolan'
+import { BogolanBand } from './bogolan'
+import { Brand } from './site-header'
 
 // La confidentialité : ce que le membre montre, ce qu'il cache. L'exemple est étiqueté comme tel.
 const EXAMPLE = [
@@ -20,8 +21,8 @@ export function VisibilitySection() {
             Vous choisissez ce que les autres voient
           </h2>
           <p className="mt-5 max-w-[50ch] text-lg leading-relaxed text-olive text-pretty">
-            L&apos;annuaire n&apos;est ouvert qu&apos;aux membres connectés. Votre email et votre téléphone restent
-            cachés tant que vous ne décidez pas de les montrer, et vous pouvez vous retirer de l&apos;annuaire à
+            L’annuaire n’est ouvert qu’aux membres connectés. Votre email et votre téléphone restent
+            cachés tant que vous ne décidez pas de les montrer, et vous pouvez vous retirer de l’annuaire à
             tout moment.
           </p>
         </div>
@@ -55,12 +56,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1280px] px-5 py-12 sm:px-8">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="flex items-center gap-2.5 text-2xl font-bold [font-stretch:90%]">
-              <span className="grid size-9 place-items-center rounded-full bg-or text-vert-nuit">
-                <Glyph name="chevrons" className="size-5" />
-              </span>
-              AET Connect
-            </p>
+            <Brand tone="sombre" />
             <p className="mt-2 text-sm text-brume">Annuaire panafricain des Anciens Enfants de Troupe</p>
           </div>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-sm font-semibold">
@@ -68,7 +64,7 @@ export function SiteFooter() {
               Rejoindre ma promo
             </a>
             <Link href="/register/with-code" className="inline-flex min-h-11 items-center underline decoration-or decoration-2 underline-offset-[6px] hover:text-or">
-              Entrer un code
+              Entrer mon code
             </Link>
             <Link href="/login" className="inline-flex min-h-11 items-center underline decoration-or decoration-2 underline-offset-[6px] hover:text-or">
               Se connecter
@@ -82,8 +78,8 @@ export function SiteFooter() {
             Crédits photographiques
           </summary>
           <p className="mt-3 max-w-[70ch]">
-            Photographies d&apos;illustration de soldats et d&apos;officiers des pays des écoles, via Wikimedia Commons.
-            Les personnes représentées ne sont pas des membres d&apos;AET Connect.
+            Photographies d’illustration de soldats et d’officiers des pays des écoles, via Wikimedia Commons.
+            Les personnes représentées ne sont pas des membres d’AET Connect.
           </p>
           <ul className="mt-3 grid gap-1.5">
             {Object.values(PHOTOS).map((p) => (
