@@ -8,12 +8,12 @@ export function Hero() {
     <section className="sur-creme text-encre">
       <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-5 pb-16 pt-8 sm:px-8 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:pb-24 lg:pt-14">
         <div>
-          <h1 className="max-w-[16ch] text-[clamp(2.25rem,4.4vw,3.75rem)] font-bold leading-[1.06] tracking-[-0.025em] text-vert text-balance font-titre">
-            Retrouvez les anciens de votre promo
+          <h1 className="text-[clamp(2.1rem,4vw,3.4rem)] font-bold leading-[1.06] tracking-[-0.025em] text-vert text-balance font-titre">
+            Enfants de Troupe, une seule famille
           </h1>
-          <p className="mt-6 max-w-[40ch] text-lg leading-relaxed text-olive text-pretty">
-            Le réseau des Anciens Enfants de Troupe, toutes écoles militaires préparatoires confondues. On le rejoint
-            par sa promo, sur l’invitation d’un ancien.
+          <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-olive text-pretty">
+            Cet annuaire numérique est une porte d’entrée à la communauté élargie que forment les Anciens Enfants de
+            Troupe. Retrouvez-y vos collègues de promotion, sur invitation.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a
