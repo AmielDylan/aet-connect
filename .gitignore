@@ -61,3 +61,7 @@ coverage/
 # Supabase CLI (local)
 supabase/.branches/
 supabase/.temp/
+
+# Impeccable : captures de revue et pages de décision (fichiers de travail)
+**/.impeccable/review/
+**/.impeccable/questions/

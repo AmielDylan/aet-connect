@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { useJoinPromo } from '@/hooks/use-join-promo'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,82 +17,14 @@ export default function RegisterPage() {
   const router = useRouter()
   const [schoolId, setSchoolId] = useState('')
   const [entryYear, setEntryYear] = useState('')
-  const [error, setError] = useState('')
-
   const { data: schools, isLoading } = useQuery({
     queryKey: ['schools'],
     queryFn: () => apiClient.getSchools(),
   })
 
-  const checkPromoMutation = useMutation({
-    mutationFn: () =>
-      apiClient.checkSchoolPromo({
-        school_id: schoolId,
-        entry_year: entryYear,
-      }),
-    onSuccess: (data) => {
-      if (data.exists) {
-        // Promo existe → Rediriger vers workflow avec code
-        router.push(`/register/with-code?school=${schoolId}&year=${entryYear}`)
-      } else {
-        // Promo n'existe pas → Rediriger vers demande accès initial
-        router.push(`/register/request-access?school=${schoolId}&year=${entryYear}`)
-      }
-    },
-    onError: () => {
-      setError('Erreur lors de la vérification')
-    },
-  })
-
-  const validateYear = (year: string): boolean => {
-    const yearNum = parseInt(year, 10)
-    const currentYear = new Date().getFullYear()
-    
-    // Récupérer l'école sélectionnée pour avoir established_year
-    const selectedSchoolData = schools?.schools?.find(s => s.id === schoolId)
-    const minYear = selectedSchoolData?.established_year || 1950
-
-    if (!/^\d{4}$/.test(year)) {
-      setError('Format invalide (YYYY requis)')
-      return false
-    }
-
-    if (yearNum < minYear) {
-      if (selectedSchoolData?.established_year) {
-        setError(`Cette école a été créée en ${selectedSchoolData.established_year}. L'année minimale est ${selectedSchoolData.established_year}.`)
-      } else {
-        setError(`Année minimale : ${minYear}`)
-      }
-      return false
-    }
-
-    if (yearNum > currentYear + 1) {
-      setError(`Année doit être au maximum ${currentYear + 1}`)
-      return false
-    }
-
-    return true
-  }
-
-  const handleSubmit = () => {
-    setError('')
-
-    if (!schoolId) {
-      setError('Veuillez sélectionner une école')
-      return
-    }
-
-    if (!entryYear) {
-      setError('Veuillez entrer une année')
-      return
-    }
-
-    if (!validateYear(entryYear)) {
-      return
-    }
-
-    checkPromoMutation.mutate()
-  }
+  // Validation + bon parcours (code ou demande d'accès) : partagés avec la page d'accueil
+  const { join, error, isPending } = useJoinPromo(schools?.schools ?? [])
+  const handleSubmit = () => join(schoolId, entryYear)
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
@@ -156,33 +89,8 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Ex: 2000"
                 value={entryYear}
-                onChange={(e) => {
-                  const value = e.target.value
-                  setEntryYear(value)
-                  if (value.length === 4) {
-                    const yearNum = parseInt(value, 10)
-                    const currentYear = new Date().getFullYear()
-                    // Récupérer l'école sélectionnée pour avoir established_year
-                    const selectedSchoolData = schools?.schools?.find(s => s.id === schoolId)
-                    const minYear = selectedSchoolData?.established_year || 1950
-                    
-                    if (!/^\d{4}$/.test(value)) {
-                      setError('Format invalide (YYYY requis)')
-                    } else if (yearNum < minYear) {
-                      if (selectedSchoolData?.established_year) {
-                        setError(`Cette école a été créée en ${selectedSchoolData.established_year}. L'année minimale est ${selectedSchoolData.established_year}.`)
-                      } else {
-                        setError(`Année minimale : ${minYear}`)
-                      }
-                    } else if (yearNum > currentYear + 1) {
-                      setError(`Année doit être au maximum ${currentYear + 1}`)
-                    } else {
-                      setError('')
-                    }
-                  } else {
-                    setError('')
-                  }
-                }}
+                inputMode="numeric"
+                onChange={(e) => setEntryYear(e.target.value)}
                 className={error ? 'border-destructive' : ''}
                 maxLength={4}
                 disabled={!schoolId}
@@ -215,9 +123,9 @@ export default function RegisterPage() {
             <Button
               className="w-full"
               onClick={handleSubmit}
-              disabled={checkPromoMutation.isPending}
+              disabled={isPending}
             >
-              {checkPromoMutation.isPending && (
+              {isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Continuer
