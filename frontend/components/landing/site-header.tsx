@@ -27,7 +27,7 @@ export function SiteHeader() {
     <header className="sur-creme">
       <a
         href="#contenu"
-        className="sr-only z-50 rounded-full bg-vert px-5 py-3 font-semibold text-creme focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+        className="sr-only z-50 rounded-full bg-vert px-5 py-3 font-semibold text-or focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
       >
         Aller au contenu
       </a>
@@ -48,7 +48,7 @@ export function SiteHeader() {
 
         <Link
           href={isAuthenticated ? '/dashboard' : '/login'}
-          className="inline-flex min-h-11 items-center rounded-full border-2 border-vert px-5 text-base font-semibold text-vert transition-colors duration-200 hover:bg-vert hover:text-creme"
+          className="inline-flex min-h-11 items-center rounded-full border-2 border-vert px-5 text-base font-semibold text-vert transition-colors duration-200 hover:bg-vert hover:text-or"
         >
           {isAuthenticated ? 'Mon espace' : 'Se connecter'}
         </Link>

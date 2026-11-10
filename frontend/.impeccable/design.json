@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-10T19:38:02.944Z",
+  "generatedAt": "2026-11-10T19:54:15.860Z",
   "title": "Design System: AET Connect",
   "extensions": {
     "colorMeta": {
@@ -18,6 +18,22 @@
           "oklch(70% 0.048 157.5)",
           "oklch(82% 0.048 157.5)",
           "oklch(95% 0.048 157.5)"
+        ]
+      },
+      "or": {
+        "role": "primary",
+        "displayName": "Or",
+        "canonical": "#FFC000",
+        "oklch": "oklch(84.2% 0.173 84.6)",
+        "tonalRamp": [
+          "oklch(15% 0.114 84.6)",
+          "oklch(26% 0.147 84.6)",
+          "oklch(37% 0.17 84.6)",
+          "oklch(48% 0.173 84.6)",
+          "oklch(59% 0.173 84.6)",
+          "oklch(70% 0.157 84.6)",
+          "oklch(82% 0.124 84.6)",
+          "oklch(95% 0.079 84.6)"
         ]
       },
       "terre": {
@@ -268,9 +284,9 @@
       "name": "Bouton principal",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Pilule vert profond, texte crème : l’action principale.",
+      "description": "Pilule vert profond, texte or : l’action principale.",
       "html": "<button class=\"ds-btn\">Rejoindre ma promo <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
-      "css": ".ds-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border:0;border-radius:9999px;background:#1D3B2A;color:#F4EEE2;font-family:'Familjen Grotesk', ui-sans-serif, sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:background-color .2s}.ds-btn svg{transition:transform .2s ease-out}.ds-btn:hover{background:#24452F}.ds-btn:hover svg{transform:translateX(4px)}.ds-btn:focus-visible{outline:3px solid #1D3B2A;outline-offset:3px}"
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border:0;border-radius:9999px;background:#1D3B2A;color:#FFC000;font-family:'Familjen Grotesk', ui-sans-serif, sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:background-color .2s}.ds-btn svg{transition:transform .2s ease-out}.ds-btn:hover{background:#24452F}.ds-btn:hover svg{transform:translateX(4px)}.ds-btn:focus-visible{outline:3px solid #1D3B2A;outline-offset:3px}"
     },
     {
       "name": "Bouton contour",
@@ -278,7 +294,7 @@
       "refersTo": "button-outline",
       "description": "Pilule cerclée de vert : Se connecter.",
       "html": "<div class=\"ds-creme\"><a href=\"#\" class=\"ds-btn-o\">Se connecter</a></div>",
-      "css": ".ds-creme{background:#F4EEE2;padding:24px}.ds-btn-o{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border:2px solid #1D3B2A;border-radius:9999px;color:#1D3B2A;font-family:'Familjen Grotesk', ui-sans-serif, sans-serif;font-weight:600;text-decoration:none;transition:background-color .2s,color .2s}.ds-btn-o:hover{background:#1D3B2A;color:#F4EEE2}.ds-btn-o:focus-visible{outline:3px solid #1D3B2A;outline-offset:3px}"
+      "css": ".ds-creme{background:#F4EEE2;padding:24px}.ds-btn-o{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border:2px solid #1D3B2A;border-radius:9999px;color:#1D3B2A;font-family:'Familjen Grotesk', ui-sans-serif, sans-serif;font-weight:600;text-decoration:none;transition:background-color .2s,color .2s}.ds-btn-o:hover{background:#1D3B2A;color:#FFC000}.ds-btn-o:focus-visible{outline:3px solid #1D3B2A;outline-offset:3px}"
     },
     {
       "name": "Champ",
@@ -300,9 +316,9 @@
       "name": "Carte de parcours mise en avant",
       "kind": "card",
       "refersTo": "card-way-featured",
-      "description": "Carte brun-roux : texte d’abord, photo ensuite.",
+      "description": "Carte or : texte d’abord, photo ensuite.",
       "html": "<div class=\"ds-vert\"><div class=\"ds-card\"><div class=\"ds-inner\"><h3>Votre promo a déjà des membres</h3><p>Votre demande part vers l’ambassadeur de votre promo.</p><a href=\"#\">Demander un code <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></div></div></div>",
-      "css": ".ds-vert{background:#1D3B2A;padding:24px}.ds-card{width:340px;padding:12px;border-radius:28px;background:#8B4A1E;color:#F4EEE2;font-family:'Familjen Grotesk', ui-sans-serif, sans-serif}.ds-inner{padding:16px 12px 12px}.ds-inner h3{margin:0;font-family:'Unbounded', ui-sans-serif, sans-serif;font-size:1.125rem;font-weight:600;letter-spacing:-.02em}.ds-inner p{margin:8px 0 16px;opacity:.9}.ds-inner a{display:inline-flex;align-items:center;gap:8px;color:#F4EEE2;font-weight:600;text-decoration:underline;text-decoration-color:rgba(244,238,226,.5);text-decoration-thickness:2px;text-underline-offset:6px}"
+      "css": ".ds-vert{background:#1D3B2A;padding:24px}.ds-card{width:340px;padding:12px;border-radius:28px;background:#FFC000;color:#12261B;font-family:'Familjen Grotesk', ui-sans-serif, sans-serif}.ds-inner{padding:16px 12px 12px}.ds-inner h3{margin:0;font-family:'Unbounded', ui-sans-serif, sans-serif;font-size:1.125rem;font-weight:600;letter-spacing:-.02em}.ds-inner p{margin:8px 0 16px;opacity:.85}.ds-inner a{display:inline-flex;align-items:center;gap:8px;color:#12261B;font-weight:600;text-decoration:underline;text-decoration-color:rgba(18,38,27,.4);text-decoration-thickness:2px;text-underline-offset:6px}"
     },
     {
       "name": "Trame topographique",
@@ -315,18 +331,18 @@
   ],
   "narrative": {
     "northStar": "Esprit de corps",
-    "overview": "AET Connect montre la fraternité d'armes en vraies photos (soldats, officiers, cérémonies, gestes d'entraide), en noir et blanc, posées sur un monde de formes organiques. Une trame de courbes de niveau, le langage des cartes d'état-major, court en fond tamisé. Un soleil aux neuf pétales, un par école, porte la marque. Le vert profond, le crème et une seule touche brun-roux composent la palette, sans couleur vive.\n\nLa composition reprend la planche de référence du client (« must ») : un hero avec le texte à gauche et une mosaïque de photos à droite, un bandeau des écoles, une section avec un collage et des chiffres, une section verte à trois cartes dont celle du milieu est mise en avant, puis le formulaire et la confidentialité. Les formes organiques viennent des deux autres références du client : un soleil en papier découpé et des ondes topographiques.\n\nLes photos sont d'illustration tant que l'association n'a pas fourni les siennes : de vrais soldats et officiers des pays des écoles, jamais présentés comme des membres.",
+    "overview": "AET Connect montre la fraternité d'armes en vraies photos (soldats, officiers, cérémonies, gestes d'entraide), en noir et blanc, posées sur un monde de formes organiques. Une trame de courbes de niveau, le langage des cartes d'état-major, court en fond tamisé. Un soleil aux neuf pétales, un par école, porte la marque. Le vert profond et le crème composent la palette ; l'or marque les actions, le brun-roux le décor.\n\nLa composition reprend la planche de référence du client (« must ») : un hero avec le texte à gauche et une mosaïque de photos à droite, un bandeau des écoles, une section avec un collage et des chiffres, une section verte à trois cartes dont celle du milieu est mise en avant, puis le formulaire et la confidentialité. Les formes organiques viennent des deux autres références du client : un soleil en papier découpé et des ondes topographiques.\n\nLes photos sont d'illustration tant que l'association n'a pas fourni les siennes : de vrais soldats et officiers des pays des écoles, jamais présentés comme des membres.",
     "keyCharacteristics": [
       "Vraies photos en noir et blanc ; la couleur revient au survol.",
-      "Vert profond, crème et brun-roux : aucune couleur vive.",
+      "Vert profond et crème ; or pour les actions, brun-roux pour le décor.",
       "Trame topographique en fond tamisé ; soleil aux neuf pétales pour la marque.",
       "Titres en Unbounded (capitales larges et pleines), texte en Familjen Grotesk.",
       "Cadres arrondis à 24 px avec un coin plus arrondi (72 px) ; boutons en pilule."
     ],
     "rules": [
       {
-        "name": "The One Accent Rule",
-        "body": "Le brun-roux est le seul accent : un aplat par écran au plus (la carte mise en avant), sinon de petites touches (cœur du soleil, soulignements).",
+        "name": "The Two Roles Rule",
+        "body": "L'or signale ce qu'on peut faire, le brun-roux orne. L'or n'est jamais décoratif et le brun-roux jamais une action. Un seul aplat d'or par écran, la carte mise en avant.",
         "section": "colors"
       },
       {
@@ -353,7 +369,7 @@
     "dos": [
       "Do montrer de vraies personnes en photo, en noir et blanc, dans des cadres arrondis.",
       "Do créditer chaque photo de remplacement dans le pied de page, et la remplacer dès que l'association fournit les siennes.",
-      "Do garder le brun-roux comme seul accent.",
+      "Do garder l'or pour les actions et le brun-roux pour le décor, sans les échanger.",
       "Do poser la trame en fond tamisé, jamais à pleine force derrière du texte.",
       "Do n'afficher que des chiffres tirés de la base.",
       "Do donner aux champs un contour trait (#7A887D), jamais sable.",
@@ -361,7 +377,7 @@
       "Do écrire en typographie française : apostrophe ’, espace insécable avant « : » et « ? »."
     ],
     "donts": [
-      "Don't réintroduire de couleur vive (jaune, or, corail) ni de deuxième accent.",
+      "Don't ajouter une troisième couleur d'accent (corail, bleu, rouge vif).",
       "Don't répéter un même motif en frise : la trame et le soleil suffisent.",
       "Don't faire tourner les pétales du soleil dans un même sens.",
       "Don't montrer de mineurs, d'arme pointée ou de scène de combat.",

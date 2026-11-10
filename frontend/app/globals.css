@@ -28,6 +28,7 @@
   --color-vert: var(--esp-vert);
   --color-vert-nuit: var(--esp-vert-nuit);
   --color-vert-carte: var(--esp-vert-carte);
+  --color-or: var(--esp-or);
   --color-terre: var(--esp-terre);
   --color-creme: var(--esp-creme);
   --color-sable: var(--esp-sable);
@@ -75,14 +76,16 @@
 :root {
   /* ── Monde « esprit de corps » ───
      vert : le vert armée, fonds profonds et action principale ; vert-nuit : barre du haut et pied de page
-     vert-carte : cartes posées sur le vert ; terre : l'accent brun-roux (cœur du soleil, soulignements, carte mise
-     en avant, sélection) ; texte terre sur crème 5,87:1, crème sur terre 5,87:1 ; jamais en texte sur le vert
+     vert-carte : cartes posées sur le vert ; or : les actions (texte des boutons verts, liens d'action sur le vert,
+     carte mise en avant) ; terre : le décor brun-roux (cœur du soleil, soulignements sur crème, sélection),
+     texte terre sur crème 5,87:1, jamais en texte sur le vert
      creme : le fond clair ; sable : filets sur crème
      encre : texte sur crème ; olive : texte secondaire sur crème (5,98:1) ; brume : texte secondaire sur vert (7,75:1)
      alerte : erreurs sur crème (6,58:1) */
   --esp-vert:       #1D3B2A;
   --esp-vert-nuit:  #12261B;
   --esp-vert-carte: #24452F;
+  --esp-or:         #FFC000; /* les actions : texte des boutons verts (7,48:1), carte mise en avant */
   --esp-terre:      #8B4A1E;
   --esp-creme:      #F4EEE2;
   --esp-sable:      #DDD2BB;

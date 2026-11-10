@@ -16,7 +16,7 @@ Historique : une première direction, « la ligne AET » (plan de réseau schém
 THESIS : la fraternité d'armes se montre en vraies photos. Des soldats, des officiers, des cérémonies et de l'entraide, en noir et blanc, encadrent un réseau sobre où l'on retrouve sa promo.
 
 OWN-WORLD : la planche « must » du client pour la composition ; deux autres références du client (un soleil en papier découpé, des ondes topographiques vert profond sur crème) pour la matière et la palette.
-- Palette : vert profond #1D3B2A, crème #F4EEE2 et un seul accent, le brun-roux #8B4A1E (choix du client : plus d'or).
+- Palette : vert profond #1D3B2A et crème #F4EEE2 ; or #FFC000 pour les actions (texte des boutons, carte mise en avant), brun-roux #8B4A1E pour le décor (cœur du soleil, soulignements). Choix du client : « Or + brun-roux ».
 - Photos : vraies photos en noir et blanc, dans des cadres arrondis à 24 px avec un coin à 72 px.
 - Motifs : une trame topographique en fond tamisé (6 %) et le soleil aux neuf pétales, un par école, comme marque. Tous deux sont dessinés pour AET Connect (`scripts/motifs.mjs`).
 - Typographie (choix du client, essai « C · Le défilé ») : Unbounded pour les titres, Familjen Grotesk pour le texte.
