@@ -16,6 +16,8 @@ export interface School {
   city: string
   established_year: number | null
   is_active: boolean
+  acronym?: string | null
+  flag?: string | null
   logo_url?: string | null
   description?: string | null
   website?: string | null

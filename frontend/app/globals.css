@@ -20,6 +20,19 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-cal: 'Cal Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, 'Roboto Mono', monospace;
+  /* Monde « la ligne AET » : titres de signalétique, étiquettes lisibles (next/font, auto-hébergées) */
+  --font-display: var(--font-big-shoulders), ui-sans-serif, sans-serif;
+  --font-label: var(--font-atkinson), ui-sans-serif, sans-serif;
+
+  /* Monde « la ligne AET » : chaque couleur a un seul rôle */
+  --color-outremer: var(--aet-outremer);
+  --color-outremer-nuit: var(--aet-outremer-nuit);
+  --color-safran: var(--aet-safran);
+  --color-corail: var(--aet-corail);
+  --color-savane: var(--aet-savane);
+  --color-craie: var(--aet-craie);
+  --color-brume: var(--aet-brume);
+  --color-encre: var(--aet-encre);
 
   /* Colors */
   --color-background: var(--background);
@@ -57,6 +70,21 @@
 }
 
 :root {
+  /* ── Monde « la ligne AET » ─────
+     outremer : le fond du plan ; outremer-nuit : sections profondes et pied de page
+     safran : la ligne AET et le chemin vers l'action, rien d'autre
+     corail : l'action principale, rien d'autre
+     savane : les ambassadeurs et ce qui est confirmé
+     craie : texte et stations ; brume : texte secondaire sur outremer ; encre : texte sur safran/corail */
+  --aet-outremer:      #12307A;
+  --aet-outremer-nuit: #0C2159;
+  --aet-safran:        #F2A900;
+  --aet-corail:        #FF6B4A;
+  --aet-savane:        #2BA36B;
+  --aet-craie:         #FFFFFF;
+  --aet-brume:         #C9D3F0;
+  --aet-encre:         #0B1640;
+
   /* ── Radius ───────────────────── */
   --radius: 0.5rem; /* 8px — Cal.com standard */
 
@@ -193,3 +221,45 @@
     box-shadow: rgba(34, 42, 53, 0.08) 0px 0px 0px 1px;
   }
 }
+
+/* ─────────────────────────────────────────
+   Monde « la ligne AET » (page d'accueil)
+───────────────────────────────────────── */
+.ligne-aet {
+  caret-color: var(--aet-safran);
+}
+.ligne-aet ::selection {
+  background: var(--aet-safran);
+  color: var(--aet-encre);
+}
+.ligne-aet :focus-visible {
+  outline: 3px solid var(--aet-safran);
+  outline-offset: 3px;
+}
+.ligne-aet select option {
+  background: var(--aet-outremer-nuit);
+  color: var(--aet-craie);
+}
+
+/* Le seul mouvement : la ligne se trace une fois, les stations s'allument quand elle les atteint.
+   Sans préférence de mouvement réduit uniquement ; sinon tout est visible d'emblée. */
+@media (prefers-reduced-motion: no-preference) {
+  .ligne-aet-trace {
+    stroke-dasharray: var(--len);
+    stroke-dashoffset: var(--len);
+    animation: ligne-aet-trace 1600ms cubic-bezier(0.16, 1, 0.3, 1) 150ms forwards;
+  }
+  .ligne-aet-station {
+    opacity: 0;
+    animation: ligne-aet-station 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(250ms + var(--i, 0) * 150ms);
+  }
+}
+@keyframes ligne-aet-trace {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ligne-aet-station {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
