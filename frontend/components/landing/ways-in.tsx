@@ -8,15 +8,15 @@ type Way = { title: string; text: string; action: string; href: string; photo: P
 const WAYS: Way[] = [
   {
     title: 'Un ancien vous a envoyé un code',
-    text: 'Le code vous rattache directement à la promo de l’ancien qui vous l’a donné.',
+    text: 'Saisissez-le : il vous rattache directement à la promo de l’ancien qui vous l’a envoyé.',
     action: 'Entrer mon code',
     href: '/register/with-code',
     photo: PHOTOS.ceremonie,
     position: '30% 50%',
   },
   {
-    title: 'Votre promo a déjà des membres',
-    text: 'Votre demande part vers l’ambassadeur de votre promo, ou vers l’un de ses membres.',
+    title: 'Des anciens de votre promo sont déjà inscrits',
+    text: 'Demandez un code à l’ambassadeur de votre promo ou à l’un de ses membres.',
     action: 'Demander un code',
     href: '/register/request-code',
     photo: PHOTOS.ecusson,
@@ -24,8 +24,8 @@ const WAYS: Way[] = [
     featured: true,
   },
   {
-    title: 'Vous êtes le premier de votre promo',
-    text: 'Un administrateur vérifie votre demande, puis vous transmet votre code d’invitation.',
+    title: 'Personne de votre promo n’est encore inscrit',
+    text: 'Envoyez une demande : un administrateur la vérifie et vous transmet votre code d’invitation.',
     action: 'Demander l’accès',
     href: '/register/request-access',
     photo: PHOTOS.defile,
@@ -45,15 +45,15 @@ export function WaysIn() {
           {WAYS.map((way) => (
             <li
               key={way.href}
-              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-or text-vert-nuit' : 'flex-col bg-vert-carte'}`}
+              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-terre text-creme' : 'sur-creme flex-col bg-creme text-encre'}`}
             >
               <PhotoFrame photo={way.photo} position={way.position} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] rounded-[20px]" />
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
-                <h3 className="text-lg font-semibold leading-snug tracking-[-0.02em] font-titre">{way.title}</h3>
-                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-vert-nuit/85' : 'text-brume'}`}>{way.text}</p>
+                <h3 className={`text-lg font-semibold leading-snug tracking-[-0.02em] font-titre ${way.featured ? '' : 'text-vert'}`}>{way.title}</h3>
+                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-creme/90' : 'text-olive'}`}>{way.text}</p>
                 <Link
                   href={way.href}
-                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold underline decoration-2 underline-offset-[6px] ${way.featured ? 'text-vert-nuit decoration-vert-nuit/40 hover:decoration-vert-nuit' : 'text-or decoration-or/40 hover:decoration-or'}`}
+                  className={`group mt-5 inline-flex min-h-11 items-center gap-2 self-start font-semibold decoration-2 underline-offset-[6px] hover:underline ${way.featured ? 'text-creme decoration-creme' : 'text-terre decoration-terre'}`}
                 >
                   {way.action}
                   <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />

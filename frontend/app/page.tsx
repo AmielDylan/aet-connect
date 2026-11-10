@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Familjen_Grotesk, Unbounded } from 'next/font/google'
+import { Figtree, Unbounded } from 'next/font/google'
 import { schoolFacts, type LandingSchool } from '@/lib/landing'
 import { SiteHeader } from '@/components/landing/site-header'
 import { Hero } from '@/components/landing/hero'
@@ -7,17 +7,17 @@ import { SchoolsBand } from '@/components/landing/schools-band'
 import { NetworkSection } from '@/components/landing/network-section'
 import { WaysIn } from '@/components/landing/ways-in'
 import { JoinSection } from '@/components/landing/join-section'
-import { VisibilitySection, SiteFooter } from '@/components/landing/visibility-and-footer'
+import { SiteFooter } from '@/components/landing/site-footer'
 
 // Titres : Unbounded, capitales larges et pleines (l'énergie des grands rassemblements) ;
-// texte : Familjen Grotesk, sobre et lisible. Toutes deux auto-hébergées par next/font.
+// texte : Figtree, ronde et amicale, en écho aux formes d'Unbounded. Toutes deux auto-hébergées par next/font.
 const titre = Unbounded({ subsets: ['latin'], variable: '--font-titre-var', display: 'swap' })
-const texte = Familjen_Grotesk({ subsets: ['latin'], variable: '--font-texte-var', display: 'swap' })
+const texte = Figtree({ subsets: ['latin'], variable: '--font-texte-var', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'AET Connect · Annuaire panafricain des Anciens Enfants de Troupe',
   description:
-    'Retrouvez les anciens de votre promo et de toutes les écoles militaires préparatoires. Un réseau fermé, où l’on entre sur l’invitation d’un ancien.',
+    'Retrouvez les anciens de votre promo et de toutes les écoles militaires préparatoires. Un réseau privé, que l’on rejoint sur l’invitation d’un ancien.',
 }
 
 // Les écoles et leur nombre réel d'anciens, rafraîchis toutes les 5 minutes
@@ -51,7 +51,6 @@ export default async function HomePage() {
         <NetworkSection facts={facts} />
         <WaysIn />
         <JoinSection schools={schools} />
-        <VisibilitySection />
       </main>
       <SiteFooter />
     </div>

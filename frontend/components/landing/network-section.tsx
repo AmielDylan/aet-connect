@@ -5,16 +5,16 @@ import { Soleil } from './soleil'
 // Ce que l'annuaire permet, concrètement
 const USES = [
   {
-    title: 'Votre promo au complet',
-    text: 'Les anciens de votre école et de votre année d’entrée, réunis au même endroit.',
+    title: 'Toute votre promo',
+    text: 'Les anciens de votre école entrés la même année que vous, réunis au même endroit.',
   },
   {
     title: 'Un ancien dans chaque ville',
-    text: 'Cherchez par nom, école, promo, pays ou ville : pour un conseil, une introduction, un premier contact.',
+    text: 'Cherchez par nom, école, promo, pays ou ville : pour un conseil, une mise en relation, un premier contact en arrivant quelque part.',
   },
   {
     title: 'Entre anciens seulement',
-    text: 'Chaque membre a été invité par un ancien de sa promo, ou accueilli par un administrateur.',
+    text: 'Chaque membre a été invité par un ancien de sa promo ou validé par un administrateur : l’annuaire ne réunit que de vrais anciens.',
   },
 ]
 
@@ -24,7 +24,7 @@ export function NetworkSection({ facts }: { facts: Facts }) {
   const stats = [
     facts.count > 0 && { value: String(facts.count), label: 'écoles militaires préparatoires' },
     facts.countries > 0 && { value: String(facts.countries), label: 'pays d’Afrique de l’Ouest et centrale' },
-    facts.oldest && { value: String(facts.oldest.year), label: `création de la plus ancienne, à ${facts.oldest.city}` },
+    facts.oldest && { value: String(facts.oldest.year), label: `création de la plus ancienne école, à ${facts.oldest.city}` },
   ].filter(Boolean) as Array<{ value: string; label: string }>
 
   return (
@@ -47,11 +47,11 @@ export function NetworkSection({ facts }: { facts: Facts }) {
           <div>
             <p className="max-w-[48ch] text-lg leading-relaxed text-olive text-pretty">
               L’internat, la discipline, les camarades : ce qui lie les Anciens Enfants de Troupe ne s’arrête pas à la
-              sortie de l’école. AET Connect les réunit, d’une école et d’un pays à l’autre.
+              sortie de l’école. AET Connect les rassemble, par-delà les écoles et les frontières.
             </p>
-            <ul className="mt-8 border-t-2 border-sable">
+            <ul className="mt-8 grid gap-6">
               {USES.map((u) => (
-                <li key={u.title} className="grid gap-1 border-b-2 border-sable py-4 sm:grid-cols-[13rem_1fr] sm:gap-6">
+                <li key={u.title} className="grid gap-1 sm:grid-cols-[13rem_1fr] sm:gap-6">
                   <span className="text-base font-semibold leading-snug text-vert font-titre">{u.title}</span>
                   <span className="text-base leading-relaxed text-olive">{u.text}</span>
                 </li>
@@ -62,9 +62,9 @@ export function NetworkSection({ facts }: { facts: Facts }) {
 
         {/* Les chiffres, tous tirés de la base */}
         {stats.length > 0 && (
-          <ul className="mt-20 grid gap-8 border-t-2 border-sable pt-10 sm:grid-cols-3 sm:gap-0">
-            {stats.map((s, i) => (
-              <li key={s.label} className={`grid sm:px-8 ${i > 0 ? 'sm:border-l-2 sm:border-sable' : 'sm:pl-0'}`}>
+          <ul className="mt-20 grid gap-8 sm:grid-cols-3 sm:gap-8">
+            {stats.map((s) => (
+              <li key={s.label} className="grid">
                 <span className="text-[2.5rem] font-semibold leading-none tracking-[-0.03em] text-vert tabular-nums font-titre">{s.value}</span>
                 <span className="mt-1 text-base text-olive">{s.label}</span>
               </li>

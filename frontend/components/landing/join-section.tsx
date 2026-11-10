@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import { ArrowRight, ChevronDown, Loader2 } from 'lucide-react'
 import { useJoinPromo } from '@/hooks/use-join-promo'
 import { realSchools, type LandingSchool } from '@/lib/landing'
 
@@ -22,15 +22,15 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
             Rejoindre ma promo
           </h2>
           <p className="mt-5 max-w-[40ch] text-lg leading-relaxed text-olive text-pretty">
-            Indiquez votre école et votre année d’entrée. Nous vérifions si votre promo a déjà des membres et vous
-            orientons vers la bonne démarche.
+            Indiquez votre école et votre année d’entrée : nous vérifions si des anciens de votre promo sont déjà
+            inscrits et vous indiquons la marche à suivre.
           </p>
         </div>
 
         {/* Le formulaire, posé sur l'étoffe */}
         <div className="sur-vert trame trame-etoffe overflow-hidden rounded-3xl rounded-tl-[72px] bg-vert p-4 sm:p-10">
           <form
-            className="sur-creme relative grid gap-5 rounded-2xl bg-creme p-6 sm:max-w-[28rem] sm:p-8"
+            className="sur-creme relative grid gap-5 rounded-2xl rounded-tl-[56px] bg-creme p-6 pt-8 sm:max-w-[28rem] sm:rounded-tl-[48px] sm:p-8 sm:pt-10"
             onSubmit={(e) => {
               e.preventDefault()
               join(schoolId, entryYear)
@@ -40,19 +40,23 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
               <label htmlFor="ecole" className="text-sm font-semibold text-vert">
                 Votre école
               </label>
-              <select
-                id="ecole"
-                value={schoolId}
-                onChange={(e) => setSchoolId(e.target.value)}
-                className={`${field} appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%228%22><path d=%22M1 1l6 6 6-6%22 fill=%22none%22 stroke=%22%231D3B2A%22 stroke-width=%222%22/></svg>')] bg-[length:14px_8px] bg-[position:right_16px_center] bg-no-repeat pr-11`}
-              >
-                <option value="">Choisir une école</option>
-                {list.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.acronym} · {s.city} ({s.country})
-                  </option>
-                ))}
-              </select>
+              {/* La flèche signale la liste déroulante (le select natif perd la sienne avec appearance-none) */}
+              <div className="relative">
+                <select
+                  id="ecole"
+                  value={schoolId}
+                  onChange={(e) => setSchoolId(e.target.value)}
+                  className={`${field} cursor-pointer appearance-none pr-12`}
+                >
+                  <option value="">Choisir une école</option>
+                  {list.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.acronym} · {s.city} ({s.country})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-5 -translate-y-1/2 text-vert" aria-hidden="true" />
+              </div>
             </div>
             <div className="grid gap-2">
               <label htmlFor="annee" className="text-sm font-semibold text-vert">
@@ -79,7 +83,7 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
             <button
               type="submit"
               disabled={isPending}
-              className="group mt-1 inline-flex min-h-12 items-center justify-center gap-2.5 justify-self-start rounded-full bg-vert px-7 text-base font-semibold text-or transition-colors duration-200 hover:bg-vert-carte disabled:opacity-70"
+              className="group mt-1 inline-flex min-h-12 items-center justify-center gap-2.5 justify-self-start rounded-full bg-vert px-7 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte disabled:opacity-70"
             >
               {isPending ? 'Vérification…' : 'Trouver ma promo'}
               {isPending ? (
