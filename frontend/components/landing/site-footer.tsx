@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PHOTOS } from '@/lib/landing'
+import { PHOTOS, type Photo } from '@/lib/landing'
 import { Soleil } from './soleil'
 
 export function SiteFooter() {
@@ -38,16 +38,20 @@ export function SiteFooter() {
             Crédits photographiques
           </summary>
           <p className="mt-3 max-w-[70ch]">
-            Photographies d’illustration de soldats et d’officiers des pays des écoles, via Wikimedia Commons.
-            Les personnes représentées ne sont pas des membres d’AET Connect.
+            Photographies d’illustration de soldats et d’officiers des pays des écoles, via Wikimedia Commons, et images
+            générées pour AET Connect. Les personnes représentées ne sont pas des membres d’AET Connect.
           </p>
           {/* Chaque lien seul sur sa ligne : reconnaissable sans soulignement au repos */}
           <ul className="mt-4 grid gap-3">
-            {Object.values(PHOTOS).map((p) => (
+            {(Object.values(PHOTOS) as Photo[]).map((p) => (
               <li key={p.src} className="grid">
-                <a href={p.page} className="justify-self-start text-creme decoration-or underline-offset-4 transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or" rel="noopener noreferrer" target="_blank">
-                  {p.alt}
-                </a>
+                {p.page ? (
+                  <a href={p.page} className="justify-self-start text-creme decoration-or underline-offset-4 transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or" rel="noopener noreferrer" target="_blank">
+                    {p.alt}
+                  </a>
+                ) : (
+                  <span className="text-creme">{p.alt}</span>
+                )}
                 <span>
                   {p.by} · {p.licence}
                   {'note' in p && p.note ? ` · ${p.note}` : ''}
