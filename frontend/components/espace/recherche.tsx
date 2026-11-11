@@ -8,10 +8,11 @@ import { Loader2, Search, X } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import { LienFleche } from '@/components/landing/lien-fleche'
 import { Portrait } from './portrait'
+import { ecoleCourte } from '@/types/directory'
 
 const RESULTATS = 6
 
-/** « promo 2005 keita » : l'année devient le filtre de promo, le reste la recherche par nom, école ou ville */
+/** « promo 2005 keita » : l'année devient le filtre de promo, le reste la recherche par nom (l'API ne cherche que dans les noms) */
 export function lireRecherche(saisie: string) {
   const mots = saisie.trim().split(/\s+/).filter(Boolean)
   const annee = mots.find((m) => /^(19|20)\d{2}$/.test(m))
@@ -60,7 +61,7 @@ export function Recherche({ tone, autoFocus, onNavigate }: { tone: 'creme' | 've
           type="search"
           autoFocus={autoFocus}
           autoComplete="off"
-          placeholder="Nom, école, promo, ville"
+          placeholder="Un nom, ou une promo (2005)"
           value={saisie}
           onChange={(e) => setSaisie(e.target.value)}
           className={`min-h-12 w-full appearance-none rounded-full border-2 pl-12 pr-11 text-base text-encre placeholder:text-olive [&::-webkit-search-cancel-button]:appearance-none ${
@@ -96,7 +97,7 @@ export function Recherche({ tone, autoFocus, onNavigate }: { tone: 'creme' | 've
                         {m.first_name} {m.last_name}
                       </span>
                       <span className={`block truncate text-sm ${secondaire}`}>
-                        {[m.school_name, m.entry_year && `promo ${m.entry_year}`, m.current_city].filter(Boolean).join(' · ')}
+                        {[ecoleCourte(m), m.entry_year && `promo ${m.entry_year}`, m.current_city].filter(Boolean).join(' · ')}
                       </span>
                     </span>
                   </Link>
