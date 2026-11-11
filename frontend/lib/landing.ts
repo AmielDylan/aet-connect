@@ -128,7 +128,7 @@ export const PHOTOS = {
   },
   parcoursSalle: {
     src: '/images/accueil/parcours-salle.jpg', width: 1586, height: 992,
-    alt: 'Un militaire, son paquetage à l’épaule, entre dans une grande salle vide et lumineuse',
+    alt: 'Un homme, son paquetage à l’épaule, entre dans une grande salle vide et lumineuse',
     caption: 'Image d’illustration générée',
     by: 'Image générée par IA pour AET Connect', licence: 'Personnages imaginaires',
   },

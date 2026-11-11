@@ -52,7 +52,7 @@ export function WaysIn() {
                 {way.bulle && (
                   <span
                     aria-hidden="true"
-                    className="absolute left-[60%] top-[39.5%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-xl bg-creme px-2.5 py-2 font-titre text-[11px] font-semibold tracking-[0.04em] text-vert shadow-md after:absolute after:left-[25%] after:top-full after:border-x-[6px] after:border-t-[7px] after:border-x-transparent after:border-t-creme sm:text-xs"
+                    className="absolute left-[60%] top-[39.5%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-creme px-2 py-1.5 font-titre text-[9px] font-semibold tracking-[0.04em] text-vert shadow-md after:absolute after:left-[25%] after:top-full after:border-x-[4px] after:border-t-[5px] after:border-x-transparent after:border-t-creme sm:text-[10px]"
                   >
                     AET-7K2P-Q9XD
                   </span>
