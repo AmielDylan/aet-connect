@@ -204,8 +204,8 @@ Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au 
 
 ### Diaporama (`PhotoDiaporama`)
 - Quatre photos d'illustration en noir et blanc, en fondu toutes les 6 s.
-- En bas à droite, discrets : la légende (scène, lieu, année ; jamais l'identité des personnes), en petit texte crème avec une ombre portée, sans pastille, juste au-dessus des repères. Sur ordinateur, la légende n'apparaît qu'au survol ou au focus ; sur mobile, elle reste visible.
-- Repères : de simples points crème posés sur la photo, un court trait pour la photo active. Pas de bouton pause : le défilement s'arrête au survol, au focus et dès qu'on choisit une photo, et reste immobile en mouvement réduit (WCAG 2.2.2).
+- Légende (scène, lieu, année ; jamais l'identité des personnes) en petit, en haut à gauche, sur une pastille crème à 90 %, toujours visible.
+- En bas à droite, une pastille crème avec les repères resserrés (points, un trait pour la photo active) et le bouton pause. Le défilement s'arrête aussi au survol, au focus et dès qu'on choisit une photo ; immobile en mouvement réduit (WCAG 2.2.2). Les repères font 16 × 24 px, sous les 24 px de WCAG 2.5.8 : compromis voulu par le client pour les resserrer.
 - Sur la connexion, un petit cartouche « AET un jour, AET toujours » en bas à gauche (le texte disparaît sous 360px, le soleil reste).
 
 ### Page de connexion
