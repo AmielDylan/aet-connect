@@ -28,7 +28,7 @@ Ce que ni un groupe WhatsApp ni LinkedIn ne peuvent revendiquer : **la confiance
 
 ## Operating Context
 
-- **Entrée dans le réseau**, trois parcours : code reçu d'un ancien (lien partagé par WhatsApp, SMS ou email) ; demande de code à l'ambassadeur ou à un membre de sa promo ; demande d'accès validée par un administrateur quand la promo n'a encore aucun membre.
+- **Entrée dans le réseau**, trois parcours : code reçu d'un ancien (lien partagé par WhatsApp, SMS ou email) ; demande de code quand la promo a déjà des membres (transmise aux administrateurs, qui envoient un code) ; demande d'accès validée par un administrateur quand la promo n'a encore aucun membre.
 - **Ambassadeurs** : membres qui portent leur promo et disposent de 15 invitations (3 pour un membre, illimité pour un admin). Un code non utilisé expire au bout de 30 jours ou peut être révoqué, et rend alors sa place.
 - **Annuaire** : recherche par nom (sans accents), filtres par école, promo, pays de l'école et ville ; profils dont l'email et le téléphone ne sont visibles que si le membre l'a choisi ; un membre peut se retirer entièrement de l'annuaire.
 - **Administration** : validation des demandes d'accès (avec le message d'invitation à transmettre), demandes de suppression de compte, gestion des écoles et des membres (rôles, ambassadeurs).

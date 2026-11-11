@@ -314,16 +314,9 @@ export interface CheckSchoolPromoRequest {
   entry_year: string
 }
 
+// Route publique : seulement l'existence de la promo, rien sur ses membres
 export interface CheckSchoolPromoResponse {
   exists: boolean
-  has_ambassador: boolean
-  ambassador_info: {
-    id: string
-    first_name: string
-    last_name: string
-    avatar_url: string | null
-  } | null
-  member_count: number
 }
 
 export interface RequestInitialAccessRequest {
@@ -375,17 +368,19 @@ export interface CompleteRegistrationResponse {
   message: string
 }
 
+// Demande de code : transmise aux administrateurs, qui envoient le code à cette adresse
 export interface RequestCodeFromPeerRequest {
   school_id: string
   entry_year: string
   first_name: string
   last_name: string
+  email: string
   message: string
 }
 
 export interface RequestCodeFromPeerResponse {
   success: boolean
-  recipient_name: string
+  request_id: string
   message: string
 }
 

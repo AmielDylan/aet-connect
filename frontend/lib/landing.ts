@@ -83,6 +83,14 @@ export const PHOTOS = {
     by: 'U.S. Army, Sgt. 1st Class Mary S. Katzenberger', licence: 'Domaine public', licenceUrl: PD,
     page: 'https://commons.wikimedia.org/wiki/File:Burkinabe,_Nigerien_and_Senegalese_soldiers_and_marines_pose_for_a_photo_after_an_outstation_closing_ceremony_for_Exercise_Flintlock_2019_near_Po,_Burkina_Faso,_Feb._27,_2019.jpg',
   },
+  promoGrand: {
+    src: '/images/accueil/promo-grand.jpg', width: 1500, height: 900,
+    alt: 'Photo de groupe de soldats burkinabè, nigériens et sénégalais à la fin d’une formation',
+    caption: 'Fin de formation, Pô (Burkina Faso), 2019',
+    by: 'U.S. Army, Sgt. 1st Class Mary S. Katzenberger', licence: 'Domaine public', licenceUrl: PD,
+    page: 'https://commons.wikimedia.org/wiki/File:Burkinabe,_Nigerien_and_Senegalese_soldiers_and_marines_pose_for_a_photo_after_an_outstation_closing_ceremony_for_Exercise_Flintlock_2019_near_Po,_Burkina_Faso,_Feb._27,_2019.jpg',
+    note: 'recadrage plus large de la même photo',
+  },
   secours: {
     src: '/images/accueil/secours.jpg', width: 1600, height: 1062,
     alt: 'Des soldats burkinabè aident un camarade à descendre d’un véhicule pendant un exercice de secours',
