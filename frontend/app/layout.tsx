@@ -10,6 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://aet-connect.vercel.app"),
   title: "AET Connect",
   description: "Annuaire panafricain des Anciens Enfants de Troupe",
 };
