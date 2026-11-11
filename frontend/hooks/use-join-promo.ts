@@ -23,12 +23,12 @@ export function useJoinPromo(schools: SchoolLike[]) {
       const query = `school=${promo.schoolId}&year=${promo.entryYear}`
       router.push(data.exists ? `/register/with-code?${query}` : `/register/request-access?${query}`)
     },
-    onError: () => setError('Impossible de vérifier votre promo pour le moment. Réessayez dans un instant.'),
+    onError: () => setError('Nous n’arrivons pas à vérifier votre promo pour le moment. Vous pouvez réessayer dans un instant.'),
   })
 
   const validationError = (schoolId: string, entryYear: string): string | null => {
-    if (!schoolId) return 'Choisissez votre école.'
-    if (!/^\d{4}$/.test(entryYear)) return 'Indiquez votre année d’entrée sur quatre chiffres, par exemple 2005.'
+    if (!schoolId) return 'Il manque votre école.'
+    if (!/^\d{4}$/.test(entryYear)) return 'L’année d’entrée s’écrit sur quatre chiffres, par exemple 2005.'
     const year = parseInt(entryYear, 10)
     const school = schools.find((s) => s.id === schoolId)
     const min = school?.established_year ?? 1950

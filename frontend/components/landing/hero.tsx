@@ -12,7 +12,7 @@ export function Hero() {
           </h1>
           <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-olive text-pretty">
             Cet annuaire numérique est une porte d’entrée à la communauté élargie que forment les Anciens Enfants de
-            Troupe. Retrouvez-y vos collègues de promotion, sur invitation.
+            Troupe. Vous y retrouverez vos collègues de promotion, sur invitation.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a
