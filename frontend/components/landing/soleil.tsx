@@ -2,7 +2,7 @@ import { SOLEIL_COEUR, SOLEIL_PETALES } from '@/lib/soleil'
 
 // Le soleil aux neuf pétales, un par école : la marque d'AET Connect et son grand motif.
 // Les couleurs passent par des classes de remplissage (fill-*), le dessin par lib/soleil.ts.
-// Cœur brun-roux sur fond beige, or sur fond vert.
+// Le cœur est toujours brun-roux ; les pétales sont verts sur fond beige, crème sur fond vert.
 export function Soleil({
   className = 'size-10',
   petales = 'fill-vert',

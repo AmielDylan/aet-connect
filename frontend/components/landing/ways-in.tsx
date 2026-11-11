@@ -44,13 +44,13 @@ export function WaysIn() {
           {WAYS.map((way) => (
             <li
               key={way.href}
-              className={`flex gap-2 rounded-[28px] p-3 ${way.featured ? 'flex-col-reverse bg-or text-vert-nuit' : 'sur-creme flex-col bg-creme text-encre'}`}
+              className={`flex flex-col gap-2 rounded-[28px] p-3 ${way.featured ? 'md:flex-col-reverse' : ''} sur-creme bg-creme text-encre`}
             >
               <PhotoFrame photo={way.photo} position={way.position} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] rounded-[20px]" />
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
-                <h3 className={`text-lg font-semibold leading-snug tracking-[-0.02em] font-titre ${way.featured ? '' : 'text-vert'}`}>{way.title}</h3>
-                <p className={`mt-2 flex-1 text-base leading-relaxed ${way.featured ? 'text-vert-nuit/85' : 'text-olive'}`}>{way.text}</p>
-                <LienFleche href={way.href} surOr={way.featured} className="mt-4 self-start">
+                <h3 className={`text-lg font-semibold leading-snug tracking-[-0.02em] font-titre text-vert`}>{way.title}</h3>
+                <p className={`mt-2 flex-1 text-base leading-relaxed text-olive`}>{way.text}</p>
+                <LienFleche href={way.href} className="mt-4 self-start">
                   {way.action}
                 </LienFleche>
               </div>

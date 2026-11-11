@@ -15,8 +15,8 @@ const NAV = [
 export function Brand({ tone = 'clair' }: { tone?: 'clair' | 'sombre' }) {
   return (
     <span className="flex shrink-0 items-center gap-2 sm:gap-2.5">
-      <Soleil className="size-8 sm:size-9" petales={tone === 'clair' ? 'fill-vert' : 'fill-creme'} coeur={tone === 'clair' ? 'fill-terre' : 'fill-or'} />
-      <span className="whitespace-nowrap font-titre text-base font-semibold leading-none tracking-[-0.02em] sm:text-lg">AET Connect</span>
+      <Soleil className="size-8 sm:size-9" petales={tone === 'clair' ? 'fill-vert' : 'fill-creme'} coeur="fill-terre" />
+      <span className="whitespace-nowrap font-titre text-base leading-none tracking-[-0.02em] sm:text-lg">AET Connect</span>
     </span>
   )
 }
@@ -44,7 +44,7 @@ export function SiteHeader() {
     <header className="sur-creme relative z-30">
       <a
         href="#contenu"
-        className="sr-only z-50 rounded-full bg-vert px-5 py-3 font-semibold text-creme focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+        className="sr-only z-50 rounded-full bg-vert px-5 py-3 text-creme focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
       >
         Aller au contenu
       </a>
@@ -53,8 +53,8 @@ export function SiteHeader() {
           <Brand />
         </Link>
 
-        {/* Grand écran : les ancres, puis la connexion, un lien comme les autres, en semi-gras */}
-        <ul className="hidden items-center gap-9 text-base font-medium text-encre lg:flex">
+        {/* Grand écran : les ancres, puis la connexion, un lien comme les autres, sans gras */}
+        <ul className="hidden items-center gap-9 text-base text-encre lg:flex">
           {NAV.map((item) => (
             <li key={item.href}>
               <a href={item.href} className="inline-flex min-h-11 items-center transition-colors duration-200 hover:text-terre">
@@ -63,7 +63,7 @@ export function SiteHeader() {
             </li>
           ))}
           <li>
-            <Link href={account.href} className="inline-flex min-h-11 items-center font-semibold text-vert transition-colors duration-200 hover:text-terre">
+            <Link href={account.href} className="inline-flex min-h-11 items-center text-vert transition-colors duration-200 hover:text-terre">
               {account.label}
             </Link>
           </li>
@@ -94,7 +94,7 @@ export function SiteHeader() {
               <a
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex min-h-14 items-center rounded-2xl px-4 font-titre text-lg font-semibold tracking-[-0.02em] transition-colors hover:bg-vert-carte"
+                className="flex min-h-14 items-center rounded-2xl px-4 font-titre text-lg tracking-[-0.02em] transition-colors hover:bg-vert-carte"
               >
                 {item.label}
               </a>
@@ -104,7 +104,7 @@ export function SiteHeader() {
             <Link
               href={account.href}
               onClick={() => setOpen(false)}
-              className="flex min-h-14 items-center rounded-2xl px-4 font-titre text-lg font-semibold tracking-[-0.02em] text-or transition-colors hover:bg-vert-carte"
+              className="flex min-h-14 items-center rounded-2xl px-4 font-titre text-lg tracking-[-0.02em] text-or transition-colors hover:bg-vert-carte"
             >
               {account.label}
             </Link>

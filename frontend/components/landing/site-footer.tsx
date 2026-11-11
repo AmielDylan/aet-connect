@@ -8,10 +8,10 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1280px] px-5 pb-8 pt-16 sm:px-8 sm:pt-20">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <p className="flex items-center gap-3 text-base text-brume">
-            <Soleil className="size-8" petales="fill-creme" coeur="fill-or" />
+            <Soleil className="size-8" petales="fill-creme" coeur="fill-terre" />
             Annuaire panafricain des Anciens Enfants de Troupe
           </p>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-sm font-semibold">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-sm">
             <a href="#rejoindre" className="inline-flex min-h-11 items-center text-creme decoration-or decoration-2 underline-offset-[6px] transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or">
               Rejoindre ma promo
             </a>
@@ -45,7 +45,7 @@ export function SiteFooter() {
           <ul className="mt-4 grid gap-3">
             {Object.values(PHOTOS).map((p) => (
               <li key={p.src} className="grid">
-                <a href={p.page} className="justify-self-start font-semibold text-creme decoration-or underline-offset-4 transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or" rel="noopener noreferrer" target="_blank">
+                <a href={p.page} className="justify-self-start text-creme decoration-or underline-offset-4 transition-colors duration-200 hover:text-or hover:underline focus-visible:text-or" rel="noopener noreferrer" target="_blank">
                   {p.alt}
                 </a>
                 <span>

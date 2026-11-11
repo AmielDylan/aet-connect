@@ -40,7 +40,7 @@ export function NetworkSection({ facts }: { facts: Facts }) {
             <PhotoFrame photo={PHOTOS.promo} position="50% 45%" sizes="(min-width: 1024px) 600px, 92vw" className="col-span-2 aspect-[2/1] rounded-3xl" />
             <PhotoFrame photo={PHOTOS.secours} position="45% 40%" sizes="(min-width: 1024px) 340px, 55vw" className="aspect-[4/3] rounded-3xl rounded-bl-[72px]" />
             <div aria-hidden="true" className="grid place-items-center overflow-hidden rounded-3xl rounded-tr-[72px] bg-vert">
-              <Soleil className="w-[72%]" petales="fill-creme" coeur="fill-or" />
+              <Soleil className="w-[72%]" petales="fill-creme" coeur="fill-terre" />
             </div>
           </div>
 
