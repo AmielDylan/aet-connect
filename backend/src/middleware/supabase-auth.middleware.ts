@@ -32,6 +32,10 @@ export async function supabaseAuthMiddleware(
     // Vérifier le token avec Supabase
     const { data: { user }, error } = await supabase.auth.getUser(token)
 
+    // Supabase injoignable (réseau, 5xx) : ce n'est pas la session qui est en cause, on peut réessayer
+    if (error && (error.name === 'AuthRetryableFetchError' || !error.status || error.status >= 500)) {
+      return res.status(503).json({ error: 'Service momentanément indisponible' })
+    }
     if (error || !user) {
       return res.status(401).json({ error: 'Token invalide ou expiré' })
     }
@@ -44,7 +48,12 @@ export async function supabaseAuthMiddleware(
       .eq('is_active', true)
       .single()
 
-    if (userError || !userData) {
+    // PGRST116 : aucune ligne (compte inexistant ou désactivé). Toute autre erreur vient de la base ou du réseau :
+    // répondre 401 renverrait le membre à la connexion pour une panne passagère ; 503 laisse le client réessayer.
+    if (userError && userError.code !== 'PGRST116') {
+      return res.status(503).json({ error: 'Service momentanément indisponible' })
+    }
+    if (!userData) {
       return res.status(401).json({ error: 'Utilisateur non trouvé' })
     }
 
@@ -54,7 +63,7 @@ export async function supabaseAuthMiddleware(
     next()
   } catch (error) {
     console.error('Auth middleware error:', error)
-    res.status(401).json({ error: 'Erreur d\'authentification' })
+    res.status(503).json({ error: 'Service momentanément indisponible' })
   }
 }
 

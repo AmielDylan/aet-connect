@@ -1,186 +1,166 @@
 'use client'
 
+// Le profil d'un membre · proposition B « Le bandeau ».
+// Le bandeau a une hauteur fixe dès la tablette : c'est le portrait qui la donne, jamais le texte. Le texte est
+// donc ramassé (le lien et « Représente sa promo » sur une ligne ; école, promo et ville sur une autre ; le nom
+// sur deux lignes au plus), quelles que soient les informations que le membre a choisi de montrer.
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import { ArrowLeft, Mail } from 'lucide-react'
 import { apiClient } from '@/lib/api'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
-import { MapPin, School, Calendar, Linkedin, Star, Phone, Mail, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { useAuth } from '@/hooks/use-auth'
+import { Drapeau } from '@/components/landing/drapeau'
+import { LienFleche } from '@/components/landing/lien-fleche'
+import { Portrait } from '@/components/espace/portrait'
+import { Coordonnees } from '@/components/espace/coordonnees'
 
-export default function PublicProfilePage() {
-  const params = useParams()
-  const userId = params.id as string
-  
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['public-profile', userId],
-    queryFn: () => apiClient.getUserById(userId),
+const titre2 = 'font-titre text-xl font-semibold tracking-[-0.02em] text-vert'
+
+function Retour() {
+  return (
+    <Link href="/dashboard/directory" className="group inline-flex min-h-11 items-center gap-1.5 text-base text-encre transition-colors hover:text-terre">
+      <ArrowLeft className="size-[18px] transition-transform duration-200 group-hover:-translate-x-0.5" aria-hidden="true" />
+      Retour à l’annuaire
+    </Link>
+  )
+}
+
+export default function ProfilMembre() {
+  const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
+  const { data: p, isLoading, isError } = useQuery({ queryKey: ['public-profile', id], queryFn: () => apiClient.getUserById(id) })
+
+  const schoolId = p?.school?.id
+  const { data: promo } = useQuery({
+    queryKey: ['profil-promo', schoolId, p?.entry_year],
+    queryFn: () => apiClient.getMembers({ school_id: schoolId, entry_year: p!.entry_year!, limit: 7 }),
+    enabled: !!schoolId && !!p?.entry_year,
   })
-  
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Chargement...</p>
-        </div>
+      <div aria-hidden="true">
+        <div className="h-11" />
+        <div className="mt-4 h-[22rem] animate-pulse rounded-3xl rounded-tr-[76px] bg-sable/60" />
       </div>
     )
   }
-  
-  if (error || !user) {
+
+  if (isError || !p) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="max-w-md w-full mx-4">
-          <CardContent className="pt-6 text-center">
-            <h1 className="text-2xl font-bold mb-4">Profil non trouvé</h1>
-            <p className="text-muted-foreground mb-6">
-              Ce profil n'existe pas ou a été supprimé.
-            </p>
-            <Link href="/dashboard/directory">
-              <Button>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour à l'annuaire
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div>
+        <Retour />
+        <div className="mt-6 rounded-3xl bg-white p-8 text-center sm:p-12">
+          <h1 className="font-titre text-2xl font-semibold tracking-[-0.02em] text-vert">Ce profil est introuvable</h1>
+          <p className="mx-auto mt-3 max-w-[48ch] text-base leading-relaxed text-olive">
+            La personne l’a peut-être masqué de l’annuaire, ou il n’existe plus. Vous pouvez la retrouver par sa promo dans l’annuaire.
+          </p>
+        </div>
       </div>
     )
   }
-  
-  const initials = `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`
-  
+
+  const moi = user?.id === p.id
+  const memePromo = !!schoolId && user?.school_id === schoolId && user?.entry_year === p.entry_year
+  const relation = moi ? 'Votre profil' : memePromo ? 'Votre collègue de promotion' : user?.school_id && user.school_id === schoolId ? 'De votre école' : null
+  const enTete = [relation, p.is_ambassador ? 'Représente sa promo' : null].filter(Boolean).join(' · ')
+  const ecole = p.school ? p.school.acronym || p.school.name_fr : ''
+  const collegues = (promo?.users ?? []).filter((m) => m.id !== p.id).slice(0, 6)
+  const totalPromo = promo?.total ?? 0
+  const promoHref = `/dashboard/directory?school=${schoolId}&year=${p.entry_year}`
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header avec retour */}
-      <div className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/dashboard/directory">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour à l'annuaire
-            </Button>
-          </Link>
+    <div>
+      <Retour />
+
+      {/* Bandeau : hauteur fixe dès md (le portrait la donne) ; coin haut droit 76px, portrait concentrique 64px */}
+      <section className="sur-vert trame trame-sur-vert mt-4 grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:h-[22rem] md:grid-cols-[1fr_auto] md:rounded-tr-[76px] lg:h-[24rem]">
+        <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 lg:px-12">
+          {enTete && <p className="text-base text-or">{enTete}</p>}
+          <h1 className="font-titre md:line-clamp-2 text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]">
+            {p.first_name} {p.last_name}
+          </h1>
+          <p className="flex flex-wrap items-center gap-x-2 text-base text-brume lg:text-lg">
+            {ecole && <span>{ecole}</span>}
+            {p.school?.country && <Drapeau pays={p.school.country} className="h-3.5 w-auto" />}
+            {p.entry_year && <span>· promo {p.entry_year}</span>}
+            {p.current_city && <span>· vit à {p.current_city}</span>}
+          </p>
+          {moi ? (
+            <Link
+              href="/dashboard/profile"
+              className="inline-flex min-h-12 items-center gap-2 self-start rounded-full bg-creme px-7 text-base font-semibold text-vert transition-colors hover:bg-white"
+            >
+              Modifier mon profil
+            </Link>
+          ) : (
+            p.email && (
+              <a
+                href={`mailto:${p.email}`}
+                className="inline-flex min-h-12 items-center gap-2 self-start rounded-full bg-creme px-7 text-base font-semibold text-vert transition-colors hover:bg-white"
+              >
+                <Mail className="size-[18px]" aria-hidden="true" /> Lui écrire
+              </a>
+            )
+          )}
         </div>
-      </div>
+        <div className="md:m-3 md:h-[calc(100%-1.5rem)]">
+          <Portrait
+            prenom={p.first_name}
+            nom={p.last_name}
+            src={p.avatar_url}
+            className="aspect-[4/3] w-full bg-sable text-7xl text-vert md:aspect-square md:h-full md:w-auto md:rounded-[1.25rem] md:rounded-tr-[64px]"
+          />
+        </div>
+      </section>
 
-      {/* Contenu principal */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Carte profil principale */}
-        <Card className="overflow-hidden shadow-lg">
-          {/* Bannière colorée */}
-          <div className="h-32 bg-gradient-to-r from-gray-400 to-gray-600"></div>
-          
-          <CardContent className="relative pt-0">
-            {/* Avatar positionné sur la bannière */}
-            <div className="flex flex-col items-center -mt-16 mb-6">
-              <Avatar className="h-32 w-32 border-4 border-white shadow-xl">
-                <AvatarImage src={user.avatar_url || undefined} />
-                <AvatarFallback className="text-4xl bg-white">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              
-              {/* Nom et badge */}
-              <div className="text-center mt-4 mb-2">
-                <h1 className="text-3xl font-bold mb-2">
-                  {user.first_name} {user.last_name}
-                </h1>
-                {user.is_ambassador && (
-                  <Badge className="gap-1 bg-gray-100 text-gray-800 border-gray-300">
-                    <Star className="h-3 w-3 fill-gray-600" />
-                    Ambassadeur
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            {/* Informations principales */}
-            <div className="space-y-4 mb-6">
-              {/* École */}
-              {user.school && (
-                <div className="flex items-center justify-center gap-2 text-lg">
-                  <School className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                  <span className="font-medium">
-                    {user.school.flag} {user.school.acronym || user.school.name_fr}
-                  </span>
-                  {user.entry_year && (
-                    <>
-                      <Separator orientation="vertical" className="h-5" />
-                      <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                      <span className="text-muted-foreground">
-                        Promo {user.entry_year}
-                      </span>
-                    </>
-                  )}
-                </div>
-              )}
-              
-              {/* Localisation */}
-              {user.current_city && (
-                <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4 flex-shrink-0" />
-                  <span>{user.current_city}{user.current_country && `, ${user.current_country}`}</span>
-                </div>
-              )}
-            </div>
-
-            <Separator className="my-6" />
-
-            {/* Boutons de contact */}
-            <div className="flex flex-wrap gap-3 justify-center mb-6">
-              {user.email && (
-                <a href={`mailto:${user.email}`} className="flex-1 min-w-[140px] max-w-[200px]">
-                  <Button variant="outline" className="w-full gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email
-                  </Button>
-                </a>
-              )}
-              
-              {user.phone && (
-                <a href={`tel:${user.phone}`} className="flex-1 min-w-[140px] max-w-[200px]">
-                  <Button variant="outline" className="w-full gap-2">
-                    <Phone className="h-4 w-4" />
-                    Téléphone
-                  </Button>
-                </a>
-              )}
-              
-              {user.linkedin_url && (
-                <a
-                  href={user.linkedin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 min-w-[140px] max-w-[200px]"
-                >
-                  <Button variant="outline" className="w-full gap-2">
-                    <Linkedin className="h-4 w-4" />
-                    LinkedIn
-                  </Button>
-                </a>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Bio */}
-        {user.bio && (
-          <Card className="mt-6 shadow-lg">
-            <CardContent className="pt-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                À propos
+      <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <div className="grid content-start gap-10">
+          {p.bio && (
+            <section aria-labelledby="mots">
+              <h2 id="mots" className={titre2}>
+                En quelques mots
               </h2>
-              <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                {user.bio}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+              <p className="mt-3 max-w-[60ch] whitespace-pre-line text-lg leading-relaxed text-encre">{p.bio}</p>
+            </section>
+          )}
+          {collegues.length > 0 && (
+            <section aria-labelledby="promo">
+              <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+                <h2 id="promo" className={titre2}>
+                  {moi ? 'Votre promo' : 'Sa promo'}
+                </h2>
+                <LienFleche href={promoHref} visible>
+                  Voir les {totalPromo}
+                </LienFleche>
+              </div>
+              <ul className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-6">
+                {collegues.map((c) => (
+                  <li key={c.id}>
+                    <Link href={`/profile/${c.id}`} className="group block">
+                      <Portrait
+                        prenom={c.first_name}
+                        nom={c.last_name}
+                        src={c.avatar_url}
+                        className="aspect-square w-full rounded-2xl bg-sable text-lg text-vert transition-colors group-hover:bg-vert group-hover:text-creme"
+                      />
+                      <span className="mt-2 block truncate text-sm text-encre group-hover:text-terre">{c.first_name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+        <section aria-labelledby="coordonnees" className="content-start rounded-3xl bg-white p-6 sm:p-8">
+          <h2 id="coordonnees" className={titre2}>
+            Coordonnées
+          </h2>
+          <div className="mt-4">
+            <Coordonnees prenom={p.first_name} email={p.email} phone={p.phone} linkedin={p.linkedin_url} />
+          </div>
+        </section>
       </div>
     </div>
   )

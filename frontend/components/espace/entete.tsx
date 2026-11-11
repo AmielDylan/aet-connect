@@ -63,7 +63,9 @@ export function EnteteEspace() {
     { label: 'Suppressions', href: '/dashboard/admin/deletions', badge: suppressions },
   ]
 
-  const actif = (href: string) => (href === '/dashboard' ? pathname === href : pathname.startsWith(href))
+  // Un profil de membre s'ouvre depuis l'annuaire : « Annuaire » reste la page courante
+  const actif = (href: string) =>
+    href === '/dashboard' ? pathname === href : pathname.startsWith(href) || (href === '/dashboard/directory' && pathname.startsWith('/profile/'))
   const dansAdmin = pathname.startsWith('/dashboard/admin')
 
   // Échap ferme le menu et rend le focus au bouton
