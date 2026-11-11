@@ -14,7 +14,7 @@ Point d’étape au 11 novembre 2026, pour reprendre la refonte dans une nouvell
 | Espace membre : en-tête, pied, accueil `/dashboard` | B « La photo de promo » : navigation en haut, recherche (⌘K, menu mobile), bandeau vert, trombinoscope | oui (PR #7) |
 | Icône du site, image de partage (OG) | le soleil ; le hero avec le titre et le badge | oui (PR #8) |
 | Annuaire `/dashboard/directory` | C « La recherche » : bandeau vert « Retrouver un AET », grand champ (nom ou promo), raccourcis Ma promo / Mon école / Ma ville, filtres, fiches, « Voir plus d’AET » | oui (PR #10) |
-| Profil d’un membre `/profile/[id]` | B « Le bandeau » : bandeau à hauteur fixe (c’est le portrait qui la donne), en quelques mots, sa promo, coordonnées (seules celles que le membre montre) ; le profil est dans le cadre de l’espace membre | sur `develop`, à déployer |
+| Profil d’un membre `/profile/[id]` | B « Le bandeau » : bandeau à hauteur fixe (c’est le portrait qui la donne), en quelques mots, sa promo, coordonnées (seules celles que le membre montre) ; le profil est dans le cadre de l’espace membre | oui (PR #11) |
 | Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | oui (PR #9) |
 
 **Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :

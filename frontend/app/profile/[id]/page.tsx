@@ -77,6 +77,13 @@ export default function ProfilMembre() {
       {/* Bandeau : hauteur fixe dès md (le portrait la donne) ; coin haut droit 76px, portrait concentrique 64px */}
       <section className="sur-vert trame trame-sur-vert mt-4 grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:h-[22rem] md:grid-cols-[1fr_auto] md:rounded-tr-[76px] lg:h-[24rem]">
         <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 lg:px-12">
+          {/* Sur mobile : une vignette avant le nom (le grand portrait n'apparaît qu'à partir de md) */}
+          <Portrait
+            prenom={p.first_name}
+            nom={p.last_name}
+            src={p.avatar_url}
+            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert md:hidden"
+          />
           {enTete && <p className="text-base text-or">{enTete}</p>}
           <h1 className="font-titre md:line-clamp-2 text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]">
             {p.first_name} {p.last_name}
@@ -105,12 +112,12 @@ export default function ProfilMembre() {
             )
           )}
         </div>
-        <div className="md:m-3 md:h-[calc(100%-1.5rem)]">
+        <div className="hidden md:m-3 md:block md:h-[calc(100%-1.5rem)]">
           <Portrait
             prenom={p.first_name}
             nom={p.last_name}
             src={p.avatar_url}
-            className="aspect-[4/3] w-full bg-sable text-7xl text-vert md:aspect-square md:h-full md:w-auto md:rounded-[1.25rem] md:rounded-tr-[64px]"
+            className="aspect-square h-full w-auto rounded-[1.25rem] rounded-tr-[64px] bg-sable text-7xl text-vert"
           />
         </div>
       </section>
