@@ -1,0 +1,80 @@
+# Reprise : refonte « Esprit de corps » d’AET Connect
+
+Point d’étape au 11 novembre 2026, pour reprendre la refonte dans une nouvelle conversation.
+À lire avec [PRODUCT.md](../PRODUCT.md) (le produit, le vocabulaire, la politique d’images) et [frontend/DESIGN.md](../frontend/DESIGN.md) (le système visuel et chaque composant).
+
+## Où on en est
+
+| Écran | Proposition retenue | En ligne |
+|---|---|---|
+| Accueil `/` | « Esprit de corps » : hero et mosaïque photo, bandeau des écoles avec drapeaux, trois façons de rejoindre (images générées), formulaire, grand pied de page | oui (PR #4, #7, #8) |
+| Connexion `/login` | A « Le portrait » : formulaire, diaporama de 4 photos avec légendes, badge « AET un jour, AET toujours » | oui (PR #4) |
+| Mot de passe oublié / nouveau | B « L’étoffe » : carte centrée, calme, sans photo | oui (PR #5) |
+| Inscription `/register` et ses 3 parcours | C « La photo de promo » : photo à gauche, parcours à droite, « Étape 2/3 · titre » | oui (PR #6) |
+| Espace membre : en-tête, pied, accueil `/dashboard` | B « La photo de promo » : navigation en haut, recherche (⌘K, menu mobile), bandeau vert, trombinoscope | oui (PR #7) |
+| Icône du site, image de partage (OG) | le soleil ; le hero avec le titre et le badge | oui (PR #8) |
+
+**Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :
+1. `/dashboard/codes` (248 lignes) : vos codes d’invitation, la génération (`GenerateCodeDialog`)
+2. `/dashboard/directory` (177) et ses composants `components/directory/*` : l’annuaire (accepte déjà `?q=`, `?school=`, `?year=`)
+3. `/profile/[id]` (187) : le profil public d’un membre, hors de l’espace (pas d’en-tête)
+4. `/dashboard/profile` (816) : mon profil, l’avatar (FilePond), la vie privée, le mot de passe
+5. `/dashboard/schools` (221) : les écoles
+6. Administration : `/dashboard/admin` (149), `pending` (470), `users` (349), `schools` (388), `deletions` (337)
+
+## Comment on travaille
+
+- **Trois propositions par page**, rendues sur le serveur local (port 3100) et ouvertes dans le navigateur **avant** de demander un choix. Maquettes dans `frontend/app/maquettes/…`, supprimées après intégration.
+- Skills : refero-design pour l’inspiration (MCP Refero non connecté : références intégrées), impeccable contre les tics d’IA, design-taste-frontend pour les images, design:ux-copy pour le ton.
+- **Git** : branche `feature/…` depuis `develop`, `merge --no-ff` dans `develop`, PR `develop → main`, puis retour sur `develop` (synchronisé sur `main`).
+- **Déploiement uniquement sur le « go » explicite** de la personne. Vercel (frontend) et Railway (backend) déploient depuis `main`. Production : https://aet-connect.vercel.app
+
+## Règles de design à respecter partout
+
+- Polices : titres **Unbounded**, texte **Figtree** (`lib/fonts.ts`, classes `font-titre` / `font-texte`, conteneur `${espritFonts} esprit font-texte`).
+- Couleurs : vert `#1D3B2A`, crème `#F4EEE2`, sable, encre, olive. **Accent selon le fond** : or `#FFC000` sur vert, terre `#8B4A1E` sur crème. Le cœur du soleil est toujours terre.
+- Boutons pleins vert ou crème ; jamais d’or dans un bouton, jamais de bouton en contour. Pas de cartes vertes sur fond vert.
+- Liens : couleur du texte au repos ; au survol, l’accent avec une flèche (`LienFleche`, option `visible` quand le lien est aligné sur un bord) ou un soulignement. Jamais de soulignement au repos.
+- Pas de surtitres, pas de filets à l’intérieur des sections, pas de numéros dans des cercles (étapes : « Étape 2/3 · titre »).
+- Coins exagérés concentriques à leur conteneur (bandeau 76px, photo 64px avec 12px de marge).
+- Menu burger sur mobile. Cibles de 44px minimum. Mouvement réduit respecté.
+- **Images** : de vraies photos en noir et blanc (la couleur revient au survol), adultes seulement, ni armes pointées ni combat, ni symboles haineux. **L’esprit militaire rassemble les AET** : garder l’univers de l’école militaire, avec noblesse et simplicité, sans images disparates. Les photos d’illustration ne sont jamais présentées comme des membres (crédits dans le pied de page de l’accueil).
+- **Vocabulaire** : « rejoindre » (jamais « entrer ») ; on est invité par un « collègue de promotion » ; « ancien » seul désigne un aîné hiérarchique, les membres sont des « AET ». Voix chaleureuse et non directive : indicatif et « vous pouvez », impératif réservé aux boutons, erreurs « Il manque… ».
+
+## Lancer, tester, déployer
+
+```sh
+# Base locale (OrbStack doit tourner)
+open -a OrbStack && npx supabase start
+docker restart supabase_kong_aet-connect   # si l'API renvoie « upstream » ou « Utilisateur non trouvé »
+
+# Backend (port 3001)
+cd backend && doppler run -c dev_backend -- env FRONTEND_URL=http://localhost:3100 npx tsx src/app.ts
+
+# Frontend (port 3100, jamais 3000 : pris par un autre projet)
+cd frontend && doppler run -p aet-connect -c dev_frontend -- env -u NODE_ENV npx next build
+doppler run -p aet-connect -c dev_frontend -- env -u NODE_ENV npx next start -p 3100
+
+# Tests de bout en bout (Playwright, Chrome installé, Mailpit pour les emails)
+cd frontend && doppler run -c dev_backend -- env -u NODE_ENV npx playwright test
+
+# Déploiement (après le « go »)
+git push origin develop
+gh pr create --base main --head develop
+gh pr checks <n> --watch && gh pr merge <n> --merge
+git checkout main && git merge --ff-only origin/main && git checkout develop && git merge --ff-only origin/main && git push origin develop
+```
+
+## Points ouverts
+
+- Pas de limite de débit sur les routes publiques de demande (code, accès).
+- À vérifier dans Supabase (production) : Authentication → URL Configuration doit contenir `https://aet-connect.vercel.app/reset-password`.
+- Test e2e « suppression de l’avatar » instable (course dans `components/profile/avatar-upload.tsx` quand l’URL de l’avatar est cassée), déjà présent avant la refonte.
+- En local, les toutes premières requêtes d’un compte tout juste créé peuvent renvoyer 401 ; React Query réessaie.
+- Dette de lint dans les pages pas encore refaites (`any`, apostrophes), hors des fichiers de la refonte.
+- Les boutons `mailto:admin@aetconnect.com` ont été retirés : domaine non vérifié.
+- Réactiver les synchronisations Vercel du projet sendbox dans Doppler (côté personne).
+
+## Contraintes de sécurité
+
+Ne jamais afficher de secret (Doppler, trousseau), ne jamais committer de `.env`, ne pas toucher au projet sendbox ni au port 3000, ne pas toucher aux comptes des autres administrateurs, pas de changement de base de production ni de merge sur `main` sans accord.
