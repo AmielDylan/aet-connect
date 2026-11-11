@@ -28,7 +28,7 @@ test("après déconnexion, le membre suivant ne voit rien du précédent", async
   await login(page, second.email, { reload: false })
   // La requête des codes du second membre reste sans réponse : tout code affiché viendrait du cache
   await page.route('**/api/codes/my-codes', () => {})
-  await page.getByRole('link', { name: 'Mes codes' }).click()
+  await page.getByRole('navigation', { name: 'Mon espace' }).getByRole('link', { name: 'Mes codes' }).click()
   await page.waitForTimeout(1_500)
   expect(await page.getByText(firstCode).count()).toBe(0)
   await page.unroute('**/api/codes/my-codes')
