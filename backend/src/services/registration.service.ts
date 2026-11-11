@@ -40,36 +40,10 @@ export class RegistrationService {
     
     if (countError) throw countError
     
-    const exists = (count || 0) > 0
-    
-    if (!exists) {
-      return {
-        exists: false,
-        has_ambassador: false,
-        ambassador_info: null,
-        member_count: 0
-      }
-    }
-    
-    // Chercher l'ambassadeur
-    const { data: ambassador } = await supabase
-      .from('users')
-      .select('id, first_name, last_name, avatar_url')
-      .eq('school_id', school_id)
-      .eq('entry_year', entry_year)
-      .eq('is_ambassador', true)
-      .eq('is_active', true)
-      .limit(1)
-      .single()
-    
-    return {
-      exists: true,
-      has_ambassador: !!ambassador,
-      ambassador_info: ambassador || null,
-      member_count: count || 0
-    }
+    // Route publique : on dit seulement si la promo a des membres, rien sur eux (ni nom, ni photo, ni nombre)
+    return { exists: (count || 0) > 0 }
   }
-  
+
   // Créer une demande d'accès initiale
   async createAccessRequest(data: {
     school_id: string
@@ -175,57 +149,17 @@ export class RegistrationService {
     return data.user.id
   }
 
-  // Demander un code à un ambassadeur/membre
+  // Demander un code quand la promo a déjà des membres : la demande va aux administrateurs (demandes d'accès),
+  // qui transmettent un code. Aucun membre n'est révélé au visiteur.
   async requestCodeFromPeer(data: {
     school_id: string
     entry_year: string
     first_name: string
     last_name: string
+    email: string
     message: string
-  }): Promise<{ recipient_name: string }> {
-    
-    // Valider l'année d'entrée selon established_year de l'école
-    const { data: school } = await supabase
-      .from('schools')
-      .select('established_year')
-      .eq('id', data.school_id)
-      .single()
-    
-    if (school) {
-      const entryYearNum = parseInt(data.entry_year, 10)
-      const minYear = school.established_year || 1950
-      
-      if (entryYearNum < minYear) {
-        throw new Error(
-          school.established_year 
-            ? `Cette école a été créée en ${school.established_year}. L'année minimale est ${school.established_year}.`
-            : 'Année d\'entrée invalide'
-        )
-      }
-    }
-    
-    // Chercher l'ambassadeur ou un membre actif
-    const { data: recipient } = await supabase
-      .from('users')
-      .select('id, first_name, last_name, email')
-      .eq('school_id', data.school_id)
-      .eq('entry_year', data.entry_year)
-      .eq('is_active', true)
-      .order('is_ambassador', { ascending: false })
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .single()
-    
-    if (!recipient) {
-      throw new Error('Aucun membre trouvé pour cette promo')
-    }
-    
-    // TODO: Envoyer email/notification au recipient
-    // emailService.sendCodeRequestNotification(recipient, data)
-    
-    return {
-      recipient_name: `${recipient.first_name} ${recipient.last_name}`
-    }
+  }): Promise<AccessRequest> {
+    return this.createAccessRequest({ ...data, wants_ambassador: false })
   }
 }
 

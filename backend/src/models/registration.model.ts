@@ -17,15 +17,8 @@ export interface AccessRequest {
 
 // DTOs (Data Transfer Objects)
 
+// Route publique : seulement l'existence de la promo, rien sur ses membres
 export interface CheckSchoolPromoResponse {
   exists: boolean
-  has_ambassador: boolean
-  ambassador_info: {
-    id: string
-    first_name: string
-    last_name: string
-    avatar_url: string | null
-  } | null
-  member_count: number
 }
 
