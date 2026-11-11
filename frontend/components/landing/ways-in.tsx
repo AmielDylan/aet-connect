@@ -47,17 +47,13 @@ export function WaysIn() {
               key={way.href}
               className={`flex flex-col gap-2 rounded-[28px] p-3 ${way.featured ? 'md:flex-col-reverse' : ''} sur-creme bg-creme text-encre`}
             >
-              <PhotoFrame photo={way.photo} position={way.position} sizes="(min-width: 768px) 400px, 92vw" className="aspect-[16/10] rounded-[20px]">
-                {/* Le code reçu, posé sur la bulle dessinée dans l'image (trop petite pour être lisible) */}
-                {way.bulle && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-[60%] top-[39.5%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-creme px-2 py-1.5 font-titre text-[9px] font-semibold tracking-[0.04em] text-vert shadow-md after:absolute after:left-[25%] after:top-full after:border-x-[4px] after:border-t-[5px] after:border-x-transparent after:border-t-creme sm:text-[10px]"
-                  >
-                    AET-7K2P-Q9XD
-                  </span>
-                )}
-              </PhotoFrame>
+              <PhotoFrame
+                photo={way.photo}
+                position={way.position}
+                sizes="(min-width: 768px) 400px, 92vw"
+                className="aspect-[16/10] rounded-[20px]"
+                bulle={way.bulle ? 'AET-7K2P-Q9XD' : undefined}
+              />
               <div className="flex flex-1 flex-col px-3 pb-3 pt-4">
                 <h3 className={`text-lg font-semibold leading-snug tracking-[-0.02em] font-titre text-vert`}>{way.title}</h3>
                 <p className={`mt-2 flex-1 text-base leading-relaxed text-olive`}>{way.text}</p>

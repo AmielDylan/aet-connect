@@ -13,14 +13,14 @@ Point d’étape au 11 novembre 2026, pour reprendre la refonte dans une nouvell
 | Inscription `/register` et ses 3 parcours | C « La photo de promo » : photo à gauche, parcours à droite, « Étape 2/3 · titre » | oui (PR #6) |
 | Espace membre : en-tête, pied, accueil `/dashboard` | B « La photo de promo » : navigation en haut, recherche (⌘K, menu mobile), bandeau vert, trombinoscope | oui (PR #7) |
 | Icône du site, image de partage (OG) | le soleil ; le hero avec le titre et le badge | oui (PR #8) |
+| Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | sur `develop`, à déployer |
 
 **Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :
-1. `/dashboard/codes` (248 lignes) : vos codes d’invitation, la génération (`GenerateCodeDialog`)
-2. `/dashboard/directory` (177) et ses composants `components/directory/*` : l’annuaire (accepte déjà `?q=`, `?school=`, `?year=`)
-3. `/profile/[id]` (187) : le profil public d’un membre, hors de l’espace (pas d’en-tête)
-4. `/dashboard/profile` (816) : mon profil, l’avatar (FilePond), la vie privée, le mot de passe
-5. `/dashboard/schools` (221) : les écoles
-6. Administration : `/dashboard/admin` (149), `pending` (470), `users` (349), `schools` (388), `deletions` (337)
+1. `/dashboard/directory` (177) et ses composants `components/directory/*` : l’annuaire (accepte déjà `?q=`, `?school=`, `?year=`)
+2. `/profile/[id]` (187) : le profil public d’un membre, hors de l’espace (pas d’en-tête)
+3. `/dashboard/profile` (816) : mon profil, l’avatar (FilePond), la vie privée, le mot de passe
+4. `/dashboard/schools` (221) : les écoles
+5. Administration : `/dashboard/admin` (149), `pending` (470), `users` (349), `schools` (388), `deletions` (337)
 
 ## Comment on travaille
 
@@ -36,6 +36,7 @@ Point d’étape au 11 novembre 2026, pour reprendre la refonte dans une nouvell
 - Boutons pleins vert ou crème ; jamais d’or dans un bouton, jamais de bouton en contour. Pas de cartes vertes sur fond vert.
 - Liens : couleur du texte au repos ; au survol, l’accent avec une flèche (`LienFleche`, option `visible` quand le lien est aligné sur un bord) ou un soulignement. Jamais de soulignement au repos.
 - Pas de surtitres, pas de filets à l’intérieur des sections, pas de numéros dans des cercles (étapes : « Étape 2/3 · titre »).
+- Une bulle dessinée sur une image (`photo.bulle`) reçoit son texte dans `PhotoFrame` : elle fait partie de l’image (même filtre, même zoom, taille en unités cqw) et le cadre garde les proportions de la photo.
 - Coins exagérés concentriques à leur conteneur (bandeau 76px, photo 64px avec 12px de marge).
 - Menu burger sur mobile. Cibles de 44px minimum. Mouvement réduit respecté.
 - **Images** : de vraies photos en noir et blanc (la couleur revient au survol), adultes seulement, ni armes pointées ni combat, ni symboles haineux. **L’esprit militaire rassemble les AET** : garder l’univers de l’école militaire, avec noblesse et simplicité, sans images disparates. Les photos d’illustration ne sont jamais présentées comme des membres (crédits dans le pied de page de l’accueil).

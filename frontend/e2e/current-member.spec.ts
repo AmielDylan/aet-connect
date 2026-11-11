@@ -21,7 +21,7 @@ test("après déconnexion, le membre suivant ne voit rien du précédent", async
 
   await login(page, first.email)
   await page.goto('/dashboard/codes')
-  await expect(page.getByText(firstCode)).toBeVisible()
+  await expect(page.getByText(firstCode, { exact: true }).first()).toBeVisible()
   await logout(page)
 
   // Reconnexion dans le même onglet, sans rechargement : seul le cache pourrait trahir le précédent

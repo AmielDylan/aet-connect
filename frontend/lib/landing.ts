@@ -43,6 +43,8 @@ export type Photo = {
   licenceUrl?: string
   page?: string
   note?: string
+  /** Centre de la bulle dessinée sur la photo, en % de sa largeur et de sa hauteur (voir PhotoFrame) */
+  bulle?: { x: number; y: number }
 }
 
 const PD = 'https://creativecommons.org/publicdomain/mark/1.0/'
@@ -118,6 +120,7 @@ export const PHOTOS = {
     src: '/images/accueil/parcours-code.jpg', width: 1312, height: 816,
     alt: 'Un officier en tenue de cérémonie sourit en lisant un message sur son téléphone, sous des arcades blanches',
     caption: 'Image d’illustration générée',
+    bulle: { x: 57, y: 39.7 },
     by: 'Image générée par IA pour AET Connect', licence: 'Personnages imaginaires',
   },
   parcoursAccueil: {

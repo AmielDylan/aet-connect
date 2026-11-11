@@ -1,248 +1,193 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+// « Mes codes » · proposition B « Le bandeau » : dans la continuité de l'accueil de l'espace, un bandeau vert avec
+// l'officier qui reçoit un code (la bulle porte votre dernier code), puis les codes en attente et ceux qui ont rejoint.
+import { useState } from 'react'
+import Link from 'next/link'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import { apiClient } from '@/lib/api'
 import { useAuth } from '@/hooks/use-auth'
-import { GenerateCodeDialog } from '@/components/codes/generate-code-dialog'
-import { CodeCard } from '@/components/codes/code-card'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, AlertCircle, Info } from 'lucide-react'
+import { PHOTOS } from '@/lib/landing'
+import { PhotoFrame } from '@/components/landing/photo-frame'
+import { Portrait } from '@/components/espace/portrait'
+import { CreationAdmin, Partage, Revoquer, dateLongue, etatCode } from '@/components/espace/codes'
 
-export default function CodesPage() {
+const N = ' '
+const titre2 = 'font-titre text-xl font-semibold tracking-[-0.02em] text-vert'
+
+export default function MesCodes() {
   const { user } = useAuth()
+  const queryClient = useQueryClient()
+  const isAdmin = user?.role === 'admin'
+  const [nouveau, setNouveau] = useState<string | null>(null)
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['my-codes'],
-    queryFn: () => apiClient.getMyCodes(),
+  const { data, isLoading, isError } = useQuery({ queryKey: ['my-codes'], queryFn: () => apiClient.getMyCodes() })
+  const { data: historique } = useQuery({ queryKey: ['codes-history'], queryFn: () => apiClient.getCodesHistory() })
+
+  const creer = useMutation({
+    mutationFn: () => apiClient.generateCode(),
+    onSuccess: (r) => {
+      setNouveau(r.code)
+      queryClient.invalidateQueries({ queryKey: ['my-codes'] })
+    },
   })
 
-  const { data: historyData, isLoading: historyLoading } = useQuery({
-    queryKey: ['codes-history'],
-    queryFn: () => apiClient.getCodesHistory(),
-  })
+  if (!user) return null
 
-  const allCodes = data?.codes || []
-  const history = historyData?.codes || []
-  
-  // Statut et quota calculés par le backend (module Code d'invitation)
-  const activeCodes = allCodes.filter((code) => code.status === 'valid')
-  const usedCodesCount = allCodes.filter((code) => code.status === 'exhausted').length
   const quota = data?.quota
-  const isLimitReached = quota?.remaining === 0
-
-  // Mapper les codes actifs pour extraire school_name et entry_year
-  const mappedCodes = activeCodes.map((code: any) => {
-    // Le backend retourne schools: { name_fr } dans la relation
-    // On doit extraire ces données
-    const schoolName = code.schools?.name_fr || 'Non spécifiée'
-    const entryYear = code.entry_year || user?.entry_year || 'N/A'
-    
-    return {
-      ...code,
-      id: code.id || code.code, // Utiliser code comme id si id n'existe pas
-      schoolName,
-      entryYear,
-    }
-  })
+  const codes = [...(data?.codes ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))
+  const enAttente = codes.filter((c) => c.status === 'valid')
+  const sansSuite = codes.filter((c) => c.status === 'expired' || c.status === 'revoked')
+  const rejoints = (historique?.codes ?? []).filter((h) => h.used_by)
+  const illimite = quota?.limit === null
+  const plusAucune = !!quota && !illimite && quota.remaining === 0
+  const notrePromo = (schoolId: string, annee: string) => schoolId === user.school_id && annee === user.entry_year
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Mes codes d'invitation</h1>
-            <p className="text-muted-foreground">
-              {!quota
-                ? ''
-                : quota.limit === null
-                  ? `${allCodes.length} code${allCodes.length > 1 ? 's' : ''} émis`
-                  : `${quota.remaining} invitation${(quota.remaining ?? 0) > 1 ? 's' : ''} disponible${(quota.remaining ?? 0) > 1 ? 's' : ''} sur ${quota.limit}`
-              }
-            </p>
-          </div>
-          <GenerateCodeDialog />
+    <div>
+      {/* Bandeau : coin haut droit exagéré, la photo lui est concentrique ; la bulle porte le dernier code en attente */}
+      <section className="sur-vert trame trame-sur-vert grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:grid-cols-[1.1fr_1fr] md:items-start md:rounded-tr-[76px]">
+        <div className="flex flex-col justify-center gap-6 self-stretch px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
+          <h1 className="font-titre text-[clamp(2rem,3.4vw,2.8rem)] font-bold leading-[1.05] tracking-[-0.03em]">Vos invitations</h1>
+          {isAdmin ? (
+            <div className="sur-creme rounded-2xl bg-creme p-5 text-encre">
+              <CreationAdmin onCree={setNouveau} />
+            </div>
+          ) : (
+            quota && (
+              <div className="grid gap-3">
+                {plusAucune ? (
+                  <p className="text-lg leading-relaxed text-brume">
+                    Vos {quota.limit} invitations sont en cours ou utilisées. Un code qui expire ou que vous révoquez sans qu’il ait servi vous en rend
+                    une.
+                    {user.role === 'alumni' && !user.is_ambassador && ' Les ambassadeurs de promo en ont 15.'}
+                  </p>
+                ) : (
+                  <p className="text-lg leading-relaxed text-brume">
+                    {illimite ? (
+                      'Vous pouvez créer autant de codes que nécessaire.'
+                    ) : (
+                      <>
+                        Il vous reste <span className="font-semibold text-or">{quota.remaining}</span> {quota.remaining === 1 ? 'invitation' : 'invitations'}{' '}
+                        sur {quota.limit}.
+                      </>
+                    )}{' '}
+                    Un code sert une seule fois et reste valable 30 jours.
+                  </p>
+                )}
+                {!illimite && quota.limit !== null && quota.limit > 0 && (
+                  <span className="flex max-w-xs gap-1.5" aria-hidden="true">
+                    {Array.from({ length: quota.limit }, (_, i) => (
+                      <span key={i} className={`h-2 flex-1 rounded-full ${i < quota.used ? 'bg-or' : 'bg-creme/25'}`} />
+                    ))}
+                  </span>
+                )}
+                {!plusAucune && (
+                  <button
+                    type="button"
+                    onClick={() => creer.mutate()}
+                    disabled={creer.isPending}
+                    className="mt-3 inline-flex min-h-12 items-center justify-center gap-2 justify-self-start rounded-full bg-creme px-7 text-base font-semibold text-vert transition-colors duration-200 hover:bg-white disabled:opacity-60"
+                  >
+                    {creer.isPending && <Loader2 className="size-[18px] animate-spin" aria-hidden="true" />}
+                    Créer un code
+                  </button>
+                )}
+                {creer.isError && (
+                  <p role="alert" className="text-base font-semibold text-or">
+                    Le code n’a pas pu être créé. Vous pouvez réessayer dans un instant.
+                  </p>
+                )}
+              </div>
+            )
+          )}
         </div>
+        <div className="md:m-3">
+          <PhotoFrame
+            photo={PHOTOS.parcoursCode}
+            sizes="(min-width: 768px) 40vw, 100vw"
+            className="aspect-[1312/816] md:rounded-[1.25rem] md:rounded-tr-[64px]"
+            bulle={enAttente[0]?.code ?? nouveau ?? undefined}
+          />
+        </div>
+      </section>
 
-        {/* Info alert */}
-        <Alert>
-          <Info className="h-4 w-4" />
-          <AlertTitle>Comment ça marche ?</AlertTitle>
-          <AlertDescription>
-            Générez des codes pour inviter des membres de votre école et promotion.
-            Chaque code sert à une seule inscription et reste valable 30 jours.
-            Un code expiré ou révoqué sans avoir servi vous rend sa place.
-            Partagez-les par email, WhatsApp ou SMS.
-          </AlertDescription>
-        </Alert>
-
-        {/* Limite atteinte */}
-        {isLimitReached && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Limite atteinte</AlertTitle>
-            <AlertDescription>
-              Vos {quota?.limit} invitations sont en cours ou utilisées.
-              Révoquez un code non utilisé, ou attendez qu&apos;un code expire.
-              {user?.role === 'alumni' && !user?.is_ambassador && (
-                <> Contactez un administrateur pour devenir ambassadeur et augmenter votre limite.</>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Onglets */}
-        <Tabs defaultValue="active" className="w-full">
-          <TabsList>
-            <TabsTrigger value="active">Actifs ({activeCodes.length})</TabsTrigger>
-            <TabsTrigger value="history">Historique ({history.length})</TabsTrigger>
-          </TabsList>
-
-          {/* Onglet Actifs */}
-          <TabsContent value="active" className="space-y-6">
-            {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
-            ) : error ? (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Erreur</AlertTitle>
-                <AlertDescription>
-                  Impossible de charger vos codes d'invitation
-                </AlertDescription>
-              </Alert>
-            ) : activeCodes.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground mb-4">
-                  {usedCodesCount > 0 
-                    ? 'Tous vos codes ont été utilisés' 
-                    : 'Vous n\'avez pas encore généré de code d\'invitation'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Cliquez sur "Générer un code" pour commencer
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mappedCodes.map((code: any) => (
-                  <CodeCard
-                    key={code.id || code.code}
-                    code={code}
-                    schoolName={code.schoolName}
-                    entryYear={code.entryYear}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Onglet Historique */}
-          <TabsContent value="history" className="space-y-4">
-            {historyLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
-            ) : history.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                Aucun code utilisé pour le moment
-              </div>
-            ) : (
-              <>
-                {/* Version desktop */}
-                <div className="hidden md:block border rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-muted">
-                      <tr className="text-left text-sm">
-                        <th className="px-4 py-3 font-medium">Code</th>
-                        <th className="px-4 py-3 font-medium">École • Promotion</th>
-                        <th className="px-4 py-3 font-medium">Utilisé par</th>
-                        <th className="px-4 py-3 font-medium">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {history.map((code: any) => (
-                        <tr 
-                          key={code.id} 
-                          className="hover:bg-muted/50 transition-colors text-sm"
-                        >
-                          <td className="px-4 py-3">
-                            <code className="font-mono font-semibold">
-                              {code.code}
-                            </code>
-                          </td>
-                          <td className="px-4 py-3 text-muted-foreground">
-                            {code.school_name} • Promo {code.entry_year}
-                          </td>
-                          <td className="px-4 py-3">
-                            {code.used_by ? (
-                              <div>
-                                <p className="font-medium">
-                                  {code.used_by.first_name} {code.used_by.last_name}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {code.used_by.email}
-                                </p>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-muted-foreground">
-                            {new Date(code.used_at).toLocaleDateString('fr-FR', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              year: 'numeric',
-                            })}
-                            <br />
-                            <span className="text-xs">
-                              {new Date(code.used_at).toLocaleTimeString('fr-FR', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Version mobile */}
-                <div className="md:hidden space-y-2">
-                  {history.map((code: any) => (
-                    <div key={code.id} className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <code className="font-mono font-semibold">{code.code}</code>
-                        <Badge variant="secondary">Utilisé</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {code.school_name} • Promo {code.entry_year}
-                      </p>
-                      {code.used_by && (
-                        <div className="text-sm">
-                          <p className="font-medium">
-                            {code.used_by.first_name} {code.used_by.last_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {code.used_by.email}
-                          </p>
-                        </div>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(code.used_at).toLocaleString('fr-FR')}
-                      </p>
+      <div className="mt-14 grid gap-10 lg:grid-cols-[1.2fr_1fr]">
+        <section aria-labelledby="attente">
+          <h2 id="attente" className={titre2}>
+            En attente
+          </h2>
+          {isLoading ? (
+            <div className="mt-5 h-40 animate-pulse rounded-3xl bg-sable/60" aria-hidden="true" />
+          ) : isError ? (
+            <p className="mt-4 text-base text-olive">Vos codes n’ont pas pu être chargés. Vous pouvez recharger la page dans un instant.</p>
+          ) : enAttente.length === 0 ? (
+            <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-olive">
+              Aucun code en attente.{' '}
+              {plusAucune ? '' : `Avec «${N}Créer un code${N}», vous pouvez inviter un collègue de votre promo.`}
+            </p>
+          ) : (
+            <ul className="mt-5 grid gap-3">
+              {enAttente.map((c) => {
+                const frais = c.code === nouveau
+                return (
+                  <li key={c.id} className={`rounded-3xl bg-white p-5 sm:p-6 ${frais ? 'ring-2 ring-terre' : ''}`}>
+                    {frais && <p className="mb-1 text-sm text-terre">Votre nouveau code est prêt</p>}
+                    <p className="font-titre text-2xl font-bold tracking-[0.04em] text-vert">{c.code}</p>
+                    <p className="mt-1 text-base text-olive">
+                      {isAdmin && (c.schools?.name_fr ? `${c.schools.name_fr} · promo ${c.entry_year} · ` : 'Code universel · ')}
+                      {etatCode(c)}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+                      <Partage c={c} notrePromo={notrePromo(c.school_id, c.entry_year)} />
+                      {c.current_uses === 0 && <Revoquer c={c} />}
                     </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </TabsContent>
-        </Tabs>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+          {sansSuite.length > 0 && (
+            <ul className="mt-5 grid gap-1 text-base text-olive">
+              {sansSuite.slice(0, 5).map((c) => (
+                <li key={c.id}>
+                  <span className="tracking-[0.04em]">{c.code}</span> · {etatCode(c).toLowerCase()}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section aria-labelledby="rejoints">
+          <h2 id="rejoints" className={titre2}>
+            Ils ont rejoint grâce à vous
+          </h2>
+          {rejoints.length === 0 ? (
+            <p className="mt-4 max-w-[46ch] text-base leading-relaxed text-olive">
+              Personne n’a encore utilisé vos codes. Dès qu’un collègue s’inscrit avec l’un d’eux, il apparaît ici.
+            </p>
+          ) : (
+            <ul className="mt-5 grid grid-cols-3 gap-3">
+              {rejoints.map((h) => (
+                <li key={h.id}>
+                  <Link href={`/profile/${h.used_by!.id}`} className="group block">
+                    <Portrait
+                      prenom={h.used_by!.first_name}
+                      nom={h.used_by!.last_name}
+                      className="aspect-square w-full rounded-2xl bg-sable text-2xl text-vert transition-colors duration-200 group-hover:bg-vert group-hover:text-creme"
+                    />
+                    <span className="mt-2 block text-sm text-encre group-hover:text-terre">
+                      {h.used_by!.first_name} {h.used_by!.last_name}
+                    </span>
+                    <span className="block text-sm text-olive">le {dateLongue(h.used_at)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   )
 }
-
