@@ -726,29 +726,8 @@ class ApiClient {
     if (params.limit) searchParams.append('limit', params.limit.toString())
     if (params.offset) searchParams.append('offset', params.offset.toString())
 
-    const response = await this.fetch<{ users: User[]; total: number }>(
-      `/api/users?${searchParams.toString()}`
-    )
-    
-    // Mapper User[] vers DirectoryMember[]
-    const members: DirectoryMember[] = response.users.map((user) => ({
-      id: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      avatar_url: user.avatar_url,
-      school_name: user.school?.name_fr || 'Non spécifiée',
-      entry_year: user.entry_year || 'N/A',
-      current_city: user.current_city,
-      current_country: user.current_country,
-      is_ambassador: user.is_ambassador,
-      bio: user.bio,
-    }))
-
-    return {
-      users: members,
-      total: response.total,
-    }
+    // L'API renvoie déjà les membres sous la forme de l'annuaire (école en objet, champs masqués à null)
+    return this.fetch<{ users: DirectoryMember[]; total: number }>(`/api/users?${searchParams.toString()}`)
   }
 
   /**
