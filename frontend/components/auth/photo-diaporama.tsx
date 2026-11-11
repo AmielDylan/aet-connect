@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
-import { Pause, Play } from 'lucide-react'
 import type { Photo } from '@/lib/landing'
 
 type Slide = { photo: Photo; position: string }
@@ -18,7 +17,7 @@ const usePrefersReducedMotion = () =>
   useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED).matches, () => false)
 
 // Diaporama de photos d'illustration : fondu toutes les 6 s, légende courte et factuelle.
-// Il s'arrête au survol, au focus et par le bouton pause (WCAG 2.2.2) ; immobile en mouvement réduit.
+// Il s'arrête au survol, au focus et dès qu'on choisit une photo (WCAG 2.2.2) ; immobile en mouvement réduit.
 export function PhotoDiaporama({
   slides,
   className = '',
@@ -51,7 +50,7 @@ export function PhotoDiaporama({
       onMouseLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
       onBlur={() => setHeld(false)}
-      className={`photo-cadre relative overflow-hidden bg-sable ${className}`}
+      className={`photo-cadre group relative overflow-hidden bg-sable ${className}`}
     >
       {slides.map((slide, i) => (
         <div
@@ -71,38 +70,37 @@ export function PhotoDiaporama({
         </div>
       ))}
 
-      {/* Légende, écrite en petit */}
-      <p className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] rounded-full bg-creme/95 px-3 py-1.5 text-xs text-olive">
-        {current.photo.caption}
-      </p>
-
       {children}
 
-      {/* Repères et pause */}
-      {slides.length > 1 && (
-        <div className="absolute bottom-3 right-3 flex items-center gap-0.5 rounded-full bg-creme/95 p-1 sm:gap-1">
-          {slides.map((slide, i) => (
-            <button
-              key={slide.photo.src}
-              type="button"
-              onClick={() => setIndex(i)}
-              aria-label={`Photo ${i + 1} sur ${slides.length}`}
-              aria-current={i === index}
-              className="grid size-6 place-items-center rounded-full sm:size-8"
-            >
-              <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === index ? 'w-4 bg-vert sm:w-5' : 'w-1.5 bg-trait'}`} />
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => setPaused((p) => !p)}
-            aria-label={paused ? 'Reprendre le diaporama' : 'Mettre le diaporama en pause'}
-            className="grid size-6 place-items-center rounded-full text-vert transition-colors hover:bg-white motion-reduce:hidden sm:size-8"
-          >
-            {paused ? <Play className="size-3.5" aria-hidden="true" /> : <Pause className="size-3.5" aria-hidden="true" />}
-          </button>
-        </div>
-      )}
+      {/* Légende et repères, en bas à droite. La légende apparaît au survol sur ordinateur, reste visible sur mobile. */}
+      <div className="absolute bottom-3 right-4 flex max-w-[calc(100%-11rem)] flex-col items-end gap-1.5 lg:max-w-[60%]">
+        <p className="text-right text-xs leading-snug text-creme [text-shadow:0_0_2px_rgb(0_0_0/0.9),0_1px_8px_rgb(0_0_0/0.8)] transition-opacity duration-300 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+          {current.photo.caption}
+        </p>
+        {slides.length > 1 && (
+          <div className="flex items-center">
+            {slides.map((slide, i) => (
+              <button
+                key={slide.photo.src}
+                type="button"
+                onClick={() => {
+                  setIndex(i)
+                  setPaused(true) // choisir une photo arrête le défilement automatique (WCAG 2.2.2)
+                }}
+                aria-label={`Photo ${i + 1} sur ${slides.length}`}
+                aria-current={i === index}
+                className="grid size-6 place-items-center"
+              >
+                <span
+                  className={`block h-1 rounded-full shadow-[0_0_6px_rgb(0_0_0/0.45)] transition-all duration-300 ${
+                    i === index ? 'w-4 bg-creme' : 'w-1 bg-creme/55'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   )
 }

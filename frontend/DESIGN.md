@@ -203,9 +203,10 @@ Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au 
 - En dessous, les deux chemins pour qui n'est pas encore membre, chaque lien seul sur sa ligne.
 
 ### Diaporama (`PhotoDiaporama`)
-- Quatre photos d'illustration en noir et blanc, en fondu toutes les 6 s, chacune avec une légende courte et factuelle (scène, lieu, année : jamais l'identité des personnes), écrite en petit dans une pastille crème en haut à gauche.
-- Repères cliquables et bouton pause en bas à droite ; il s'arrête au survol et au focus ; immobile en mouvement réduit (WCAG 2.2.2).
-- Sur la connexion, il porte le cartouche « AET un jour, AET toujours » en bas à gauche (le texte disparaît sous 360px, le soleil reste).
+- Quatre photos d'illustration en noir et blanc, en fondu toutes les 6 s.
+- En bas à droite, discrets : la légende (scène, lieu, année ; jamais l'identité des personnes), en petit texte crème avec une ombre portée, sans pastille, juste au-dessus des repères. Sur ordinateur, la légende n'apparaît qu'au survol ou au focus ; sur mobile, elle reste visible.
+- Repères : de simples points crème posés sur la photo, un court trait pour la photo active. Pas de bouton pause : le défilement s'arrête au survol, au focus et dès qu'on choisit une photo, et reste immobile en mouvement réduit (WCAG 2.2.2).
+- Sur la connexion, un petit cartouche « AET un jour, AET toujours » en bas à gauche (le texte disparaît sous 360px, le soleil reste).
 
 ### Page de connexion
 Proposition « Le portrait » choisie par le client : sur ordinateur, le diaporama encadré à gauche (coin haut-droit à 72px), le formulaire à droite sur crème et trame ; sur mobile, le formulaire d'abord, le diaporama dessous, pour que la photo ne prenne pas le pas sur le formulaire.
