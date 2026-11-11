@@ -20,7 +20,7 @@ export function SchoolsBand({ schools }: { schools: LandingSchool[] }) {
           <span className="whitespace-nowrap px-6 text-xl font-semibold tracking-[-0.01em] text-creme font-titre sm:text-2xl">
             {s.acronym} <span className="font-normal text-brume">{s.city}</span>
           </span>
-          <Soleil className="size-6" petales="fill-creme/70" coeur="fill-or" />
+          <Soleil className="size-6" petales="fill-creme/70" coeur="fill-terre" />
         </li>
       ))}
     </ul>

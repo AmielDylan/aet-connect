@@ -30,7 +30,6 @@
   --color-vert-carte: var(--esp-vert-carte);
   --color-or: var(--esp-or);
   --color-terre: var(--esp-terre);
-  --color-terre-fonce: var(--esp-terre-fonce);
   --color-creme: var(--esp-creme);
   --color-sable: var(--esp-sable);
   --color-trait: var(--esp-trait);
@@ -88,7 +87,6 @@
   --esp-vert-carte: #24452F;
   --esp-or:         #FFC000; /* les actions : texte des boutons verts (7,48:1), carte mise en avant */
   --esp-terre:      #8B4A1E;
-  --esp-terre-fonce: #6B3613; /* survol d'un lien sur l'or : 5,92:1 (le brun-roux n'y fait que 4,13:1) */
   --esp-creme:      #F4EEE2;
   --esp-sable:      #DDD2BB;
   --esp-trait:      #7A887D; /* contour des champs : 3,2:1 sur crème, 3,7:1 sur blanc */
@@ -313,3 +311,4 @@
   .defile-ecoles > ul { flex-wrap: wrap; justify-content: center; row-gap: 0.75rem; }
   .defile-ecoles > ul[aria-hidden='true'] { display: none; }
 }
+

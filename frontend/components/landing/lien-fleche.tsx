@@ -3,24 +3,11 @@ import { ArrowRight } from 'lucide-react'
 
 // Un lien d'action : couleur du texte au repos ; au survol ou au focus, il passe en brun-roux et une flèche
 // apparaît. La place de la flèche est réservée : rien ne bouge autour.
-// Sur la carte or, le brun-roux est assombri (terre-fonce) pour garder 4,5:1.
-export function LienFleche({
-  href,
-  children,
-  surOr = false,
-  className = '',
-}: {
-  href: string
-  children: React.ReactNode
-  surOr?: boolean
-  className?: string
-}) {
+export function LienFleche({ href, children, className = '' }: { href: string; children: React.ReactNode; className?: string }) {
   return (
     <Link
       href={href}
-      className={`group inline-flex min-h-11 items-center gap-1.5 font-semibold transition-colors duration-200 ${
-        surOr ? 'text-vert-nuit hover:text-terre-fonce focus-visible:text-terre-fonce' : 'text-encre hover:text-terre focus-visible:text-terre'
-      } ${className}`}
+      className={`group inline-flex min-h-11 items-center gap-1.5 text-encre transition-colors duration-200 hover:text-terre focus-visible:text-terre ${className}`}
     >
       {children}
       <ArrowRight

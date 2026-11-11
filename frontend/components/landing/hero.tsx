@@ -7,7 +7,7 @@ export function Hero() {
     <section className="sur-creme text-encre">
       <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-5 pb-16 pt-8 sm:px-8 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:pb-24 lg:pt-14">
         <div>
-          <h1 className="text-[clamp(2.1rem,4vw,3.4rem)] font-bold leading-[1.06] tracking-[-0.025em] text-vert text-balance font-titre">
+          <h1 className="text-[clamp(2.1rem,4vw,3.4rem)] font-bold leading-[1.14] tracking-[-0.015em] text-vert text-balance font-titre">
             Enfants de Troupe, une seule famille
           </h1>
           <p className="mt-6 max-w-[44ch] text-lg leading-relaxed text-olive text-pretty">
@@ -17,14 +17,14 @@ export function Hero() {
           <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a
               href="#rejoindre"
-              className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-vert px-6 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte"
+              className="group inline-flex min-h-12 items-center gap-2.5 rounded-full bg-vert px-6 text-base text-creme transition-colors duration-200 hover:bg-vert-carte"
             >
               Rejoindre ma promo
               <ArrowRight className="size-[18px] transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden="true" />
             </a>
             <a
               href="#parcours"
-              className="inline-flex min-h-11 items-center font-semibold text-encre decoration-terre decoration-2 underline-offset-[6px] transition-colors duration-200 hover:text-terre hover:underline focus-visible:text-terre"
+              className="inline-flex min-h-11 items-center text-encre decoration-terre decoration-2 underline-offset-[6px] transition-colors duration-200 hover:text-terre hover:underline focus-visible:text-terre"
             >
               Comment rejoindre
             </a>
