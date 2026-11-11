@@ -196,6 +196,20 @@ Aucune ombre. La profondeur vient de l'alternance des fonds, des cartes vert de 
 ### Photo frame (signature)
 Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au survol ou au focus, la couleur revient et la photo grossit de 3 % (700ms, cubic-bezier(0.16, 1, 0.3, 1)). Un cadre ne porte jamais de légende ; la provenance est dans les crédits du pied de page.
 
+### Formulaire de connexion (`LoginForm`)
+- Libellés visibles, champ email typé (`autocomplete="email"`, sans correcteur), mot de passe avec un bouton « Afficher / Masquer » (`aria-pressed`), « Mot de passe oublié ? » à côté du libellé.
+- Les erreurs s'affichent sous les champs (`role="alert"`), en français, sur un ton qui explique sans reprocher (« Il manque votre mot de passe », « Cet email et ce mot de passe ne correspondent à aucun compte… »). Jamais de toast pour une erreur de formulaire.
+- La redirection après connexion n'accepte qu'un chemin interne (`safeRedirect`).
+- En dessous, les deux chemins pour qui n'est pas encore membre, chaque lien seul sur sa ligne.
+
+### Diaporama (`PhotoDiaporama`)
+- Quatre photos d'illustration en noir et blanc, en fondu toutes les 6 s, chacune avec une légende courte et factuelle (scène, lieu, année : jamais l'identité des personnes), écrite en petit dans une pastille crème en haut à gauche.
+- Repères cliquables et bouton pause en bas à droite ; il s'arrête au survol et au focus ; immobile en mouvement réduit (WCAG 2.2.2).
+- Sur la connexion, il porte le cartouche « AET un jour, AET toujours » en bas à gauche (le texte disparaît sous 360px, le soleil reste).
+
+### Page de connexion
+Proposition « Le portrait » choisie par le client : sur ordinateur, le diaporama encadré à gauche (coin haut-droit à 72px), le formulaire à droite sur crème et trame ; sur mobile, le formulaire d'abord, le diaporama dessous, pour que la photo ne prenne pas le pas sur le formulaire.
+
 ### Cards / Containers
 - **Carte de parcours :** crème sur le fond vert (jamais vert sur vert), 12px de marge intérieure, une photo de 16:10 puis le titre vert, le texte olive et le lien, sans bloc encadré à l’intérieur. Les trois cartes ont la même couleur. Sur mobile, l’image reste en haut pour les trois cartes. À partir de 768px, celle du milieu inverse l’ordre (texte d’abord, photo ensuite) pour le rythme.
 
