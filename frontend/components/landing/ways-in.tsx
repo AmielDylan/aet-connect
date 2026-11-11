@@ -6,8 +6,8 @@ type Way = { title: string; text: string; action: string; href: string; photo: P
 
 const WAYS: Way[] = [
   {
-    title: 'Un ancien vous a envoyé un code',
-    text: 'Saisissez-le : il vous rattache directement à la promo de l’ancien qui vous l’a envoyé.',
+    title: 'Un collègue de promotion vous a envoyé un code',
+    text: 'Saisissez-le : il vous rattache directement à votre promotion.',
     action: 'Entrer mon code',
     href: '/register/with-code',
     photo: PHOTOS.ceremonie,
