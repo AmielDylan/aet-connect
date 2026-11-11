@@ -27,9 +27,9 @@ export function schoolFacts(schools: LandingSchool[]) {
   }
 }
 
-// Photographies d'illustration, sous licence libre (Wikimedia Commons).
-// Ce sont de vrais soldats et officiers des pays des écoles, jamais présentés comme des membres
-// d'AET Connect : elles seront remplacées par les photos de l'association.
+// Photographies d'illustration, sous licence libre (Wikimedia Commons), et images générées pour les parcours.
+// Ce sont de vrais soldats et officiers des pays des écoles, ou des personnages imaginaires, jamais présentés
+// comme des membres d'AET Connect : elles seront remplacées par les photos de l'association.
 export type Photo = {
   src: string
   width: number
@@ -39,8 +39,9 @@ export type Photo = {
   caption: string
   by: string
   licence: string
-  licenceUrl: string
-  page: string
+  /** Absents pour une image générée : il n'y a ni licence à citer ni page source */
+  licenceUrl?: string
+  page?: string
   note?: string
 }
 
@@ -105,18 +106,30 @@ export const PHOTOS = {
     by: 'Spc. Britany Slessman', licence: 'Domaine public', licenceUrl: PD,
     page: 'https://commons.wikimedia.org/wiki/File:Flintlock_2017_closing_ceremony_in_Burkina_Faso_170316-A-ZF167-018.jpg',
   },
-  ecusson: {
-    src: '/images/accueil/ecusson.jpg', width: 1600, height: 1066,
-    alt: 'Gros plan sur l’écusson du Gabon cousu sur la manche d’un uniforme',
-    caption: 'Écusson du Gabon sur un uniforme',
-    by: 'U.S. Army, Sgt. 1st Class Andrew Mallett', licence: 'Domaine public', licenceUrl: PD,
-    page: 'https://commons.wikimedia.org/wiki/File:African_Lion_partner_nations_participate_in_an_academics_graduation_(9042937).jpg',
-  },
   defile: {
     src: '/images/accueil/defile.jpg', width: 1600, height: 1066,
     alt: 'Un officier nigérien défile en gants blancs devant les troupes alignées',
     caption: 'Cérémonie d’ouverture, Niger, 2018',
     by: 'USAFRICOM', licence: 'CC BY 2.0', licenceUrl: 'https://creativecommons.org/licenses/by/2.0/',
     page: 'https://commons.wikimedia.org/wiki/File:Flintlock_2018_Opening_Ceremony_(27523527268).jpg',
+  },
+  // Images générées (« Trois façons de rejoindre votre promo ») : des personnages imaginaires
+  parcoursCode: {
+    src: '/images/accueil/parcours-code.jpg', width: 1312, height: 816,
+    alt: 'Un officier en tenue de cérémonie sourit en lisant un message sur son téléphone, sous des arcades blanches',
+    caption: 'Image d’illustration générée',
+    by: 'Image générée par IA pour AET Connect', licence: 'Personnages imaginaires',
+  },
+  parcoursAccueil: {
+    src: '/images/accueil/parcours-accueil.jpg', width: 1586, height: 992,
+    alt: 'Une femme traverse une place d’armes vers des collègues en uniforme qui l’accueillent à bras ouverts',
+    caption: 'Image d’illustration générée',
+    by: 'Image générée par IA pour AET Connect', licence: 'Personnages imaginaires',
+  },
+  parcoursSalle: {
+    src: '/images/accueil/parcours-salle.jpg', width: 1586, height: 992,
+    alt: 'Un homme, son paquetage à l’épaule, entre dans une grande salle vide et lumineuse',
+    caption: 'Image d’illustration générée',
+    by: 'Image générée par IA pour AET Connect', licence: 'Personnages imaginaires',
   },
 } satisfies Record<string, Photo>

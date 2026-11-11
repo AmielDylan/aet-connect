@@ -8,12 +8,15 @@ export function PhotoFrame({
   position = 'center',
   sizes,
   priority = false,
+  children,
 }: {
   photo: Photo
   className?: string
   position?: string
   sizes: string
   priority?: boolean
+  /** Ce qui se pose sur la photo (une bulle, une légende) */
+  children?: React.ReactNode
 }) {
   return (
     <div className={`photo-cadre relative overflow-hidden bg-sable ${className}`}>
@@ -26,6 +29,7 @@ export function PhotoFrame({
         className="photo-nb object-cover"
         style={{ objectPosition: position }}
       />
+      {children}
     </div>
   )
 }
