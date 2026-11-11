@@ -14,7 +14,7 @@ const USES = [
   },
   {
     title: 'Entre anciens seulement',
-    text: 'Chaque membre a été invité par un ancien de sa promo ou validé par un administrateur : l’annuaire ne réunit que de vrais anciens.',
+    text: 'Chaque membre a été invité par un collègue de sa promotion ou validé par un administrateur : l’annuaire ne réunit que de vrais anciens.',
   },
 ]
 

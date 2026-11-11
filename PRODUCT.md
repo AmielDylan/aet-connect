@@ -18,13 +18,13 @@ Rôles dans le produit : membre (alumni), ambassadeur de promo (invite davantage
 
 ## Product Purpose
 
-AET Connect est l'annuaire panafricain des Anciens Enfants de Troupe : un réseau fermé où l'on n'entre que par un ancien qui vous connaît. Il permet de rejoindre sa promo, de retrouver et de joindre d'autres anciens tout en gardant la main sur ce que l'on montre de soi.
+AET Connect est l'annuaire panafricain des Anciens Enfants de Troupe : un réseau fermé que l'on rejoint sur l'invitation d'un collègue de sa promotion. Il permet de rejoindre sa promo, de retrouver et de joindre d'autres anciens tout en gardant la main sur ce que l'on montre de soi.
 
 Le succès : un ancien qui s'inscrit retrouve des membres de sa promo, et un membre qui cherche quelqu'un dans une ville ou un pays le trouve et peut le joindre.
 
 ## Positioning
 
-Ce que ni un groupe WhatsApp ni LinkedIn ne peuvent revendiquer : **la confiance par la promo**. Chaque membre a été invité par un ancien de sa propre promo (ou validé par un administrateur pour le premier de sa promo), via un code d'invitation à usage unique et limité dans le temps. L'annuaire ne contient donc que d'authentiques anciens, rangés par école et par promo, et chacun décide de ce qu'il rend visible.
+Ce que ni un groupe WhatsApp ni LinkedIn ne peuvent revendiquer : **la confiance par la promo**. Chaque membre a été invité par un collègue de sa propre promotion (ou validé par un administrateur pour le premier de sa promo), via un code d'invitation à usage unique et limité dans le temps. L'annuaire ne contient donc que d'authentiques anciens, rangés par école et par promo, et chacun décide de ce qu'il rend visible.
 
 ## Operating Context
 
@@ -39,6 +39,7 @@ Ce que ni un groupe WhatsApp ni LinkedIn ne peuvent revendiquer : **la confiance
 - Application web Next.js 16 (React 19, Tailwind CSS 4, composants shadcn/Radix) + API Express + Supabase (Auth, Postgres, Storage pour les avatars). Déploiement Vercel (frontend) et Railway (API).
 - Interface **en français**. Réseau sur invitation : aucune inscription publique ; annuaire et profils réservés aux membres connectés.
 - Termes du domaine à employer tels quels : AET, ancien, promo, école, ambassadeur, code d'invitation, demande d'accès, annuaire.
+- L'invitation vient d'un **collègue de promotion** (les membres d'une même promo s'invitent entre eux), pas « d'un ancien » en général : « Un collègue de promotion vous a envoyé un code ». « Ancien » désigne les membres du réseau.
 - **Décisions ouvertes** :
   - appareils et contexte d'usage réels des membres (mobile ou ordinateur, connexions en Afrique ou dans la diaspora) : inconnus à ce jour ;
   - **événements** : l'API existe (création, inscription) mais aucun écran ne l'expose ; leur place dans le produit n'est pas décidée ;
