@@ -227,6 +227,10 @@ Proposition « La photo de promo » choisie par le client : la photo de groupe e
 - **Confirmé :** une pastille verte (« Code valable · PMB, promo 2005 ») plutôt qu'une alerte.
 - **Honnêteté :** chaque écran final ne promet que ce qui se passe réellement (compte créé et utilisable tout de suite ; demande transmise à l'équipe, qui écrira à l'adresse indiquée). Aucune route publique ne révèle un membre.
 
+### Espace membre (`/dashboard`, proposition « La photo de promo »)
+L'en-tête de l'accueil, sans barre latérale : la marque, Accueil · Annuaire · Mes codes · Écoles (soulignement terre sur la page courante), « Administration » en menu déroulant avec le nombre de demandes en attente pour les administrateurs, puis la loupe et le compte (photo ou initiales, « Mon profil », « Se déconnecter »). La loupe ouvre une fenêtre de recherche (`<dialog>` natif, aussi ⌘K) ; sous lg, la recherche est en tête du panneau vert du menu. Une année dans la recherche (« promo 2005 ») devient le filtre de promo.
+Accueil : un bandeau vert (coin haut droit 76px, la photo dedans 64px avec 12px de marge : concentriques), le trombinoscope des derniers arrivés de la promo (initiales sur sable quand il n'y a pas de photo), « Vos invitations » et « Votre profil » en panneaux blancs, puis « Au-delà de votre promo » sur sable avec deux grands chiffres. Un lien aligné sur un bord garde sa flèche visible (`LienFleche visible`). Pied de page vert de nuit simple, commun à toutes les pages de l'espace.
+
 ### Soleil aux neuf pétales (signature)
 - **Le dessin :** neuf pétales, un par école, symétriques, qui s'élargissent vers l'extérieur et ondulent chacun à sa façon. Aucune rotation d'ensemble : le soleil ne doit jamais évoquer une roue tournante. Le cœur est légèrement irrégulier, comme découpé aux ciseaux. Il est généré par `scripts/motifs.mjs` dans `lib/soleil.ts`.
 - **Les usages :**
@@ -246,7 +250,7 @@ Proposition « La photo de promo » choisie par le client : la photo de groupe e
 Vert de nuit avec la trame. En haut, le soleil, la phrase « Annuaire panafricain des Anciens Enfants de Troupe » et les liens, crème au repos, or et soulignés au survol. Au milieu, « AET Connect » en Unbounded sur toute la largeur du conteneur (clamp(1.75rem, 11.2vw, 9.7rem), 93 à 99 % de la largeur, sans débordement dès 320px), « Connect » en or. Dessous, les crédits photo repliés.
 
 ### Bandeau des écoles
-Sigles et villes des écoles réelles sur le vert, en Unbounded, séparés par de petits soleils. Il défile en boucle (45s), se met en pause au survol et par un bouton (WCAG 2.2.2). Avec le mouvement réduit activé, il est immobile et montre toutes les écoles sur plusieurs lignes.
+Sigles et villes des écoles réelles sur le vert, en Unbounded, chacun suivi du drapeau de son pays (`Drapeau`, SVG 3:2 : les emoji de drapeau ne s'affichent pas sous Windows ; le drapeau porte le nom du pays pour les lecteurs d'écran), séparés par de petits soleils avec un large espace. Il défile en boucle (45s), se met en pause au survol et par un bouton (WCAG 2.2.2). Avec le mouvement réduit activé, il est immobile et montre toutes les écoles sur plusieurs lignes.
 
 ### Motion
 - Le moment d'entrée : les cadres de la mosaïque s'ouvrent du bas vers le haut (clip-path, 1000ms, 130ms d'écart).

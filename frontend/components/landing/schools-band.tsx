@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Pause, Play } from 'lucide-react'
 import { realSchools, type LandingSchool } from '@/lib/landing'
 import { Soleil } from './soleil'
+import { Drapeau } from './drapeau'
 
 // Le bandeau des écoles : chaque sigle et sa ville, séparés par un petit soleil.
 // La liste est doublée pour boucler sans couture ; la copie est cachée aux lecteurs d'écran.
@@ -17,8 +18,9 @@ export function SchoolsBand({ schools }: { schools: LandingSchool[] }) {
     <ul className="flex shrink-0 items-center" aria-hidden={hidden || undefined}>
       {list.map((s) => (
         <li key={s.id} className="flex items-center">
-          <span className="whitespace-nowrap px-6 text-xl font-semibold tracking-[-0.01em] text-creme font-titre sm:text-2xl">
+          <span className="flex items-center gap-2.5 whitespace-nowrap px-10 text-xl font-semibold tracking-[-0.01em] text-creme font-titre sm:text-2xl">
             {s.acronym} <span className="font-normal text-brume">{s.city}</span>
+            <Drapeau pays={s.country} className="h-[0.7em] w-auto ring-1 ring-creme/25" />
           </span>
           <Soleil className="size-6" petales="fill-creme/70" coeur="fill-terre" />
         </li>

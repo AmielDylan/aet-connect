@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import { SearchBar } from '@/components/directory/search-bar'
@@ -14,19 +15,30 @@ import type { DirectoryFilters, ViewMode } from '@/types/directory'
 
 const MEMBERS_PER_PAGE = 20
 
+// useSearchParams exige une frontière Suspense (sinon le build de production échoue)
 export default function DirectoryPage() {
+  return (
+    <Suspense fallback={null}>
+      <Directory />
+    </Suspense>
+  )
+}
+
+function Directory() {
+  // L'adresse peut préremplir la recherche : ?q= (recherche de l'en-tête), ?school=&year= (« Voir toute la promo »)
+  const params = useSearchParams()
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState<DirectoryFilters>({
-    search: '',
-    school_id: null,
-    entry_year: null,
+    search: params.get('q') ?? '',
+    school_id: params.get('school'),
+    entry_year: params.get('year'),
     country: null,
     city: null,
   })
 
   // Debounce search (attendre 500ms après la dernière frappe)
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(params.get('q') ?? '')
   
   useEffect(() => {
     const timeout = setTimeout(() => {
