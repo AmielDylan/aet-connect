@@ -53,12 +53,14 @@ export const CompleteRegistrationSchema = z.object({
   entry_year: z.string().regex(/^\d{4}$/, 'Année invalide').optional()
 })
 
+// Demande de code : transmise aux administrateurs, qui envoient le code à cette adresse
 export const RequestCodeFromPeerSchema = z.object({
   school_id: z.string().uuid('ID école invalide'),
   entry_year: z.string().regex(/^\d{4}$/, 'Année invalide'),
-  first_name: z.string().min(2).max(50),
-  last_name: z.string().min(2).max(50),
-  message: z.string().min(10).max(500)
+  first_name: z.string().min(2, 'Prénom trop court').max(50),
+  last_name: z.string().min(2, 'Nom trop court').max(50),
+  email: z.string().email('Email invalide'),
+  message: z.string().min(10, 'Message trop court').max(500)
 })
 
 export const CreateEventSchema = z.object({

@@ -15,7 +15,7 @@ const WAYS: Way[] = [
   },
   {
     title: 'Des collègues de votre promo sont déjà inscrits',
-    text: 'Vous pouvez demander un code à l’ambassadeur de votre promo, ou à l’un de ses membres.',
+    text: 'Votre demande arrive à l’équipe AET Connect, qui vous transmet un code pour rejoindre votre promo.',
     action: 'Demander un code',
     href: '/register/request-code',
     photo: PHOTOS.ecusson,

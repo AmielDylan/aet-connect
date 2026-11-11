@@ -219,6 +219,14 @@ Proposition « L'étoffe » choisie par le client, pour des pages simples et cal
 
 - **Carte de parcours :** crème sur le fond vert (jamais vert sur vert), 12px de marge intérieure, une photo de 16:10 puis le titre vert, le texte olive et le lien, sans bloc encadré à l’intérieur. Les trois cartes ont la même couleur. Sur mobile, l’image reste en haut pour les trois cartes. À partir de 768px, celle du milieu inverse l’ordre (texte d’abord, photo ensuite) pour le rythme.
 
+### Inscription (`/register`, avec un code, demande de code, demande d'accès)
+Proposition « La photo de promo » choisie par le client : la photo de groupe en noir et blanc à gauche (légende en haut, cartouche « Bienvenue dans la famille » en bas), le parcours à droite sur crème et trame ; sur mobile, le formulaire d'abord, la photo dessous.
+- **Repère d'étape :** « Étape 2/3 · Vos informations », en texte (le numéro en brun-roux). Pas de cercles ni de pastilles numérotées : le client les a écartés.
+- **Une étape, une question :** titre, une phrase qui explique, les champs, un seul bouton plein ; le retour à l'étape précédente est un lien discret, jamais un second bouton.
+- **Champs :** libellé visible, erreur sous le champ (contour brun-rouge, `aria-invalid`), aide reliée (`aria-describedby`) ; liste déroulante des écoles avec flèche ; règles du mot de passe qui se cochent.
+- **Confirmé :** une pastille verte (« Code valable · PMB, promo 2005 ») plutôt qu'une alerte.
+- **Honnêteté :** chaque écran final ne promet que ce qui se passe réellement (compte créé et utilisable tout de suite ; demande transmise à l'équipe, qui écrira à l'adresse indiquée). Aucune route publique ne révèle un membre.
+
 ### Soleil aux neuf pétales (signature)
 - **Le dessin :** neuf pétales, un par école, symétriques, qui s'élargissent vers l'extérieur et ondulent chacun à sa façon. Aucune rotation d'ensemble : le soleil ne doit jamais évoquer une roue tournante. Le cœur est légèrement irrégulier, comme découpé aux ciseaux. Il est généré par `scripts/motifs.mjs` dans `lib/soleil.ts`.
 - **Les usages :**
@@ -271,9 +279,3 @@ Sigles et villes des écoles réelles sur le vert, en Unbounded, séparés par d
 - **Don't** souligner un lien au repos, ni faire de « Se connecter » un bouton (plein ou à contour).
 - **Don't** recopier une image ou une étoffe existante : les motifs sont dessinés pour AET Connect.
 - **Don't** inventer de pourcentages ou de statistiques.
-
-## Écrans de connexion
-
-Le système visuel ci-dessus décrit d’abord la page d’accueil. Les écrans d’authentification actuels utilisent encore un style hérité : fond blanc, Cal Sans, bouton charbon, champs de 36px et ombres. Cette apparence est un état existant, pas une extension des règles AET.
-
-La direction visuelle de la page de connexion reste à définir lors d’une prochaine revue. Le formulaire actuel propose la connexion, la récupération du mot de passe et la création de compte. Toute photo d’illustration doit rester créditée et ne pas être présentée comme un membre.

@@ -91,16 +91,17 @@ export class RegistrationController {
     try {
       const data = req.body
       
-      const result = await registrationService.requestCodeFromPeer(data)
-      
-      res.json({
+      const request = await registrationService.requestCodeFromPeer(data)
+
+      res.status(201).json({
         success: true,
-        recipient_name: result.recipient_name,
-        message: `Demande envoyée à ${result.recipient_name}`
+        request_id: request.id,
+        message: 'Votre demande a été transmise à l’équipe AET Connect'
       })
     } catch (error: any) {
       logger.error('Error in requestCodeFromPeer:', error)
-      res.status(500).json({ error: error.message })
+      // Email déjà inscrit ou demande déjà en attente : conflit, pas une panne
+      res.status(/déjà/.test(error.message) ? 409 : 500).json({ error: error.message })
     }
   }
 }
