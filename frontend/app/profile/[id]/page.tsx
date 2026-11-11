@@ -1,7 +1,7 @@
 'use client'
 
 // Le profil d'un membre · proposition B « Le bandeau ».
-// Le bandeau a une hauteur fixe dès la tablette : c'est le portrait qui la donne, jamais le texte. Le texte est
+// Le bandeau a une hauteur fixe dès lg (1024px) : c'est le portrait qui la donne, jamais le texte. Le texte est
 // donc ramassé (le lien et « Représente sa promo » sur une ligne ; école, promo et ville sur une autre ; le nom
 // sur deux lignes au plus), quelles que soient les informations que le membre a choisi de montrer.
 import Link from 'next/link'
@@ -74,18 +74,18 @@ export default function ProfilMembre() {
     <div>
       <Retour />
 
-      {/* Bandeau : hauteur fixe dès md (le portrait la donne) ; coin haut droit 76px, portrait concentrique 64px */}
-      <section className="sur-vert trame trame-sur-vert mt-4 grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:h-[22rem] md:grid-cols-[1fr_auto] md:rounded-tr-[76px] lg:h-[24rem]">
+      {/* Bandeau : hauteur fixe dès lg (le portrait la donne ; sur tablette, il prenait la moitié du bandeau) ; coin haut droit 76px, portrait concentrique 64px */}
+      <section className="sur-vert trame trame-sur-vert mt-4 grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme lg:h-[24rem] lg:grid-cols-[1fr_auto] lg:rounded-tr-[76px]">
         <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 lg:px-12">
-          {/* Sur mobile : une vignette avant le nom (le grand portrait n'apparaît qu'à partir de md) */}
+          {/* Sur mobile et tablette : une vignette avant le nom (le grand portrait n'apparaît qu'à partir de lg) */}
           <Portrait
             prenom={p.first_name}
             nom={p.last_name}
             src={p.avatar_url}
-            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert md:hidden"
+            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert lg:hidden"
           />
           {enTete && <p className="text-base text-or">{enTete}</p>}
-          <h1 className="font-titre md:line-clamp-2 text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]">
+          <h1 className="font-titre lg:line-clamp-2 text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]">
             {p.first_name} {p.last_name}
           </h1>
           <p className="flex flex-wrap items-center gap-x-2 text-base text-brume lg:text-lg">
@@ -112,12 +112,13 @@ export default function ProfilMembre() {
             )
           )}
         </div>
-        <div className="hidden md:m-3 md:block md:h-[calc(100%-1.5rem)]">
+        {/* Cadre carré fixe (24rem - 2 × 12px) : une photo en paysage garde sa place, elle est recadrée */}
+        <div className="hidden lg:m-3 lg:block lg:size-[22.5rem]">
           <Portrait
             prenom={p.first_name}
             nom={p.last_name}
             src={p.avatar_url}
-            className="aspect-square h-full w-auto rounded-[1.25rem] rounded-tr-[64px] bg-sable text-7xl text-vert"
+            className="size-full rounded-[1.25rem] rounded-tr-[64px] bg-sable text-7xl text-vert"
           />
         </div>
       </section>

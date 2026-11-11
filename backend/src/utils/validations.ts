@@ -149,7 +149,7 @@ export const UpdateProfileSchema = z.object({
   current_country: z.string().max(100).optional(),
   bio: z.string().max(500).optional(),
   phone: z.string().max(20).optional(),
-  linkedin_url: z.string().url().optional(),
+  linkedin_url: z.union([z.string().url(), z.literal('')]).optional(), // '' : effacer le lien
   avatar_url: z.string().url().nullable().optional() // null : effacer l'avatar
 }).passthrough() // Permet les champs supplémentaires (comme email) qui seront ignorés
 

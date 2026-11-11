@@ -54,10 +54,12 @@ export class UsersService {
     }
     
     // Ne garder que les champs autorisés
+    // Un champ facultatif vidé par le membre est effacé (null), pas enregistré comme chaîne vide
+    const effacables: (keyof UpdateProfileRequest)[] = ['current_city', 'current_country', 'bio', 'phone', 'linkedin_url']
     allowedFields.forEach(field => {
-      if (data[field] !== undefined) {
-        updateData[field] = data[field]
-      }
+      if (data[field] === undefined) return
+      const valeur = typeof data[field] === 'string' ? (data[field] as string).trim() : data[field]
+      updateData[field] = valeur === '' && effacables.includes(field) ? null : valeur
     })
     
     const { data: user, error } = await supabase
