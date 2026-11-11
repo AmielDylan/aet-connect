@@ -47,9 +47,9 @@ export default function LoginPage() {
 
       <div className="order-2 p-3 sm:p-4 lg:order-1 lg:p-5">
         <PhotoDiaporama slides={SLIDES} className="h-72 rounded-3xl rounded-tr-[72px] sm:h-96 lg:h-full">
-          <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-2xl bg-creme px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 lg:px-5 lg:py-4">
-            <Soleil className="size-6 sm:size-7 lg:size-9" />
-            <p className="font-titre text-sm font-semibold leading-tight tracking-[-0.02em] text-vert max-[359px]:hidden sm:text-base lg:text-lg">
+          <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-xl bg-creme px-2.5 py-2 lg:px-3 lg:py-2.5">
+            <Soleil className="size-5 lg:size-6" />
+            <p className="font-titre text-xs font-semibold leading-tight tracking-[-0.02em] text-vert max-[359px]:hidden lg:text-sm">
               AET un jour,
               <br />
               AET toujours
