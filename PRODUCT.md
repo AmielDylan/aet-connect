@@ -18,7 +18,7 @@ Rôles dans le produit : membre (alumni), ambassadeur de promo (invite davantage
 
 ## Product Purpose
 
-AET Connect est l'annuaire panafricain des Anciens Enfants de Troupe : un réseau fermé que l'on rejoint sur l'invitation d'un collègue de sa promotion. Il permet de rejoindre sa promo, de retrouver et de joindre d'autres anciens tout en gardant la main sur ce que l'on montre de soi.
+AET Connect est l'annuaire panafricain des Anciens Enfants de Troupe : un réseau fermé que l'on rejoint sur l'invitation d'un collègue de sa promotion. Il permet de rejoindre sa promo, de retrouver et de joindre d'autres AET tout en gardant la main sur ce que l'on montre de soi.
 
 Le succès : un ancien qui s'inscrit retrouve des membres de sa promo, et un membre qui cherche quelqu'un dans une ville ou un pays le trouve et peut le joindre.
 
@@ -39,7 +39,7 @@ Ce que ni un groupe WhatsApp ni LinkedIn ne peuvent revendiquer : **la confiance
 - Application web Next.js 16 (React 19, Tailwind CSS 4, composants shadcn/Radix) + API Express + Supabase (Auth, Postgres, Storage pour les avatars). Déploiement Vercel (frontend) et Railway (API).
 - Interface **en français**. Réseau sur invitation : aucune inscription publique ; annuaire et profils réservés aux membres connectés.
 - Termes du domaine à employer tels quels : AET, ancien, promo, école, ambassadeur, code d'invitation, demande d'accès, annuaire.
-- L'invitation vient d'un **collègue de promotion** (les membres d'une même promo s'invitent entre eux), pas « d'un ancien » en général : « Un collègue de promotion vous a envoyé un code ». « Ancien » désigne les membres du réseau.
+- L'invitation vient d'un **collègue de promotion** (les membres d'une même promo s'invitent entre eux), pas « d'un ancien » en général : « Un collègue de promotion vous a envoyé un code ». « Ancien » seul désigne un aîné dans la hiérarchie de l'école (l'élève de 5ᵉ est l'ancien de celui de 6ᵉ ; le terminal est l'ancien de tous) ; il n'est devenu un nom qu'à la sortie de l'école, dans « Ancien Enfant de Troupe ». Pour les membres, on écrit donc **AET** ou **Anciens Enfants de Troupe** ; pour des pairs, **collègues de promotion**. Jamais « les anciens » pour parler des membres en général.
 - **Décisions ouvertes** :
   - appareils et contexte d'usage réels des membres (mobile ou ordinateur, connexions en Afrique ou dans la diaspora) : inconnus à ce jour ;
   - **événements** : l'API existe (création, inscription) mais aucun écran ne l'expose ; leur place dans le produit n'est pas décidée ;

@@ -12,10 +12,10 @@ import { SiteFooter } from '@/components/landing/site-footer'
 export const metadata: Metadata = {
   title: 'AET Connect · Annuaire panafricain des Anciens Enfants de Troupe',
   description:
-    'Retrouvez les anciens de votre promo et de toutes les écoles militaires préparatoires. Un réseau privé, que l’on rejoint sur l’invitation d’un collègue de promotion.',
+    'Retrouvez vos collègues de promotion et les Anciens Enfants de Troupe de toutes les écoles militaires préparatoires. Un réseau privé, sur invitation.',
 }
 
-// Les écoles et leur nombre réel d'anciens, rafraîchis toutes les 5 minutes
+// Les écoles et leur nombre réel de membres, rafraîchis toutes les 5 minutes
 export const revalidate = 300
 
 async function loadSchools(): Promise<LandingSchool[]> {

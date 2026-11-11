@@ -22,8 +22,8 @@ export function JoinSection({ schools }: { schools: LandingSchool[] }) {
             Rejoindre ma promo
           </h2>
           <p className="mt-5 max-w-[40ch] text-lg leading-relaxed text-olive text-pretty">
-            Indiquez votre école et votre année d’entrée : nous vérifions si des anciens de votre promo sont déjà
-            inscrits et vous indiquons la marche à suivre.
+            Avec votre école et votre année d’entrée, nous regardons si des collègues de votre promo sont déjà
+            inscrits, et nous vous indiquons la marche à suivre.
           </p>
         </div>
 

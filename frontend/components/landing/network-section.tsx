@@ -6,15 +6,15 @@ import { Soleil } from './soleil'
 const USES = [
   {
     title: 'Toute votre promo',
-    text: 'Les anciens de votre école entrés la même année que vous, réunis au même endroit.',
+    text: 'Vos collègues de promotion, entrés dans la même école la même année que vous, réunis au même endroit.',
   },
   {
-    title: 'Un ancien dans chaque ville',
-    text: 'Cherchez par nom, école, promo, pays ou ville : pour un conseil, une mise en relation, un premier contact en arrivant quelque part.',
+    title: 'Un AET dans chaque ville',
+    text: 'Où que vous alliez, vous pouvez chercher un AET par nom, école, promo, pays ou ville : pour un conseil, une mise en relation ou un premier contact en arrivant.',
   },
   {
-    title: 'Entre anciens seulement',
-    text: 'Chaque membre a été invité par un collègue de sa promotion ou validé par un administrateur : l’annuaire ne réunit que de vrais anciens.',
+    title: 'Entre AET seulement',
+    text: 'Chaque membre a été invité par un collègue de sa promotion ou validé par un administrateur : l’annuaire ne réunit que de vrais Anciens Enfants de Troupe.',
   },
 ]
 
@@ -46,8 +46,8 @@ export function NetworkSection({ facts }: { facts: Facts }) {
 
           <div>
             <p className="max-w-[46ch] text-lg leading-relaxed text-olive text-pretty lg:text-xl lg:leading-[1.65]">
-              L’internat, la discipline, les camarades : ce qui lie les Anciens Enfants de Troupe ne s’arrête pas à la
-              sortie de l’école. AET Connect les rassemble, par-delà les écoles et les frontières.
+              L’internat, la discipline, les camarades : ce qui nous lie ne s’est pas arrêté à la
+              sortie de l’école. AET Connect nous rassemble, par-delà les écoles et les frontières.
             </p>
             <ul className="mt-10 grid gap-8 lg:mt-12 lg:gap-10">
               {USES.map((u) => (

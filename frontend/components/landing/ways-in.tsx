@@ -7,15 +7,15 @@ type Way = { title: string; text: string; action: string; href: string; photo: P
 const WAYS: Way[] = [
   {
     title: 'Un collègue de promotion vous a envoyé un code',
-    text: 'Saisissez-le : il vous rattache directement à votre promotion.',
+    text: 'Il suffit de le saisir : il vous rattache directement à votre promotion.',
     action: 'Entrer mon code',
     href: '/register/with-code',
     photo: PHOTOS.ceremonie,
     position: '30% 50%',
   },
   {
-    title: 'Des anciens de votre promo sont déjà inscrits',
-    text: 'Demandez un code à l’ambassadeur de votre promo ou à l’un de ses membres.',
+    title: 'Des collègues de votre promo sont déjà inscrits',
+    text: 'Vous pouvez demander un code à l’ambassadeur de votre promo, ou à l’un de ses membres.',
     action: 'Demander un code',
     href: '/register/request-code',
     photo: PHOTOS.ecusson,
@@ -24,7 +24,7 @@ const WAYS: Way[] = [
   },
   {
     title: 'Personne de votre promo n’est encore inscrit',
-    text: 'Envoyez une demande : un administrateur la vérifie et vous transmet votre code d’invitation.',
+    text: 'Vous ouvrez la voie pour votre promo : un administrateur étudie votre demande, puis vous envoie votre code d’invitation.',
     action: 'Demander l’accès',
     href: '/register/request-access',
     photo: PHOTOS.defile,
