@@ -1,556 +1,247 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { RegistrationSteps } from '@/components/registration/registration-steps'
-import { FormField } from '@/components/registration/form-field'
-import { SchoolYearSelector } from '@/components/registration/school-year-selector'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { apiClient } from '@/lib/api'
+import { promoError } from '@/lib/promo'
 import type { VerifyInvitationCodeResponse } from '@/types'
 import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
-import { Loader2, CheckCircle2, Info, AlertCircle } from 'lucide-react'
+import {
+  Bouton,
+  Champ,
+  Confirme,
+  EcoleAnnee,
+  Erreur,
+  InscriptionShell,
+  N,
+  Question,
+  REGLES_INSCRIPTION,
+  ReglesMotDePasse,
+  Retour,
+  introClasse,
+  messageApi,
+  titreClasse,
+} from '@/components/registration/kit'
 
-const STEPS = [
-  { number: 1, title: 'Code', description: 'Vérification' },
-  { number: 2, title: 'Informations', description: 'Formulaire' },
-  { number: 3, title: 'Validation', description: 'Création compte' },
-]
+const ETAPES = [{ titre: 'Votre code' }, { titre: 'Vos informations' }, { titre: 'Bienvenue' }]
 
-function RegisterWithCodePageContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const codeFromUrl = searchParams.get('code')
+function WithCodeContent() {
+  const params = useSearchParams()
+  const codeFromUrl = params.get('code')?.trim() || ''
+  const schoolParam = params.get('school')
+  const yearParam = params.get('year')
   const { user, logout } = useAuth()
-  const { toast } = useToast()
-  const [currentStep, setCurrentStep] = useState(1)
+  const [etape, setEtape] = useState(1)
 
-  // Déconnecter automatiquement si connecté
+  // Une inscription se fait déconnecté : si un membre est connecté sur cet appareil, on le déconnecte
   useEffect(() => {
-    if (user) {
-      logout().then(() => {
-        console.log('Déconnexion automatique pour inscription')
-      })
-    }
+    if (user) logout()
   }, [user, logout])
 
-  // Étape 1 : Code invitation
-  const [invitationCode, setInvitationCode] = useState(codeFromUrl || '')
-  const [step1Error, setStep1Error] = useState('') // Erreur SYSTÈME uniquement (API, code invalide)
+  // Étape 1 : le code
+  const [code, setCode] = useState(codeFromUrl)
+  const [codeErreur, setCodeErreur] = useState('')
+  const [verifie, setVerifie] = useState<VerifyInvitationCodeResponse | null>(null)
+  // Code universel (émis par un administrateur) : la personne choisit son école et son année
+  const [schoolId, setSchoolId] = useState('')
+  const [year, setYear] = useState('')
 
-  // Données du code vérifié
-  const [verifiedSchoolId, setVerifiedSchoolId] = useState('')
-  const [verifiedEntryYear, setVerifiedEntryYear] = useState('')
-  const [verifiedSchoolName, setVerifiedSchoolName] = useState('')
-  const [codeFromLink, setCodeFromLink] = useState(false) // Indique si le code vient du lien
-  // Code universel (émis par un admin) : la personne choisit son école et son année
-  const [isUniversal, setIsUniversal] = useState(false)
-  const [grantsAmbassador, setGrantsAmbassador] = useState(false)
-  const [promoError, setPromoError] = useState('')
+  const universel = !!verifie?.universal
+  const { data: schoolsData } = useQuery({ queryKey: ['schools'], queryFn: () => apiClient.getSchools(), enabled: universel })
+  const schools = schoolsData?.schools ?? []
 
-  const { data: schoolsData, isLoading: schoolsLoading } = useQuery({
-    queryKey: ['schools'],
-    queryFn: () => apiClient.getSchools(),
-    enabled: isUniversal,
-  })
-
-  const applyVerifiedCode = (data: VerifyInvitationCodeResponse) => {
-    setInvitationCode(data.code ?? invitationCode)
-    setIsUniversal(!!data.universal)
-    setGrantsAmbassador(!!data.grants_ambassador)
-    setVerifiedSchoolId(data.school_id ?? '')
-    setVerifiedEntryYear(data.entry_year ?? '')
-    setVerifiedSchoolName(data.school_name ?? '')
-    setStep1Error('')
-    setCurrentStep(2)
+  const appliquer = (data: VerifyInvitationCodeResponse) => {
+    setVerifie(data)
+    setCode(data.code ?? code)
+    setCodeErreur('')
+    setEtape(2)
   }
 
-  // Étape 2 : Informations utilisateur
+  const verifier = useMutation({
+    mutationFn: (valeur: string) => apiClient.verifyInvitationCode({ code: valeur }),
+    onSuccess: (data) => (data.valid ? appliquer(data) : setCodeErreur(data.message || 'Ce code n’est pas valable.')),
+    onError: (error) => setCodeErreur(messageApi(error, 'Nous n’arrivons pas à vérifier ce code pour le moment.')),
+  })
+
+  // Le code arrive par un lien : on le vérifie tout de suite
+  useEffect(() => {
+    if (!codeFromUrl) return
+    apiClient
+      .verifyCodeInfo(codeFromUrl)
+      .then(appliquer)
+      .catch((error) => setCodeErreur(messageApi(error, 'Ce code n’est pas valable.')))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeFromUrl])
+
+  // Étape 2 : les informations
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]) // Erreurs VALIDATION mot de passe
-  const [step2Error, setStep2Error] = useState('') // Erreur SYSTÈME uniquement (API inscription)
-  
-  // Erreurs de VALIDATION pour les champs
-  const [emailError, setEmailError] = useState('')
-  const [nameError, setNameError] = useState('')
-  const [confirmPasswordError, setConfirmPasswordError] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [erreurs, setErreurs] = useState<Record<string, string>>({})
+  const [erreurApi, setErreurApi] = useState('')
 
-  // Validation mot de passe
-  const validatePassword = (pwd: string) => {
-    const errors: string[] = []
-    if (pwd.length < 8) errors.push('Au moins 8 caractères')
-    if (!/[A-Z]/.test(pwd)) errors.push('Au moins une majuscule')
-    if (!/[a-z]/.test(pwd)) errors.push('Au moins une minuscule')
-    if (!/[0-9]/.test(pwd)) errors.push('Au moins un chiffre')
-    setPasswordErrors(errors)
-    return errors.length === 0
-  }
-
-  // Vérifier automatiquement le code si présent dans l'URL
-  useEffect(() => {
-    if (codeFromUrl && codeFromUrl.trim()) {
-      setCodeFromLink(true)
-      apiClient.verifyCodeInfo(codeFromUrl)
-        .then((data) => {
-          applyVerifiedCode(data)
-          toast({
-            title: 'Code valide !',
-            description: data.universal
-              ? 'Choisissez votre école et votre promotion'
-              : `Inscription pour ${data.school_name} - Promo ${data.entry_year}`,
-          })
-        })
-        .catch((error) => {
-          setStep1Error(error.message || 'Code invalide')
-          toast({
-            title: 'Erreur',
-            description: error.message || 'Code invalide',
-            variant: 'destructive',
-          })
-        })
-    }
-  }, [codeFromUrl])
-
-  // Mutation vérification code
-  const verifyCodeMutation = useMutation({
-    mutationFn: () =>
-      // La promo vient du code : seul le code est envoyé
-      apiClient.verifyInvitationCode({ code: invitationCode }),
-    onSuccess: (data) => {
-      if (data.valid) {
-        applyVerifiedCode(data)
-        toast({
-          title: 'Code valide !',
-        })
-      } else {
-        setStep1Error(data.message)
-        toast({
-          title: 'Erreur',
-          description: data.message,
-          variant: 'destructive',
-        })
-      }
-    },
-    onError: () => {
-      setStep1Error('Erreur lors de la vérification du code')
-      toast({
-        title: 'Erreur',
-        description: 'Erreur lors de la vérification',
-        variant: 'destructive',
-      })
-    },
-  })
-
-  // Mutation inscription
-  const registerMutation = useMutation({
+  const inscrire = useMutation({
     mutationFn: () =>
       apiClient.completeRegistration({
-        invitation_code: invitationCode,
-        first_name: firstName,
-        last_name: lastName,
-        email,
+        invitation_code: code,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        email: email.trim(),
         password,
-        ...(isUniversal ? { school_id: verifiedSchoolId, entry_year: verifiedEntryYear } : {}),
+        ...(universel ? { school_id: schoolId, entry_year: year } : {}),
       }),
-    onSuccess: () => {
-      setCurrentStep(3)
-      toast({
-        title: 'Compte créé avec succès !',
-        description: 'Un email de confirmation a été envoyé à votre adresse. Vous pouvez vous connecter dès maintenant.',
-        duration: 8000,
-      })
-      setTimeout(() => {
-        window.location.href = '/login'
-      }, 2000)
-    },
-    onError: (error: Error) => {
-      setStep2Error(error.message || 'Erreur lors de l\'inscription')
-      toast({
-        title: 'Erreur',
-        description: 'Erreur lors de l\'inscription',
-        variant: 'destructive',
-      })
-    },
+    onSuccess: () => setEtape(3),
+    onError: (error) => setErreurApi(messageApi(error, 'Votre compte n’a pas pu être créé. Vous pouvez réessayer dans un instant.')),
   })
 
-  // Handler Étape 1
-  const handleStep1Next = () => {
-    // Validation locale : champ requis (mais on l'affiche dans Alert car c'est une erreur de soumission)
-    if (!invitationCode.trim()) {
-      setStep1Error('Veuillez entrer votre code d\'invitation')
-      return
-    }
-    setStep1Error('') // Réinitialiser avant la vérification
-    verifyCodeMutation.mutate()
+  function onCode(e: React.FormEvent) {
+    e.preventDefault()
+    if (!code.trim()) return setCodeErreur('Il manque votre code d’invitation.')
+    setCodeErreur('')
+    verifier.mutate(code.trim())
   }
 
-  // Handler Étape 2
-  const handleStep2Next = () => {
-    // Réinitialiser toutes les erreurs
-    setNameError('')
-    setEmailError('')
-    setConfirmPasswordError('')
-    setStep2Error('')
-    
-    let hasValidationError = false
-    
-    // Validation : Prénom et nom
-    if (!firstName.trim() || !lastName.trim()) {
-      setNameError('Prénom et nom requis')
-      hasValidationError = true
+  function onInscription(e: React.FormEvent) {
+    e.preventDefault()
+    setErreurApi('')
+    const e2: Record<string, string> = {}
+    if (firstName.trim().length < 2) e2.prenom = 'Il manque votre prénom.'
+    if (lastName.trim().length < 2) e2.nom = 'Il manque votre nom.'
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) e2.email = email.trim() ? 'Cette adresse email semble incomplète.' : 'Il manque votre adresse email.'
+    if (!REGLES_INSCRIPTION.every((r) => r.test(password))) e2.password = 'Le mot de passe ne remplit pas encore toutes les règles.'
+    if (confirmation !== password) e2.confirmation = 'Les deux mots de passe ne sont pas identiques.'
+    if (universel) {
+      const p = promoError(schools, schoolId, year)
+      if (p) e2.promo = p
     }
-    
-    // Validation : Email
-    if (!email.trim()) {
-      setEmailError('Email requis')
-      hasValidationError = true
-    } else if (!email.includes('@') || !email.includes('.')) {
-      setEmailError('Format d\'email invalide')
-      hasValidationError = true
-    }
-    
-    // Validation : Mot de passe
-    if (!validatePassword(password)) {
-      // Les erreurs sont déjà affichées via passwordErrors
-      hasValidationError = true
-    }
-    
-    // Validation : Confirmation mot de passe
-    if (password !== confirmPassword) {
-      setConfirmPasswordError('Les mots de passe ne correspondent pas')
-      hasValidationError = true
-    }
-    
-    // Code universel : école et promo obligatoires
-    setPromoError('')
-    if (isUniversal && (!verifiedSchoolId || !verifiedEntryYear)) {
-      setPromoError('Choisissez votre école et votre année d\'entrée')
-      hasValidationError = true
-    }
-
-    if (hasValidationError) {
-      return
-    }
-
-    // Toutes les validations passent → appel API
-    registerMutation.mutate()
+    setErreurs(e2)
+    if (Object.keys(e2).length === 0) inscrire.mutate()
   }
+
+  const demanderUnCode = schoolParam && yearParam ? `/register/request-code?school=${schoolParam}&year=${yearParam}` : '/register/request-code'
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">Inscription avec code d&apos;invitation</h1>
-          <p className="text-muted-foreground mt-2">
-            Créez votre compte en quelques étapes
-          </p>
+    <InscriptionShell etapes={ETAPES} courante={etape}>
+      {etape === 1 && (
+        <div>
+          <h1 className={titreClasse}>Rejoindre votre promo avec un code</h1>
+          <p className={introClasse}>Le code reçu d’un collègue de promotion vous rattache directement à votre promo.</p>
+          <form onSubmit={onCode} noValidate className="mt-8 grid gap-5">
+            <Champ
+              id="code"
+              label="Code d’invitation"
+              placeholder="AET-XXXX-XXXX"
+              autoComplete="off"
+              spellCheck={false}
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              className="font-semibold uppercase tracking-[0.08em]"
+            />
+            {codeErreur && <Erreur>{codeErreur}</Erreur>}
+            <Bouton pending={verifier.isPending}>{verifier.isPending ? 'Vérification…' : 'Vérifier le code'}</Bouton>
+          </form>
+          <div className="mt-8">
+            <Question question={`Pas encore de code${N}?`} href={demanderUnCode}>
+              Le demander pour ma promo
+            </Question>
+          </div>
         </div>
+      )}
 
-        {/* Steps indicator */}
-        <RegistrationSteps currentStep={currentStep} steps={STEPS} />
-
-        {/* Content */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>{STEPS[currentStep - 1].title}</CardTitle>
-            <CardDescription>{STEPS[currentStep - 1].description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* Étape 1 : Code invitation */}
-            {currentStep === 1 && (
-              <div className="space-y-6">
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    Entrez le code d&apos;invitation fourni par un ambassadeur ou un membre de votre promotion
-                  </AlertDescription>
-                </Alert>
-
-                <FormField
-                  id="invitation-code"
-                  label="Code d'invitation"
-                  placeholder="AET-XXXX-XXXX"
-                  value={invitationCode}
-                  onChange={setInvitationCode}
-                  // error supprimé : step1Error est une erreur SYSTÈME, affichée dans Alert uniquement
-                  required
-                  disabled={verifyCodeMutation.isPending || codeFromLink}
-                />
-                {codeFromLink && (
-                  <p className="text-sm text-muted-foreground">
-                    Code d'invitation : {codeFromUrl}
-                  </p>
-                )}
-
-                {step1Error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      <p className="mb-3">{step1Error}</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const subject = encodeURIComponent('Problème code d\'invitation')
-                          const body = encodeURIComponent(`Code saisi : ${invitationCode}\n\nMessage d'erreur : ${step1Error}`)
-                          window.location.href = `mailto:admin@aetconnect.com?subject=${subject}&body=${body}`
-                        }}
-                      >
-                        Contacter les admins AET Connect
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="flex justify-end gap-3">
-                  <Button variant="outline" onClick={() => router.push('/register')}>
-                    Retour
-                  </Button>
-                  <Button
-                    onClick={handleStep1Next}
-                    disabled={verifyCodeMutation.isPending}
-                  >
-                    {verifyCodeMutation.isPending && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Vérifier le code
-                  </Button>
-                </div>
-
-                {/* Lien vers demande de code */}
-                <div className="text-center text-sm border-t pt-4">
-                  <p className="text-muted-foreground mb-2">
-                    Vous n&apos;avez pas de code d&apos;invitation ?
-                  </p>
-                  <Button
-                    variant="link"
-                    onClick={() => {
-                      const params = new URLSearchParams(window.location.search)
-                      const school = params.get('school')
-                      const year = params.get('year')
-                      
-                      if (school && year) {
-                        router.push(`/register/request-code?school=${school}&year=${year}`)
-                      } else {
-                        router.push('/register/request-code')
-                      }
-                    }}
-                  >
-                    Contacter un ambassadeur de ma promotion
-                  </Button>
-                </div>
-              </div>
+      {etape === 2 && verifie && (
+        <div>
+          {universel ? (
+            <Confirme>Code valable</Confirme>
+          ) : (
+            <Confirme>
+              Code valable · {verifie.school_name}, promo {verifie.entry_year}
+            </Confirme>
+          )}
+          <h1 className={titreClasse}>Vos informations</h1>
+          <p className={introClasse}>Elles servent à créer votre compte. Vous choisirez ensuite ce que les autres voient.</p>
+          {verifie.grants_ambassador && (
+            <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-base leading-relaxed text-olive">
+              Vous serez l’ambassadeur ou l’ambassadrice de votre promo{N}: vous pourrez inviter jusqu’à 15 collègues.
+            </p>
+          )}
+          <form onSubmit={onInscription} noValidate className="mt-8 grid gap-5">
+            {universel && (
+              <EcoleAnnee schools={schools} schoolId={schoolId} onSchool={setSchoolId} year={year} onYear={setYear} erreur={erreurs.promo} />
             )}
-
-            {/* Étape 2 : Formulaire inscription */}
-            {currentStep === 2 && (
-              <div className="space-y-6">
-                <Alert>
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  <AlertDescription>
-                    Code validé ! Complétez vos informations pour créer votre compte.
-                  </AlertDescription>
-                </Alert>
-
-                {grantsAmbassador && (
-                  <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                      Vous deviendrez ambassadeur ou ambassadrice de votre promotion : vous pourrez inviter jusqu&apos;à 15 membres.
-                    </AlertDescription>
-                  </Alert>
+            <div className="grid gap-5 sm:grid-cols-2 sm:gap-3">
+              <Champ id="prenom" label="Prénom" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} erreur={erreurs.prenom} />
+              <Champ id="nom" label="Nom" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} erreur={erreurs.nom} />
+            </div>
+            <Champ
+              id="email"
+              label="Email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              spellCheck={false}
+              placeholder="prenom.nom@exemple.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              erreur={erreurs.email}
+            />
+            <Champ
+              id="password"
+              label="Mot de passe"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aide={<ReglesMotDePasse id="regles" password={password} />}
+              erreur={erreurs.password}
+            />
+            <Champ
+              id="confirmation"
+              label="Confirmation"
+              type="password"
+              autoComplete="new-password"
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+              erreur={erreurs.confirmation}
+            />
+            {erreurApi && (
+              <Erreur>
+                {erreurApi}
+                {/déjà un compte/.test(erreurApi) && (
+                  <>
+                    {' '}
+                    <Link href="/login" className="underline">
+                      Se connecter
+                    </Link>
+                  </>
                 )}
-
-                {isUniversal ? (
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Votre école et votre promotion</p>
-                    <SchoolYearSelector
-                      selectedSchoolId={verifiedSchoolId}
-                      selectedYear={verifiedEntryYear}
-                      onSchoolChange={setVerifiedSchoolId}
-                      onYearChange={setVerifiedEntryYear}
-                      schools={schoolsData?.schools || []}
-                      isLoading={schoolsLoading}
-                      error={promoError || null}
-                    />
-                  </div>
-                ) : (
-                <div className="p-4 bg-muted rounded-lg space-y-2">
-                  <p className="text-sm font-medium">Informations du code :</p>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">École :</span>
-                      <span className="ml-2 font-medium">{verifiedSchoolName || 'Chargement...'}</span>
-                      {codeFromLink && (
-                        <span className="ml-2 text-xs text-muted-foreground">(pré-remplie)</span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Promotion :</span>
-                      <span className="ml-2 font-medium">{verifiedEntryYear}</span>
-                      {codeFromLink && (
-                        <span className="ml-2 text-xs text-muted-foreground">(pré-remplie)</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    id="first-name"
-                    label="Prénom"
-                    placeholder="Jean"
-                    value={firstName}
-                    onChange={(value) => {
-                      setFirstName(value)
-                      if (nameError) setNameError('') // Réinitialiser l'erreur lors de la saisie
-                    }}
-                    error={nameError}
-                    required
-                    disabled={registerMutation.isPending}
-                  />
-                  <FormField
-                    id="last-name"
-                    label="Nom"
-                    placeholder="Dupont"
-                    value={lastName}
-                    onChange={(value) => {
-                      setLastName(value)
-                      if (nameError) setNameError('') // Réinitialiser l'erreur lors de la saisie
-                    }}
-                    error={nameError}
-                    required
-                    disabled={registerMutation.isPending}
-                  />
-                </div>
-
-                <FormField
-                  id="email"
-                  type="email"
-                  label="Email"
-                  placeholder="jean.dupont@example.com"
-                  value={email}
-                  onChange={(value) => {
-                    setEmail(value)
-                    if (emailError) setEmailError('') // Réinitialiser l'erreur lors de la saisie
-                  }}
-                  error={emailError}
-                  required
-                  disabled={registerMutation.isPending}
-                />
-
-                <div className="space-y-2 mb-6">
-                  <FormField
-                    id="password"
-                    type="password"
-                    label="Mot de passe"
-                    placeholder="Min 8 caractères"
-                    value={password}
-                    onChange={(value) => {
-                      setPassword(value)
-                      validatePassword(value)
-                    }}
-                    required
-                    disabled={registerMutation.isPending}
-                    description="Doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre"
-                  />
-                  {passwordErrors.length > 0 && (
-                    <ul className="text-xs space-y-1 mt-2">
-                      {passwordErrors.map((err, i) => (
-                        <li key={i} className="flex items-center gap-2 text-muted-foreground">
-                          <span className="text-destructive">✗</span> {err}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                <FormField
-                  id="confirm-password"
-                  type="password"
-                  label="Confirmer le mot de passe"
-                  placeholder="Retapez votre mot de passe"
-                  value={confirmPassword}
-                  onChange={(value) => {
-                    setConfirmPassword(value)
-                    if (confirmPasswordError) setConfirmPasswordError('') // Réinitialiser l'erreur lors de la saisie
-                    // Vérifier aussi si les mots de passe correspondent maintenant
-                    if (value && password && value === password) {
-                      setConfirmPasswordError('')
-                    }
-                  }}
-                  error={confirmPasswordError}
-                  required
-                  disabled={registerMutation.isPending}
-                />
-
-                {step2Error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      <p className="mb-3">{step2Error}</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const subject = encodeURIComponent('Problème inscription')
-                          const body = encodeURIComponent(`Message d'erreur : ${step2Error}\n\nCode d'invitation : ${invitationCode}`)
-                          window.location.href = `mailto:admin@aetconnect.com?subject=${subject}&body=${body}`
-                        }}
-                      >
-                        Contacter les admins AET Connect
-                      </Button>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="flex justify-between gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentStep(1)}
-                    disabled={registerMutation.isPending}
-                  >
-                    Retour
-                  </Button>
-                  <Button
-                    onClick={handleStep2Next}
-                    disabled={registerMutation.isPending}
-                  >
-                    {registerMutation.isPending && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Créer mon compte
-                  </Button>
-                </div>
-              </div>
+              </Erreur>
             )}
+            <Bouton pending={inscrire.isPending}>{inscrire.isPending ? 'Création du compte…' : 'Créer mon compte'}</Bouton>
+            <Retour onClick={() => setEtape(1)}>Revenir au code</Retour>
+          </form>
+        </div>
+      )}
 
-            {/* Étape 3 : Success */}
-            {currentStep === 3 && (
-              <div className="text-center space-y-6 py-8">
-                <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
-                <div>
-                  <h3 className="text-xl font-semibold">Inscription réussie !</h3>
-                  <p className="text-muted-foreground mt-2">
-                    Votre compte a été créé avec succès. Redirection vers la page de connexion...
-                  </p>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      {etape === 3 && (
+        <div aria-live="polite">
+          <h1 className={titreClasse}>Bienvenue dans la famille</h1>
+          <p className={introClasse}>
+            Votre compte est créé. Vous pouvez vous connecter dès maintenant avec <strong className="font-semibold text-encre">{email.trim()}</strong> et
+            votre mot de passe.
+          </p>
+          <Link
+            href="/login"
+            className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-vert px-7 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte"
+          >
+            Me connecter
+          </Link>
+        </div>
+      )}
+    </InscriptionShell>
   )
 }
 
@@ -558,7 +249,7 @@ function RegisterWithCodePageContent() {
 export default function RegisterWithCodePage() {
   return (
     <Suspense fallback={null}>
-      <RegisterWithCodePageContent />
+      <WithCodeContent />
     </Suspense>
   )
 }
