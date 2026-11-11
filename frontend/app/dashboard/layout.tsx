@@ -1,74 +1,51 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { Header } from '@/components/layout/header'
-import { Sidebar } from '@/components/layout/sidebar'
 import { Loader2 } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { espritFonts } from '@/lib/fonts'
+import { EnteteEspace } from '@/components/espace/entete'
+import { PiedEspace } from '@/components/espace/pied'
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+// L'espace membre, dans le monde « Esprit de corps » : en-tête comme l'accueil, contenu sur crème, pied vert
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      const currentPath = window.location.pathname
-      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`)
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`)
     }
   }, [isAuthenticated, isLoading, router])
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <div className="text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#242424]" />
-          <p className="mt-3 text-sm text-[#898989]">Chargement...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) return null
-
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
-      {/* Sidebar — Desktop */}
-      <aside
-        className="hidden w-60 shrink-0 md:block"
-        style={{ boxShadow: 'rgba(34, 42, 53, 0.08) 1px 0px 0px 0px' }}
-      >
-        <Sidebar />
-      </aside>
-
-      {/* Sidebar — Mobile overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <aside
-            className="absolute left-0 top-0 h-full w-60 bg-white"
-            style={{ boxShadow: 'rgba(34, 42, 53, 0.12) 4px 0px 16px 0px' }}
-          >
-            <Sidebar onClose={() => setSidebarOpen(false)} isMobile />
-          </aside>
+    <div
+      style={{ ['--trame-opacite' as string]: 0.035 }}
+      className={`${espritFonts} esprit trame trame-sur-creme flex min-h-svh flex-col bg-creme font-texte text-encre`}
+    >
+      {isLoading || !isAuthenticated ? (
+        <div className="grid flex-1 place-items-center" role="status">
+          <p className="flex items-center gap-3 text-base text-olive">
+            <Loader2 className="size-5 animate-spin text-vert" aria-hidden="true" />
+            {isLoading ? 'Ouverture de votre espace…' : 'Redirection vers la connexion…'}
+          </p>
         </div>
+      ) : (
+        <>
+          <a
+            href="#contenu"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-vert focus:px-4 focus:py-2 focus:text-creme"
+          >
+            Aller au contenu
+          </a>
+          <EnteteEspace />
+          <main id="contenu" className="mx-auto w-full max-w-6xl flex-1 px-5 pb-20 pt-4 sm:px-8 sm:pt-8">
+            {children}
+          </main>
+          <PiedEspace />
+        </>
       )}
-
-      {/* Main */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto bg-white px-4 py-6 sm:px-8 sm:py-8">
-          {children}
-        </main>
-      </div>
     </div>
   )
 }
