@@ -211,7 +211,12 @@ Une photo de remplacement, en noir et blanc (`grayscale(1) contrast(1.06)`). Au 
 ### Page de connexion
 Proposition « Le portrait » choisie par le client : sur ordinateur, le diaporama encadré à gauche (coin haut-droit à 72px), le formulaire à droite sur crème et trame ; sur mobile, le formulaire d'abord, le diaporama dessous, pour que la photo ne prenne pas le pas sur le formulaire.
 
-### Cards / Containers
+### Écrans d'accès (mot de passe oublié, nouveau mot de passe)
+Proposition « L'étoffe » choisie par le client, pour des pages simples et calmes : une colonne centrée sur crème et trame, le soleil en emblème au-dessus du nom, le contenu dans une carte blanche (coins de 28px, haut-gauche à 72px), « AET un jour, AET toujours » en pied. Pas de photo : ces pages vont droit au but.
+- Mot de passe oublié : le formulaire, puis « Le lien est en route » (on ne dit jamais si l'adresse a un compte).
+- Nouveau mot de passe : vérification du lien, « Ce lien n'est plus valable » quand il a expiré ou déjà servi, le formulaire avec les règles qui se cochent au fil de la saisie, puis « C'est fait » et l'accès direct à l'espace (la session est déjà ouverte).
+
+
 - **Carte de parcours :** crème sur le fond vert (jamais vert sur vert), 12px de marge intérieure, une photo de 16:10 puis le titre vert, le texte olive et le lien, sans bloc encadré à l’intérieur. Les trois cartes ont la même couleur. Sur mobile, l’image reste en haut pour les trois cartes. À partir de 768px, celle du milieu inverse l’ordre (texte d’abord, photo ensuite) pour le rythme.
 
 ### Soleil aux neuf pétales (signature)
