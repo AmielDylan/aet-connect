@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createAccessRequest, createPromo } from './support/fixtures'
+import { createAccessRequest, createMember, createPromo } from './support/fixtures'
 import { api, session } from './support/http'
 
 describe('accès aux routes admin', () => {
@@ -114,5 +114,29 @@ describe('statistiques', () => {
     expect(res.status).toBe(200)
     const parRole = Object.values(res.body.roles as Record<string, number>).reduce((a, b) => a + b, 0)
     expect(parRole).toBe(res.body.overview.totalUsers)
+  })
+})
+
+describe('liste des membres', () => {
+  it("donne les nombres par type pour l'école choisie, l'ambassadeur de chaque promo et les invitations utilisées", async () => {
+    const adminSession = await session('admin')
+    const promo = await createPromo()
+    const ambassadeur = await createMember({ promo, isAmbassador: true })
+    const membre = await createMember({ promo })
+    await createMember({ promo, role: 'admin' })
+    const { supabase } = await import('@/config/database')
+    await supabase.from('invitation_codes').insert({
+      code: `AET-T${Date.now().toString(36).slice(-3).toUpperCase()}-TEST`, school_id: promo.schoolId, entry_year: promo.entryYear,
+      created_by_user_id: membre, max_uses: 1, expires_at: new Date(Date.now() + 86_400_000).toISOString()
+    })
+
+    const res = await api().get(`/api/admin/users?school_id=${promo.schoolId}`).set('Authorization', adminSession.auth)
+    const parId = new Map(res.body.users.map((u: any) => [u.id, u]))
+
+    expect(res.status).toBe(200)
+    expect(res.body.counts).toEqual({ all: 3, alumni: 2, moderator: 0, admin: 1, ambassadors: 1 })
+    expect((parId.get(membre) as any).promo_ambassador).toEqual({ first_name: 'Test', last_name: 'Membre' })
+    expect((parId.get(ambassadeur) as any).promo_ambassador).toBeNull()
+    expect((parId.get(membre) as any).invitations_used).toBe(1)
   })
 })

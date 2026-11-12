@@ -18,11 +18,12 @@ Point d’étape au 12 novembre 2026, pour reprendre la refonte dans une nouvell
 | Mon profil `/dashboard/profile` | B « Le bandeau » : le bandeau du profil d’un membre avec la photo à changer sur place, vos informations, ce que voient les AET (dont « Apparaître dans l’annuaire »), mot de passe, départ | oui (PR #12) |
 | Écoles `/dashboard/schools` | A « Les cartes » : bandeau vert avec trois chiffres et la cérémonie, une carte par école (la vôtre en premier), « N membres » et « Voir » vers l’annuaire | oui (PR #12) |
 | Administration, vue d’ensemble `/dashboard/admin` | B « Les chiffres » : quatre chiffres en tuiles blanches (sans cercle), panneau vert des membres par école (barres d’or) et par rôle, demandes d’accès en attente | `develop` |
-| Administration, demandes d’accès `/dashboard/admin/pending` | B « Le tri » : liste à gauche, demande choisie à droite, décision sur place ; l’option ambassadeur n’apparaît que si la promo n’en a pas (sinon, qui la représente) | `develop` |
+| Administration, demandes d’accès `/dashboard/admin/pending` | B « Le tri » : liste à gauche, demande choisie à droite, décision sur place ; l’option ambassadeur n’apparaît que si la promo n’en a pas (sinon, qui la représente) ; sur mobile, filtre en liste déroulante et demandes dépliées comme une FAQ | `develop` |
+| Administration, membres `/dashboard/admin/users` | C « Le tri » : même disposition ; nombres par type selon la recherche et l’école, rôle, ambassadeur (une seule personne par promo), suppression, lien « Profil » | `develop` |
 | Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | oui (PR #9) |
 
 **Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :
-1. Administration : `users` (349), `schools` (388), `deletions` (337). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
+1. Administration : `schools` (388), `deletions` (337). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
 
 ## Comment on travaille
 

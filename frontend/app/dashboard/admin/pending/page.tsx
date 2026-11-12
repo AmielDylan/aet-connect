@@ -4,27 +4,48 @@
 // droite, comme une boîte de réception. On décide sur place ; le message à transmettre prend la place des boutons.
 // Sur mobile, la demande s'ouvre dans la liste, sous son nom.
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAdminCheck } from '@/hooks/use-admin-check'
 import { apiClient } from '@/lib/api'
 import { Drapeau } from '@/components/landing/drapeau'
 import {
-  ChoixAmbassadeur, Filtres, MessageATransmettre, N, boutonAlerte, boutonVert, depuis, lienAlerte, lienSimple, nomComplet,
+  ChoixAmbassadeur,
+  Filtres,
+  MessageATransmettre,
+  N,
+  boutonAlerte,
+  boutonVert,
+  depuis,
+  lienAlerte,
+  lienSimple,
+  nomComplet,
 } from '@/components/espace/administration'
 import type { AccessRequest } from '@/types'
 
 type Filtre = AccessRequest['status'] | 'all'
-type Resultat = { code: string; message: string; envoye: boolean; email: string }
+type Resultat = {
+  code: string
+  message: string
+  envoye: boolean
+  email: string
+}
+
+/** Grand écran : une demande est toujours affichée à droite. Mobile : chaque demande se déplie sur place. */
+const grandEcran = () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
 
 const message = (e: unknown) => (e instanceof Error && e.message ? e.message : 'Une erreur est survenue. Réessayez.')
 
 function Detail({
   d,
+  entete = true,
   resultat,
   onAccepte,
   onRefuse,
 }: {
   d: AccessRequest
+  /** false : dans la liste dépliée (mobile), le nom est déjà au-dessus */
+  entete?: boolean
   resultat: Resultat | null
   onAccepte: (r: Resultat) => void
   onRefuse: () => void
@@ -38,9 +59,17 @@ function Detail({
   }
 
   const accepter = useMutation({
-    mutationFn: () => apiClient.approveAccessRequest(d.id, { grants_ambassador: ambassadeur && !d.promo_ambassador }),
+    mutationFn: () =>
+      apiClient.approveAccessRequest(d.id, {
+        grants_ambassador: ambassadeur && !d.promo_ambassador,
+      }),
     onSuccess: (r) => {
-      onAccepte({ code: r.code, message: r.delivery.text, envoye: r.delivery.sent, email: r.email })
+      onAccepte({
+        code: r.code,
+        message: r.delivery.text,
+        envoye: r.delivery.sent,
+        email: r.email,
+      })
       rafraichir()
     },
   })
@@ -56,9 +85,15 @@ function Detail({
 
   return (
     <div>
-      <p className="text-sm text-olive">Demande reçue {depuis(d.created_at)}</p>
-      <h2 className="mt-1 font-titre text-2xl font-semibold tracking-[-0.02em] text-vert">{nomComplet(d)}</h2>
-      <dl className="mt-5 grid gap-x-6 text-base sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-y-3 [&>dt:first-child]:mt-0 [&>dt]:mt-3 [&>dt]:text-sm sm:[&>dt]:mt-0 sm:[&>dt]:text-base">
+      {entete && (
+        <>
+          <p className="text-sm text-olive">Demande reçue {depuis(d.created_at)}</p>
+          <h2 className="mt-1 font-titre text-2xl font-semibold tracking-[-0.02em] text-vert">{nomComplet(d)}</h2>
+        </>
+      )}
+      <dl
+        className={`${entete ? 'mt-5' : ''} grid gap-x-6 text-base sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-y-3 [&>dt:first-child]:mt-0 [&>dt]:mt-3 [&>dt]:text-sm sm:[&>dt]:mt-0 sm:[&>dt]:text-base`}
+      >
         {ecole && (
           <>
             <dt className="text-olive">École</dt>
@@ -86,13 +121,7 @@ function Detail({
       {d.status === 'pending' && !resultat && (
         <>
           <div className="mt-6">
-            <ChoixAmbassadeur
-              annee={d.entry_year}
-              souhaite={d.wants_ambassador}
-              actuel={d.promo_ambassador}
-              actif={ambassadeur}
-              onChange={setAmbassadeur}
-            />
+            <ChoixAmbassadeur annee={d.entry_year} souhaite={d.wants_ambassador} actuel={d.promo_ambassador} actif={ambassadeur} onChange={setAmbassadeur} />
           </div>
           {erreur && (
             <p role="alert" className="mt-4 text-base font-semibold text-alerte">
@@ -101,9 +130,7 @@ function Detail({
           )}
           {confirmeRefus ? (
             <div className="mt-6 rounded-2xl bg-creme p-4">
-              <p className="text-base text-encre">
-                Refuser la demande{N}? Aucun message n’est envoyé ; la personne pourra en faire une nouvelle.
-              </p>
+              <p className="text-base text-encre">Refuser la demande{N}? Aucun message n’est envoyé ; la personne pourra en faire une nouvelle.</p>
               <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <button type="button" className={boutonAlerte} disabled={refuser.isPending} onClick={() => refuser.mutate()}>
                   {refuser.isPending ? 'Refus…' : 'Refuser la demande'}
@@ -151,8 +178,8 @@ export default function DemandesAcces() {
     enabled: isAdmin,
   })
   const [filtre, setFiltre] = useState<Filtre>('pending')
-  // undefined : la première de la liste ; null : aucune (on a refermé)
-  const [choisie, setChoisie] = useState<string | null | undefined>(undefined)
+  // Mobile : la demande dépliée (aucune au départ). Grand écran : la demande affichée à droite (à défaut, la première).
+  const [choisie, setChoisie] = useState<string | null>(null)
   const [resultats, setResultats] = useState<Record<string, Resultat>>({})
 
   if (!isAdmin) return null
@@ -162,18 +189,19 @@ export default function DemandesAcces() {
   const attente = compte('pending')
   // Une demande tout juste acceptée reste dans la liste, le temps de copier le message
   const liste = demandes.filter((d) => filtre === 'all' || d.status === filtre || resultats[d.id] || d.id === choisie)
-  const active = choisie === undefined ? liste[0] : liste.find((d) => d.id === choisie)
+  const active = liste.find((d) => d.id === choisie) ?? liste[0]
 
-  const detail = (d: AccessRequest) => (
+  const detail = (d: AccessRequest, entete = true) => (
     <Detail
       key={d.id}
       d={d}
+      entete={entete}
       resultat={resultats[d.id] ?? null}
       onAccepte={(r) => {
         setResultats((x) => ({ ...x, [d.id]: r }))
         setChoisie(d.id)
       }}
-      onRefuse={() => setChoisie(undefined)}
+      onRefuse={() => setChoisie(null)}
     />
   )
 
@@ -182,23 +210,23 @@ export default function DemandesAcces() {
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
         <div>
           <h1 className="font-titre text-[clamp(2rem,3.4vw,2.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-vert">Demandes d’accès</h1>
-          <p className="mt-3 text-lg text-olive">
-            {isLoading ? ' ' : attente > 0 ? `${attente} en attente de votre réponse` : 'Aucune demande en attente'}
-          </p>
+          <p className="mt-3 text-lg text-olive">{isLoading ? ' ' : attente > 0 ? `${attente} en attente de votre réponse` : 'Aucune demande en attente'}</p>
         </div>
-        <Filtres
-          valeur={filtre}
-          onChange={(f) => {
-            setFiltre(f)
-            setChoisie(undefined)
-          }}
-          options={[
-            { valeur: 'pending', texte: 'En attente', n: attente },
-            { valeur: 'approved', texte: 'Acceptées', n: compte('approved') },
-            { valeur: 'rejected', texte: 'Refusées', n: compte('rejected') },
-            { valeur: 'all', texte: 'Toutes', n: demandes.length },
-          ]}
-        />
+        <div className="w-full sm:w-auto">
+          <Filtres
+            valeur={filtre}
+            onChange={(f) => {
+              setFiltre(f)
+              setChoisie(null)
+            }}
+            options={[
+              { valeur: 'pending', texte: 'En attente', n: attente },
+              { valeur: 'approved', texte: 'Acceptées', n: compte('approved') },
+              { valeur: 'rejected', texte: 'Refusées', n: compte('rejected') },
+              { valeur: 'all', texte: 'Toutes', n: demandes.length },
+            ]}
+          />
+        </div>
       </div>
 
       {isLoading ? (
@@ -222,43 +250,53 @@ export default function DemandesAcces() {
           {filtre === 'pending' ? 'Aucune demande n’attend de réponse.' : 'Aucune demande ici.'}
         </p>
       ) : (
-        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-          <ul className="grid content-start gap-2">
+        <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+          <ul className="grid grid-cols-[minmax(0,1fr)] content-start gap-2">
             {liste.map((d) => {
-              const ouverte = d.id === active?.id
+              const deplie = d.id === choisie // mobile
+              const choisieIci = d.id === active?.id // grand écran
               return (
-                <li key={d.id}>
+                <li
+                  key={d.id}
+                  className={`rounded-2xl transition-colors ${deplie ? 'max-lg:bg-white max-lg:ring-2 max-lg:ring-vert' : 'max-lg:bg-white/60'} ${
+                    choisieIci ? 'lg:bg-white lg:ring-2 lg:ring-vert' : 'lg:bg-white/60 lg:hover:bg-white'
+                  }`}
+                >
                   <button
                     type="button"
-                    aria-expanded={ouverte}
-                    onClick={() => setChoisie(ouverte ? null : d.id)}
-                    className={`grid w-full gap-0.5 rounded-2xl px-5 py-4 text-left transition-colors ${
-                      ouverte ? 'bg-white ring-2 ring-vert' : 'bg-white/60 hover:bg-white'
-                    }`}
+                    aria-expanded={deplie}
+                    onClick={() => setChoisie(grandEcran() ? d.id : deplie ? null : d.id)}
+                    className="flex w-full items-center gap-3 px-5 py-4 text-left"
                   >
-                    <span className="flex items-baseline justify-between gap-3">
-                      <span className="font-semibold text-vert">{nomComplet(d)}</span>
-                      <span className="shrink-0 text-sm text-olive">{depuis(d.created_at)}</span>
+                    <span className="grid min-w-0 flex-1 gap-0.5">
+                      <span className="flex items-baseline justify-between gap-3">
+                        <span className="font-semibold text-vert">{nomComplet(d)}</span>
+                        <span className="shrink-0 text-sm text-olive">{depuis(d.created_at)}</span>
+                      </span>
+                      <span className="flex flex-wrap items-center gap-x-2 text-sm text-olive">
+                        {d.schools && (
+                          <>
+                            {d.schools.acronym || d.schools.name_fr} <Drapeau pays={d.schools.country} className="h-3 w-auto" /> ·
+                          </>
+                        )}{' '}
+                        {d.entry_year}
+                        {d.status !== 'pending' && <span>· {d.status === 'approved' ? 'acceptée' : 'refusée'}</span>}
+                      </span>
+                      {d.wants_ambassador && <span className="text-sm text-terre">Veut représenter sa promo</span>}
                     </span>
-                    <span className="flex flex-wrap items-center gap-x-2 text-sm text-olive">
-                      {d.schools && (
-                        <>
-                          {d.schools.acronym || d.schools.name_fr} <Drapeau pays={d.schools.country} className="h-3 w-auto" /> ·
-                        </>
-                      )}{' '}
-                      {d.entry_year}
-                      {d.status !== 'pending' && <span>· {d.status === 'approved' ? 'acceptée' : 'refusée'}</span>}
-                    </span>
-                    {d.wants_ambassador && <span className="text-sm text-terre">Veut représenter sa promo</span>}
+                    <ChevronDown
+                      className={`size-5 shrink-0 text-vert transition-transform duration-200 lg:hidden ${deplie ? 'rotate-180' : ''}`}
+                      aria-hidden="true"
+                    />
                   </button>
-                  {ouverte && <div className="mt-2 rounded-3xl bg-white p-5 lg:hidden">{detail(d)}</div>}
+                  {deplie && <div className="px-5 pb-5 pt-1 lg:hidden">{detail(d, false)}</div>}
                 </li>
               )
             })}
           </ul>
 
           <section aria-label="La demande choisie" className="hidden self-start rounded-3xl bg-white p-8 lg:sticky lg:top-6 lg:block">
-            {active ? detail(active) : <p className="text-base text-olive">Choisissez une demande dans la liste.</p>}
+            {active && detail(active)}
           </section>
         </div>
       )}
