@@ -24,7 +24,7 @@ Point d’étape au 12 novembre 2026, pour reprendre la refonte dans une nouvell
 | Administration, suppressions `/dashboard/admin/deletions` | B « Les cartes » : une carte par demande en attente (raison en grand, « Supprimer le compte » ou « Garder le compte », chacun confirmé), puis l’historique | `develop` |
 | Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | oui (PR #9) |
 
-**Reste à refaire** : rien. Toutes les pages de l’espace membre et de l’administration sont dans le style « Esprit de corps ». Briques communes de l’administration dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
+**Reste à refaire** : rien. Toutes les pages de l’espace membre et de l’administration sont dans le style « Esprit de corps ». Briques communes de l’administration dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
 
 ## Comment on travaille
 
