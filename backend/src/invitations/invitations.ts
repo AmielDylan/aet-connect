@@ -1,6 +1,7 @@
 import { randomInt } from 'crypto'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Mailer, InvitationEmail } from './mailer'
+import { ambassadeurDeLaPromo, nomComplet } from '@/utils/ambassadeurs'
 
 export interface Promo {
   schoolId: string
@@ -65,7 +66,7 @@ export function defaultQuota(member: { role: string; isAmbassador: boolean }): n
 
 export type InvitationErrorReason =
   | 'quota_reached' | 'not_allowed' | 'promo_required' | 'not_owner' | 'already_used'
-  | 'request_not_pending' | CodeRefusal
+  | 'request_not_pending' | 'promo_has_ambassador' | CodeRefusal
 
 export class InvitationError extends Error {
   constructor(readonly reason: InvitationErrorReason, message: string) {
@@ -283,6 +284,25 @@ export function createInvitations({ db, mailer, appUrl }: Deps): Invitations {
     return { id: row.id, code: row.code, promo: args.promo, maxUses: args.maxUses, expiresAt }
   }
 
+  /** Un seul ambassadeur par promo : ni membre ambassadeur, ni code « ambassadeur » encore valable */
+  async function verifierPromoSansAmbassadeur(promo: { schoolId: string; entryYear: string }) {
+    const deja = await ambassadeurDeLaPromo(db, promo)
+    if (deja) {
+      throw new InvitationError('promo_has_ambassador', `${nomComplet(deja)} représente déjà cette promo.`)
+    }
+    const { data: codes, error } = await db
+      .from('invitation_codes')
+      .select('id, status:invitation_code_status')
+      .eq('school_id', promo.schoolId)
+      .eq('entry_year', promo.entryYear)
+      .eq('grants_ambassador', true)
+      .is('used_by_user_id', null)
+    if (error) throw error
+    if ((codes ?? []).some((c: { status: string }) => c.status === 'valid')) {
+      throw new InvitationError('promo_has_ambassador', 'Un code d’ambassadeur pour cette promo attend déjà d’être utilisé.')
+    }
+  }
+
   async function approveAccessRequest(adminId: string, requestId: string, grantsAmbassador: boolean): Promise<IssuedCode> {
     const { data: request, error } = await db
       .from('access_requests')
@@ -295,6 +315,7 @@ export function createInvitations({ db, mailer, appUrl }: Deps): Invitations {
     }
 
     const promo = { schoolId: request.school_id, entryYear: request.entry_year }
+    if (grantsAmbassador) await verifierPromoSansAmbassadeur(promo)
     const issued = await insertCode({ issuerId: adminId, isAdmin: true, promo, maxUses: 1, grantsAmbassador })
 
     // status = 'pending' dans le filtre : deux admins qui approuvent en même temps → un seul gagne

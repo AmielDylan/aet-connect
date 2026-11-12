@@ -7,6 +7,7 @@ import { UpdateUserSchema, IncreaseCodeLimitSchema } from '@/utils/validations'
 import { asyncRoute, HttpError } from '@/utils/http'
 import { plainSearchTerm } from '@/utils/search'
 import { logger } from '@/utils/logger'
+import { ambassadeurDeLaPromo, nomComplet } from '@/utils/ambassadeurs'
 
 // Gestion des membres par un admin. Montées sous /api/admin/users.
 const router = Router()
@@ -14,7 +15,7 @@ const router = Router()
 const ROLES = ['alumni', 'moderator', 'admin']
 
 async function member(id: string) {
-  const { data, error } = await supabase.from('users').select('id, role, is_ambassador').eq('id', id).maybeSingle()
+  const { data, error } = await supabase.from('users').select('id, role, is_ambassador, school_id, entry_year').eq('id', id).maybeSingle()
   if (error) throw error
   if (!data) throw new HttpError(404, 'Membre introuvable')
   return data
@@ -82,10 +83,16 @@ router.patch('/:id/role', asyncRoute(async (req, res) => {
 router.patch('/:id/ambassador', asyncRoute(async (req, res) => {
   const is_ambassador = req.body.is_ambassador === true
   const target = await member(req.params.id)
+  if (is_ambassador && target.school_id && target.entry_year) {
+    const deja = await ambassadeurDeLaPromo(supabase, { schoolId: target.school_id, entryYear: target.entry_year }, target.id)
+    if (deja) throw new HttpError(409, `${nomComplet(deja)} représente déjà cette promo.`)
+  }
   const max_codes_allowed = defaultQuota({ role: target.role, isAmbassador: is_ambassador }) ?? 999
 
   const { data, error } = await supabase
     .from('users').update({ is_ambassador, max_codes_allowed }).eq('id', target.id).select().single()
+  // 23505 : un autre admin vient de nommer l'ambassadeur de cette promo (index unique)
+  if (error?.code === '23505') throw new HttpError(409, 'Cette promo a déjà un ambassadeur.')
   if (error) throw error
   res.json(data)
 }))
