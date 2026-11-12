@@ -1,17 +1,6 @@
 import { supabase } from '@/config/database'
+import { toutesLesLignes } from '@/utils/pages'
 import { SchoolFilters, SchoolWithStats, SchoolStatistics } from '@/models/school.model'
-
-/** Toutes les lignes d'une requête, par pages de 1000 (la limite de lignes de l'API de la base) */
-async function toutesLesLignes<T>(page: (de: number, a: number) => PromiseLike<{ data: unknown; error: unknown }>): Promise<T[]> {
-  const lignes: T[] = []
-  for (let de = 0; ; de += 1000) {
-    const { data, error } = await page(de, de + 999)
-    if (error) throw error
-    const lot = (data ?? []) as T[]
-    lignes.push(...lot)
-    if (lot.length < 1000) return lignes
-  }
-}
 
 export class SchoolsService {
   
