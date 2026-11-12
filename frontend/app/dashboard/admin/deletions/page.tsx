@@ -1,337 +1,219 @@
 'use client'
 
-// ═══════════════════════════════════════════════════
-// ADMIN DELETIONS PAGE
-// Gestion des demandes de suppression de compte
-// ═══════════════════════════════════════════════════
-
+// Administration · demandes de suppression, proposition B « Les cartes » : les demandes en attente sont rares ;
+// chacune a sa carte blanche où tout se lit (le membre, sa raison en grand) et où l'on décide : supprimer le compte
+// ou le garder. Dessous, l'historique : ce qui a été décidé, et quand. Une demande traitée garde le nom et l'email.
 import { useState } from 'react'
+import Link from 'next/link'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAdminCheck } from '@/hooks/use-admin-check'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { useToast } from '@/hooks/use-toast'
-import { Check, X, Loader2, Trash2, RefreshCw } from 'lucide-react'
+import { Drapeau } from '@/components/landing/drapeau'
+import { N, boutonAlerte, boutonVert, depuis, lienSimple } from '@/components/espace/administration'
 import type { DeletionRequest } from '@/types'
 
-// ═══════════════════════════════════════════════════
-// STATUS BADGE
-// ═══════════════════════════════════════════════════
+const titre2 = 'font-titre text-xl font-semibold tracking-[-0.02em] text-vert'
+const message = (e: unknown) => (e instanceof Error && e.message ? e.message : 'Une erreur est survenue. Réessayez.')
+const nom = (d: DeletionRequest) => (d.users ? `${d.users.first_name} ${d.users.last_name}`.trim() : null) || d.requester_name || d.requester_email || 'Membre'
+const email = (d: DeletionRequest) => d.users?.email ?? d.requester_email ?? ''
+const issue = (d: DeletionRequest) => (d.status === 'approved' ? 'Compte supprimé' : 'Compte gardé')
 
-function StatusBadge({ status }: { status: DeletionRequest['status'] }) {
-  if (status === 'pending') {
-    return <Badge variant="outline" className="border-yellow-500 text-yellow-600">En attente</Badge>
+/* ─────────── La décision ─────────── */
+
+/**
+ * « Supprimer le compte » (plein, en alerte, après confirmation) ou « Garder le compte » (après confirmation).
+ * Le compte d'un administrateur ne se supprime pas ici : il faut d'abord lui retirer ses droits.
+ */
+function Decision({ d }: { d: DeletionRequest }) {
+  const queryClient = useQueryClient()
+  const [confirme, setConfirme] = useState<null | 'supprimer' | 'garder'>(null)
+  const rafraichir = () => {
+    queryClient.invalidateQueries({ queryKey: ['deletion-requests'] })
+    queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
+    queryClient.invalidateQueries({ queryKey: ['admin-users'] })
   }
-  if (status === 'approved') {
-    return <Badge variant="destructive">Approuvée</Badge>
+  const supprimer = useMutation({ mutationFn: () => apiClient.approveDeletionRequest(d.id), onSuccess: rafraichir })
+  const garder = useMutation({ mutationFn: () => apiClient.rejectDeletionRequest(d.id), onSuccess: rafraichir })
+  const erreur = supprimer.error ?? garder.error
+  const enCours = supprimer.isPending || garder.isPending
+
+  const alerte = erreur && (
+    <p role="alert" className="text-base font-semibold text-alerte">
+      {message(erreur)}
+    </p>
+  )
+
+  if (d.users?.role === 'admin') {
+    return (
+      <div className="grid gap-2">
+        <p className="text-base text-olive">C’est un compte administrateur : retirez-lui d’abord ses droits (page des membres) pour pouvoir le supprimer.</p>
+        {alerte}
+        <div className="flex flex-wrap items-center gap-x-6">
+          <Link href="/dashboard/admin/users" className={lienSimple}>
+            Ouvrir la page des membres
+          </Link>
+          <button type="button" className={lienSimple} disabled={enCours} onClick={() => garder.mutate()}>
+            {garder.isPending ? 'Classement…' : 'Garder le compte'}
+          </button>
+        </div>
+      </div>
+    )
   }
-  return <Badge variant="secondary">Rejetée</Badge>
+
+  if (confirme) {
+    const suppression = confirme === 'supprimer'
+    return (
+      <div className="grid gap-3 rounded-2xl bg-creme p-4">
+        <p className="text-base text-encre">
+          {suppression ? (
+            <>
+              Supprimer le compte de {nom(d)}
+              {N}? Sa fiche disparaît de l’annuaire et ses codes encore valables sont révoqués. La demande reste dans l’historique. On ne peut pas revenir en
+              arrière.
+            </>
+          ) : (
+            <>
+              Garder le compte{N}? La demande est classée et le compte reste actif. Aucun message ne part : pensez à prévenir {d.users?.first_name ?? nom(d)} (
+              {email(d)}).
+            </>
+          )}
+        </p>
+        {alerte}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          {suppression ? (
+            <button type="button" className={boutonAlerte} disabled={enCours} onClick={() => supprimer.mutate()}>
+              {supprimer.isPending ? 'Suppression…' : 'Supprimer le compte'}
+            </button>
+          ) : (
+            <button type="button" className={boutonVert} disabled={enCours} onClick={() => garder.mutate()}>
+              {garder.isPending ? 'Classement…' : 'Garder le compte'}
+            </button>
+          )}
+          <button type="button" className={lienSimple} disabled={enCours} onClick={() => setConfirme(null)}>
+            Annuler
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <button type="button" className={boutonAlerte} onClick={() => setConfirme('supprimer')}>
+        Supprimer le compte
+      </button>
+      <button type="button" className={lienSimple} onClick={() => setConfirme('garder')}>
+        Garder le compte
+      </button>
+    </div>
+  )
 }
 
-// ═══════════════════════════════════════════════════
-// PAGE COMPONENT
-// ═══════════════════════════════════════════════════
+/* ─────────── La page ─────────── */
 
-export default function AdminDeletionsPage() {
+export default function DemandesSuppression() {
   const { isAdmin } = useAdminCheck()
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
-
-  const [statusFilter, setStatusFilter] = useState('pending')
-  const [approveDialog, setApproveDialog] = useState<{ open: boolean; request?: DeletionRequest }>({ open: false })
-  const [rejectDialog, setRejectDialog] = useState<{ open: boolean; request?: DeletionRequest }>({ open: false })
-
-  const { data: requests, isLoading, refetch } = useQuery({
-    queryKey: ['deletion-requests', statusFilter],
-    queryFn: () => apiClient.getDeletionRequests(statusFilter),
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['deletion-requests', 'all'],
+    queryFn: () => apiClient.getDeletionRequests('all'),
     enabled: isAdmin,
   })
 
-  const approveMutation = useMutation({
-    mutationFn: (id: string) => apiClient.approveDeletionRequest(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['deletion-requests'] })
-      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
-      setApproveDialog({ open: false })
-      toast({
-        title: 'Compte supprimé',
-        description: 'Le compte a été supprimé définitivement.',
-      })
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Erreur',
-        description: error.message || 'Impossible de supprimer le compte',
-        variant: 'destructive',
-      })
-    },
-  })
+  if (!isAdmin) return null
 
-  const rejectMutation = useMutation({
-    mutationFn: (id: string) => apiClient.rejectDeletionRequest(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['deletion-requests'] })
-      queryClient.invalidateQueries({ queryKey: ['admin-stats'] })
-      setRejectDialog({ open: false })
-      toast({
-        title: 'Demande rejetée',
-        description: 'Le compte a été conservé.',
-      })
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Erreur',
-        description: error.message || 'Impossible de rejeter la demande',
-        variant: 'destructive',
-      })
-    },
-  })
-
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+  const demandes = data ?? []
+  const enAttente = demandes.filter((d) => d.status === 'pending')
+  const traitees = demandes.filter((d) => d.status !== 'pending').sort((a, b) => (b.processed_at ?? b.created_at).localeCompare(a.processed_at ?? a.created_at))
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Trash2 className="h-8 w-8 text-destructive" />
-            Demandes de suppression
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Gérer les demandes de suppression de compte des membres
-          </p>
+    <div>
+      <h1 className="font-titre text-[clamp(2rem,3.4vw,2.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-vert">Demandes de suppression</h1>
+      <p className="mt-3 min-h-7 max-w-[62ch] text-lg leading-relaxed text-olive">
+        {data &&
+          (enAttente.length > 0
+            ? `${enAttente.length} ${enAttente.length > 1 ? 'membres demandent' : 'membre demande'} à quitter AET Connect. Supprimer le compte efface la fiche ; garder le compte classe la demande.`
+            : 'Aucune demande en attente.')}
+      </p>
+
+      {isLoading ? (
+        <ul className="mt-8 grid gap-4 lg:grid-cols-2" aria-hidden="true">
+          {Array.from({ length: 2 }, (_, i) => (
+            <li key={i} className="h-64 animate-pulse rounded-3xl bg-sable/50" />
+          ))}
+        </ul>
+      ) : isError ? (
+        <div className="mt-8 rounded-3xl bg-white p-8 text-center">
+          <p className="text-base text-olive">Les demandes n’ont pas pu être chargées.</p>
+          <button type="button" onClick={() => refetch()} className={`${boutonVert} mt-4`}>
+            Réessayer
+          </button>
         </div>
-        <Button variant="outline" onClick={() => refetch()}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Actualiser
-        </Button>
-      </div>
-
-      {/* Filtre status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtrer par statut</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">En attente</SelectItem>
-              <SelectItem value="approved">Approuvées</SelectItem>
-              <SelectItem value="rejected">Rejetées</SelectItem>
-              <SelectItem value="all">Toutes</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
-
-      {/* Tableau */}
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : !requests || requests.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Trash2 className="h-10 w-10 text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">
-                Aucune demande de suppression{' '}
-                {statusFilter !== 'all' && `avec le statut "${statusFilter}"`}
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Membre</TableHead>
-                  <TableHead>École</TableHead>
-                  <TableHead>Raison</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(requests as DeletionRequest[]).map((request) => {
-                  const user = request.users
-                  const school = user?.schools
-                  return (
-                    <TableRow key={request.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">
-                            {user ? `${user.first_name} ${user.last_name}` : request.requester_name || '—'}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {user?.email || request.requester_email || '—'}
-                            {!user && request.status === 'approved' && ' · compte supprimé'}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {school?.acronym || school?.name_fr || '—'}
-                      </TableCell>
-                      <TableCell className="max-w-[200px]">
-                        <p className="text-sm text-muted-foreground truncate">
-                          {request.reason || <span className="italic">Aucune raison fournie</span>}
-                        </p>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {formatDate(request.created_at)}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={request.status} />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {request.status === 'pending' && (
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => setApproveDialog({ open: true, request })}
-                            >
-                              <Check className="mr-1 h-3 w-3" />
-                              Approuver
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setRejectDialog({ open: true, request })}
-                            >
-                              <X className="mr-1 h-3 w-3" />
-                              Rejeter
-                            </Button>
-                          </div>
-                        )}
-                        {request.status !== 'pending' && (
-                          <span className="text-xs text-muted-foreground">
-                            {request.processed_at ? formatDate(request.processed_at) : '—'}
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+      ) : (
+        <>
+          {enAttente.length > 0 && (
+            <ul className="mt-8 grid gap-4 lg:grid-cols-2">
+              {enAttente.map((d) => {
+                const ecole = d.users?.schools
+                return (
+                  <li key={d.id} className="flex flex-col rounded-3xl bg-white p-5 sm:p-7">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                      <h2 className="font-titre text-xl font-semibold tracking-[-0.02em] text-vert">{nom(d)}</h2>
+                      <p className="text-sm text-olive">{depuis(d.created_at)}</p>
+                    </div>
+                    {d.users && (
+                      <p className="mt-1 flex flex-wrap items-center gap-x-2 text-base text-encre">
+                        {ecole && (
+                          <>
+                            {ecole.acronym || ecole.name_fr} {ecole.country && <Drapeau pays={ecole.country} className="h-3.5 w-auto" />} ·
+                          </>
+                        )}{' '}
+                        promo {d.users.entry_year}
+                        {d.users.role === 'admin' && <span className="text-terre">· administrateur</span>}
+                      </p>
+                    )}
+                    <p className="mt-0.5 break-all text-base text-olive">
+                      {email(d)}
+                      {d.users && ` · membre depuis ${depuis(d.users.created_at).replace(/^il y a /, '')}`}
+                    </p>
+                    <p className={`mt-4 whitespace-pre-line text-lg leading-relaxed ${d.reason ? 'text-encre' : 'text-olive'}`}>
+                      {d.reason ? `«${N}${d.reason}${N}»` : 'Aucune raison donnée.'}
+                    </p>
+                    <div className="mt-auto pt-6">
+                      <Decision d={d} />
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Dialog Approuver */}
-      <AlertDialog
-        open={approveDialog.open}
-        onOpenChange={(open) => setApproveDialog({ open })}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmer la suppression du compte</AlertDialogTitle>
-            <AlertDialogDescription>
-              Vous êtes sur le point de supprimer définitivement le compte de{' '}
-              <strong>
-                {approveDialog.request?.users
-                  ? `${approveDialog.request.users.first_name} ${approveDialog.request.users.last_name}`
-                  : 'cet utilisateur'}
-              </strong>
-              . Cette action est irréversible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={approveMutation.isPending}>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={approveMutation.isPending}
-              onClick={(e) => {
-                e.preventDefault()
-                if (approveDialog.request) {
-                  approveMutation.mutate(approveDialog.request.id)
-                }
-              }}
-            >
-              {approveMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              Supprimer définitivement
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Dialog Rejeter */}
-      <AlertDialog
-        open={rejectDialog.open}
-        onOpenChange={(open) => setRejectDialog({ open })}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Rejeter la demande de suppression</AlertDialogTitle>
-            <AlertDialogDescription>
-              Le compte de{' '}
-              <strong>
-                {rejectDialog.request?.users
-                  ? `${rejectDialog.request.users.first_name} ${rejectDialog.request.users.last_name}`
-                  : 'cet utilisateur'}
-              </strong>{' '}
-              sera conservé et la demande sera marquée comme rejetée.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={rejectMutation.isPending}>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={rejectMutation.isPending}
-              onClick={(e) => {
-                e.preventDefault()
-                if (rejectDialog.request) {
-                  rejectMutation.mutate(rejectDialog.request.id)
-                }
-              }}
-            >
-              {rejectMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              Rejeter la demande
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          <section aria-labelledby="historique" className="mt-12">
+            <h2 id="historique" className={titre2}>
+              Historique
+            </h2>
+            {traitees.length === 0 ? (
+              <p className="mt-5 text-base text-olive">Aucune demande traitée pour l’instant.</p>
+            ) : (
+              <ul className="mt-5 grid gap-2">
+                {traitees.map((d) => (
+                  <li
+                    key={d.id}
+                    className="grid gap-x-6 gap-y-1 rounded-2xl bg-white/60 px-5 py-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_auto] sm:items-center"
+                  >
+                    <p className="min-w-0 text-base text-encre">
+                      {nom(d)} <span className="break-all text-sm text-olive">· {email(d)}</span>
+                    </p>
+                    <p className="truncate text-sm text-olive">{d.reason ? `«${N}${d.reason}${N}»` : 'Sans raison'}</p>
+                    <p className={`text-sm ${d.status === 'approved' ? 'text-alerte' : 'text-vert'}`}>
+                      {issue(d)} {d.processed_at ? depuis(d.processed_at) : ''}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
     </div>
   )
 }

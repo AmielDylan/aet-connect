@@ -113,10 +113,11 @@ export function EnteteEspace() {
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={`inline-flex min-h-11 items-center gap-2 text-base outline-none transition-colors duration-200 hover:text-terre data-[state=open]:text-terre ${
-                  dansAdmin ? 'text-vert underline decoration-terre decoration-2 underline-offset-8' : 'text-encre'
+                  dansAdmin ? 'text-vert' : 'text-encre'
                 }`}
               >
-                Administration
+                {/* Le soulignement porte sur le mot seul : le nombre à côté n'est pas souligné */}
+                <span className={dansAdmin ? 'underline decoration-terre decoration-2 underline-offset-8' : ''}>Administration</span>
                 <Badge n={demandes + suppressions} />
                 <ChevronDown className="size-4" aria-hidden="true" />
               </DropdownMenuTrigger>

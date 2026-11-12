@@ -21,10 +21,10 @@ Point d’étape au 12 novembre 2026, pour reprendre la refonte dans une nouvell
 | Administration, demandes d’accès `/dashboard/admin/pending` | B « Le tri » : liste à gauche, demande choisie à droite, décision sur place ; l’option ambassadeur n’apparaît que si la promo n’en a pas (sinon, qui la représente) ; sur mobile, filtre en liste déroulante et demandes dépliées comme une FAQ | oui (PR #13) |
 | Administration, membres `/dashboard/admin/users` | C « Le tri » : même disposition ; nombres par type selon la recherche et l’école, rôle, ambassadeur (une seule personne par promo), suppression, lien « Profil » | oui (PR #13) |
 | Administration, écoles `/dashboard/admin/schools` | A « Le tri » : liste et fiche modifiable sur place, ajout, suppression (refusée tant que des membres y sont rattachés) ; une école sans sigle est signalée comme absente du site | `develop` |
+| Administration, suppressions `/dashboard/admin/deletions` | B « Les cartes » : une carte par demande en attente (raison en grand, « Supprimer le compte » ou « Garder le compte », chacun confirmé), puis l’historique | `develop` |
 | Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | oui (PR #9) |
 
-**Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :
-1. Administration : `deletions` (337). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
+**Reste à refaire** : rien. Toutes les pages de l’espace membre et de l’administration sont dans le style « Esprit de corps ». Briques communes de l’administration dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
 
 ## Comment on travaille
 

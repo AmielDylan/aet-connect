@@ -35,6 +35,7 @@ import type {
   ApiError,
   ApproveAccessRequestResponse,
   AccessRequest,
+  DeletionRequest,
   AdminMembersPage,
   AdminSchool,
   AdminSchoolInput,
@@ -375,8 +376,8 @@ class ApiClient {
    * Get deletion requests (requires admin role)
    * GET /api/admin/deletion-requests
    */
-  async getDeletionRequests(status: string = 'pending'): Promise<any[]> {
-    return this.fetch<any[]>(`/api/admin/deletion-requests?status=${status}`)
+  async getDeletionRequests(status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending'): Promise<DeletionRequest[]> {
+    return this.fetch<DeletionRequest[]>(`/api/admin/deletion-requests?status=${status}`)
   }
 
   /**
