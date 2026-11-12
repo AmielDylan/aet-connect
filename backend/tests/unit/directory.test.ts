@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { randomUUID } from 'crypto'
 import { createPromo, createProfile } from './support/fixtures'
 import { api, session } from './support/http'
+import { supabase } from '@/config/database'
 
 let viewer: Awaited<ReturnType<typeof session>>
 let admin: Awaited<ReturnType<typeof session>>
@@ -70,7 +71,7 @@ describe("annuaire (GET /api/users)", () => {
     const discreet = await createProfile({
       promo,
       profile: { current_city: 'Dakar', bio: 'Ma bio', phone: '+221000000', linkedin_url: 'https://linkedin.com/in/x' },
-      privacy: { show_bio: false, show_entry_year: false }
+      privacy: { show_bio: false }
     })
     const open = await createProfile({ promo, profile: { phone: '+229000000' }, privacy: { show_email: true, show_phone: true } })
 
@@ -78,18 +79,21 @@ describe("annuaire (GET /api/users)", () => {
     const byId = Object.fromEntries(res.body.users.map((u: any) => [u.id, u]))
 
     expect(byId[discreet.id]).toMatchObject({
-      current_city: 'Dakar', linkedin_url: 'https://linkedin.com/in/x', bio: null, entry_year: null, email: null, phone: null
+      current_city: 'Dakar', linkedin_url: 'https://linkedin.com/in/x', bio: null, entry_year: promo.entryYear, email: null, phone: null
     })
     expect(byId[open.id]).toMatchObject({ email: open.email, phone: '+229000000' })
   })
 
-  it("filtrer par année ne révèle pas l'année d'un membre qui la masque", async () => {
+  it("la promo se voit toujours : la base refuse de la masquer, et l'API ignore la demande", async () => {
     const promo = await createPromo('1999')
-    await createProfile({ promo, privacy: { show_entry_year: false } })
+    const member = await createProfile({ promo })
+
+    const { error } = await supabase.from('user_privacy_settings').update({ show_entry_year: false }).eq('user_id', member.id)
+    expect(error).not.toBeNull()
 
     const res = await directory({ school_id: promo.schoolId, entry_year: '1999' })
-
-    expect(res.body.total).toBe(0)
+    expect(res.body.total).toBe(1)
+    expect(res.body.users[0].entry_year).toBe('1999')
   })
 
   it('la recherche ignore les accents', async () => {

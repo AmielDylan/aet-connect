@@ -235,7 +235,7 @@ export default function MonProfil() {
             <h2 id="visibilite" className={titre2}>
               Ce que voient les AET
             </h2>
-            <p className="mt-2 text-base leading-relaxed text-olive">Votre nom et votre école se voient toujours{N}: c’est ainsi qu’on vous retrouve.</p>
+            <p className="mt-2 text-base leading-relaxed text-olive">Votre nom, votre école et votre promo se voient toujours{N}: c’est ainsi que vos collègues vous retrouvent.</p>
             {vie ? (
               <form onSubmit={enregistrerVie} className="sur-creme">
                 <div className="mt-5 rounded-2xl bg-creme p-4">
