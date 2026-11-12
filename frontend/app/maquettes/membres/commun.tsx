@@ -4,7 +4,7 @@
 // et un état local qui imite les changements de rôle, le statut d'ambassadeur et la suppression.
 import { useId, useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, Search, Shield, ShieldCheck, Star, User } from 'lucide-react'
+import { ArrowUpRight, ChevronDown, Search } from 'lucide-react'
 import { Brand } from '@/components/landing/site-header'
 import { Portrait } from '@/components/espace/portrait'
 
@@ -15,7 +15,7 @@ export const titre2 = 'font-titre text-xl font-semibold tracking-[-0.02em] text-
 
 export type Role = 'alumni' | 'moderator' | 'admin'
 export const ROLES: { valeur: Role; texte: string; court: string; pluriel: string; plurielCourt: string }[] = [
-  { valeur: 'alumni', texte: 'Membre', court: 'Membre', pluriel: 'Membres', plurielCourt: 'Membres' },
+  { valeur: 'alumni', texte: 'Membre', court: 'Membre', pluriel: 'Membres', plurielCourt: 'Memb.' },
   { valeur: 'moderator', texte: 'Modérateur', court: 'Modér.', pluriel: 'Modérateurs', plurielCourt: 'Modér.' },
   { valeur: 'admin', texte: 'Administrateur', court: 'Admin.', pluriel: 'Administrateurs', plurielCourt: 'Admin.' },
 ]
@@ -98,15 +98,8 @@ export type Etat = ReturnType<typeof useMembres>
 
 // Tous = membres + modérateurs + administrateurs ; les ambassadeurs ont aussi l'un de ces rôles
 export const FILTRES: Filtre[] = ['tous', 'alumni', 'moderator', 'admin', 'ambassadeurs']
-const icone = 'size-[18px]'
-const ICONES: Partial<Record<Filtre, React.ReactNode>> = {
-  alumni: <User className={icone} />,
-  moderator: <Shield className={icone} />,
-  admin: <ShieldCheck className={icone} />,
-  ambassadeurs: <Star className={icone} />,
-}
 const texteCourt = (f: Filtre) =>
-  f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Ambass.' : ROLES.find((r) => r.valeur === f)!.plurielCourt
+  f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Amb.' : ROLES.find((r) => r.valeur === f)!.plurielCourt
 export const texteFiltre = (f: Filtre) =>
   f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Ambassadeurs' : ROLES.find((r) => r.valeur === f)!.pluriel
 
@@ -142,7 +135,7 @@ export function Outils({ e }: { e: Etat }) {
         </label>
       </div>
       <div className="min-w-0">
-        <Filtres valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), court: texteCourt(f), icone: ICONES[f], n: e.compte(f) }))} />
+        <Filtres valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), court: texteCourt(f), n: e.compte(f) }))} />
       </div>
     </div>
   )
@@ -155,7 +148,7 @@ export function ChoixRole({ m, e, moi }: { m: Membre; e: Etat; moi: boolean }) {
   return (
     <fieldset>
       <legend className="text-sm text-olive">Rôle</legend>
-      <div role="radiogroup" className="mt-2 inline-flex max-w-full gap-1 rounded-full bg-sable/60 p-1">
+      <div role="radiogroup" className="mt-2 flex w-full gap-1 rounded-full bg-sable/60 p-1 lg:inline-flex lg:w-auto">
         {ROLES.map((r) => {
           const actif = m.role === r.valeur
           const interdit = moi && r.valeur !== 'admin'
@@ -167,7 +160,7 @@ export function ChoixRole({ m, e, moi }: { m: Membre; e: Etat; moi: boolean }) {
               aria-checked={actif}
               disabled={interdit}
               onClick={() => e.changerRole(m, r.valeur)}
-              className={`inline-flex min-h-10 shrink-0 items-center rounded-full px-3.5 text-sm transition-colors disabled:cursor-not-allowed sm:px-4 disabled:opacity-40 ${
+              className={`inline-flex min-h-10 flex-1 items-center justify-center rounded-full px-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 lg:flex-none lg:px-4 ${
                 actif ? 'bg-white font-semibold text-vert' : 'text-encre hover:text-terre'
               }`}
             >
@@ -267,17 +260,38 @@ export function EnteteMaquette() {
 /* ─────────── Supprimer ─────────── */
 
 /** Supprimer le compte, après confirmation. Ni soi-même, ni un administrateur (lui retirer d'abord ses droits). */
+/** En bas de la fiche : « Supprimer le compte » à gauche, « Profil » à droite ; la confirmation s'ouvre dessous.
+ * Ni soi-même, ni un administrateur (lui retirer d'abord ses droits). */
 export function Supprimer({ m, e, moi, onFait }: { m: Membre; e: Etat; moi: boolean; onFait?: () => void }) {
   const [confirme, setConfirme] = useState(false)
-  if (moi) return null
-  if (m.role === 'admin') return <p className="text-sm text-olive">Pour supprimer ce compte, retirez-lui d’abord ses droits d’administrateur.</p>
-  if (!confirme) {
-    return (
-      <button type="button" className="inline-flex min-h-11 items-center text-base text-alerte underline-offset-4 hover:underline" onClick={() => setConfirme(true)}>
-        Supprimer le compte
-      </button>
-    )
-  }
+  return (
+    <div className="grid gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+        {moi ? (
+          <span />
+        ) : m.role === 'admin' ? (
+          <p className="max-w-[34ch] text-sm text-olive">Pour supprimer ce compte, retirez-lui d’abord ses droits d’administrateur.</p>
+        ) : (
+          <button
+            type="button"
+            aria-expanded={confirme}
+            className="inline-flex min-h-11 items-center text-base text-alerte underline-offset-4 hover:underline"
+            onClick={() => setConfirme(true)}
+          >
+            Supprimer le compte
+          </button>
+        )}
+        <a href={`/profile/${m.id}`} className="ml-auto inline-flex min-h-11 items-center gap-1 text-base text-encre transition-colors hover:text-terre">
+          Profil
+          <ArrowUpRight className="size-[18px]" aria-hidden="true" />
+        </a>
+      </div>
+      {confirme && !moi && m.role !== 'admin' && <Confirmation m={m} e={e} onFait={onFait} onAnnule={() => setConfirme(false)} />}
+    </div>
+  )
+}
+
+function Confirmation({ m, e, onFait, onAnnule }: { m: Membre; e: Etat; onFait?: () => void; onAnnule: () => void }) {
   return (
     <div className="rounded-2xl bg-creme p-4">
       <p className="text-base text-encre">
@@ -294,7 +308,7 @@ export function Supprimer({ m, e, moi, onFait }: { m: Membre; e: Etat; moi: bool
         >
           Supprimer le compte
         </button>
-        <button type="button" className="inline-flex min-h-11 items-center text-base text-encre hover:text-terre" onClick={() => setConfirme(false)}>
+        <button type="button" className="inline-flex min-h-11 items-center text-base text-encre hover:text-terre" onClick={onAnnule}>
           Annuler
         </button>
       </div>

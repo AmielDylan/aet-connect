@@ -76,14 +76,6 @@ function Detail({
       </dl>
       <ChoixRole m={m} e={e} moi={moi} />
       <ChoixAmbassadeurMembre m={m} e={e} />
-      <div className="flex flex-wrap items-center gap-x-6">
-        <a
-          href="#"
-          className="inline-flex min-h-11 items-center text-base text-encre hover:text-terre"
-        >
-          Voir son profil
-        </a>
-      </div>
       <Supprimer m={m} e={e} moi={moi} onFait={onSupprime} />
     </div>
   );

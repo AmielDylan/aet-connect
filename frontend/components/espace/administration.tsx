@@ -32,13 +32,13 @@ export function Filtres<T extends string>({
   valeur,
   onChange,
 }: {
-  /** Sur mobile, pour que tout tienne sur une ligne : une icône (le texte reste lu et s'affiche au survol), ou un libellé court */
-  options: { valeur: T; texte: string; court?: string; icone?: React.ReactNode; n?: number }[]
+  /** court : le libellé sur mobile, où les choix se partagent toute la largeur sur une ligne */
+  options: { valeur: T; texte: string; court?: string; n?: number }[]
   valeur: T
   onChange: (v: T) => void
 }) {
   return (
-    <div role="radiogroup" aria-label="Afficher" className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-sable/60 p-1">
+    <div role="radiogroup" aria-label="Afficher" className="flex w-full gap-0.5 rounded-full bg-sable/60 p-1 sm:inline-flex sm:w-auto sm:max-w-full sm:gap-1 sm:overflow-x-auto">
       {options.map((o) => {
         const actif = valeur === o.valeur
         return (
@@ -47,20 +47,12 @@ export function Filtres<T extends string>({
             type="button"
             role="radio"
             aria-checked={actif}
-            title={o.icone ? o.texte : undefined}
             onClick={() => onChange(o.valeur)}
-            className={`inline-flex min-h-10 shrink-0 items-center gap-1 rounded-full px-2.5 text-sm transition-colors sm:gap-2 sm:px-4 ${
+            className={`inline-flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-1 text-sm transition-colors sm:flex-none sm:shrink-0 sm:gap-2 sm:px-4 ${
               actif ? 'bg-white font-semibold text-vert' : 'text-encre hover:text-terre'
             }`}
           >
-            {o.icone ? (
-              <>
-                <span className="sm:hidden" aria-hidden="true">
-                  {o.icone}
-                </span>
-                <span className="sr-only sm:not-sr-only">{o.texte}</span>
-              </>
-            ) : o.court ? (
+            {o.court ? (
               <>
                 <span className="sm:hidden">{o.court}</span>
                 <span className="hidden sm:inline">{o.texte}</span>
