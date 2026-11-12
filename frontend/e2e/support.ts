@@ -114,3 +114,30 @@ export async function accessRequestOf(id: string): Promise<{ status: string; gra
   const code = (data as { invitation_codes: { grants_ambassador: boolean } | null } | null)?.invitation_codes
   return { status: (data as { status: string } | null)?.status ?? '', grants_ambassador: code?.grants_ambassador ?? null }
 }
+
+/** Une école, retrouvée par son nom (null si elle n'existe pas) */
+export async function schoolByName(name: string): Promise<Record<string, unknown> | null> {
+  const { data } = await admin.from('schools').select('*').eq('name_fr', name).maybeSingle()
+  return data
+}
+
+export async function schoolNameOf(id: string): Promise<string> {
+  const { data } = await admin.from('schools').select('name_fr').eq('id', id).single()
+  return data?.name_fr ?? ''
+}
+
+/** Demande de suppression en attente, comme le membre l'aurait envoyée depuis « Mon profil » */
+export async function createDeletionRequest(member: { id: string; email: string }, opts: { name: string; reason?: string }) {
+  const { data, error } = await admin
+    .from('deletion_requests')
+    .insert({ user_id: member.id, requester_email: member.email, requester_name: opts.name, reason: opts.reason ?? null, status: 'pending' })
+    .select('id')
+    .single()
+  if (error) throw error
+  return data.id as string
+}
+
+export async function deletionStatusOf(id: string): Promise<string | null> {
+  const { data } = await admin.from('deletion_requests').select('status').eq('id', id).maybeSingle()
+  return data?.status ?? null
+}
