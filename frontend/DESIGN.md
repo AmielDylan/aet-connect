@@ -262,6 +262,9 @@ Ces demandes sont rares : pas de filtre. « Demandes de suppression » et une ph
 
 **Badge de l'en-tête** : le nombre à côté d'« Administration » n'est jamais souligné ; seul le mot porte le soulignement de la page active.
 
+### Administration · kit réseaux sociaux (`/dashboard/admin/kit`)
+« Kit réseaux sociaux », une phrase, « Tout télécharger (zip) » (bouton vert, le zip est préparé dans le navigateur avec fflate), puis des pastilles blanches qui mènent à chaque thème. Par thème : le titre numéroté, un conseil de publication, un panneau blanc avec le réseau (`Filtres`, liste déroulante sur fond sable sur mobile), le texte sur fond crème, « Copier le texte », « Envoyer sur WhatsApp », « Publier sur X » ; pour les écoles, une liste choisit l'école dont on veut le texte. Dessous, les visuels en cartes blanches (format, taille, usage), chacun avec « Télécharger » et « Partager » : le partage du téléphone envoie l'image et le texte du réseau choisi ; ailleurs, l'image est téléchargée et le texte copié. Visuels générés par `scripts/kit-reseaux.tsx` dans `public/kit/`, textes dans `lib/kit-reseaux.ts`.
+
 ### Soleil aux neuf pétales (signature)
 - **Le dessin :** neuf pétales, un par école, symétriques, qui s'élargissent vers l'extérieur et ondulent chacun à sa façon. Aucune rotation d'ensemble : le soleil ne doit jamais évoquer une roue tournante. Le cœur est légèrement irrégulier, comme découpé aux ciseaux. Il est généré par `scripts/motifs.mjs` dans `lib/soleil.ts`.
 - **Les usages :**
