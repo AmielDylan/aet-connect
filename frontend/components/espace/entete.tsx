@@ -61,6 +61,7 @@ export function EnteteEspace() {
     { label: 'Membres', href: '/dashboard/admin/users' },
     { label: 'Écoles', href: '/dashboard/admin/schools' },
     { label: 'Suppressions', href: '/dashboard/admin/deletions', badge: suppressions },
+    { label: 'Kit réseaux sociaux', href: '/dashboard/admin/kit' },
   ]
 
   // Un profil de membre s'ouvre depuis l'annuaire : « Annuaire » reste la page courante

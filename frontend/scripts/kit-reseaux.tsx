@@ -1,5 +1,6 @@
-// Génère le kit réseaux sociaux d'AET Connect dans communication/reseaux-sociaux/ : visuels PNG aux formats de
-// chaque réseau, logos, et une page d'aperçu. Les visuels reprennent le système « Esprit de corps » du site :
+// Génère le kit réseaux sociaux d'AET Connect : les visuels PNG aux formats de chaque réseau et les logos dans
+// public/kit/ (servis par le site, page d'administration « Kit réseaux sociaux »), leur liste dans lib/kit-visuels.json,
+// et dans communication/reseaux-sociaux/ le fichier TEXTES.md et une page d'aperçu. Les visuels reprennent le système « Esprit de corps » du site :
 // couleurs, polices (Unbounded, Figtree), trame topographique, soleil aux neuf pétales, drapeaux, photos en noir et blanc.
 //
 //   cd frontend && npx tsx scripts/kit-reseaux.tsx
@@ -12,10 +13,14 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { chromium } from '@playwright/test'
 import { Drapeau } from '../components/landing/drapeau'
 import { SOLEIL_COEUR, SOLEIL_PETALES } from '../lib/soleil'
+import { ECOLES_KIT, SITE, THEMES, fichierEcole, textesMarkdown, type GroupeKit } from '../lib/kit-reseaux'
 
-const RACINE = join(__dirname, '..', '..', 'communication', 'reseaux-sociaux')
 const PUBLIC = join(__dirname, '..', 'public')
-const SITE = 'aet-connect.vercel.app'
+/** Les visuels, servis par le site sous /kit/ */
+const RACINE = join(PUBLIC, 'kit')
+const MANIFESTE = join(__dirname, '..', 'lib', 'kit-visuels.json')
+/** Le dossier à partager : les textes, la charte et l'aperçu */
+const DOSSIER = join(__dirname, '..', '..', 'communication', 'reseaux-sociaux')
 
 const C = {
   vert: '#1D3B2A',
@@ -54,25 +59,7 @@ const drapeau = (pays: string, hauteur: number) =>
 const marque = (taille: number, ton: 'vert' | 'creme') =>
   `<div class="marque" style="gap:${taille * 0.32}px">${soleil(taille, ton === 'vert' ? C.creme : C.vert)}<span class="titre" style="font-size:${taille * 0.62}px;font-weight:500;letter-spacing:-0.02em">AET Connect</span></div>`
 
-/* ─────────── Les écoles (celles du site, avec leur sigle) ─────────── */
-
-const ECOLES = [
-  { sigle: 'EMPT', nom: 'École Militaire Préparatoire Technique', ville: 'Bingerville', pays: 'Côte d’Ivoire', annee: 1962 },
-  { sigle: 'PMS', nom: 'Prytanée militaire Charles N’Tchoréré de Saint-Louis', ville: 'Saint-Louis', pays: 'Sénégal', annee: 1973 },
-  { sigle: 'CME', nom: 'Collège Militaire Eyadema', ville: 'Tchitchao', pays: 'Togo', annee: 1979 },
-  { sigle: 'PMK (Kati)', nom: 'Prytanée militaire de Kati', ville: 'Kati', pays: 'Mali', annee: 1981 },
-  { sigle: 'PMB', nom: 'Prytanée militaire de Bembéréké', ville: 'Bembéréké', pays: 'Bénin', annee: 1986 },
-  { sigle: 'PMK', nom: 'Prytanée militaire de Kadiogo', ville: 'Kamboincè', pays: 'Burkina Faso', annee: 1992 },
-  { sigle: 'PMN', nom: 'Prytanée militaire de Niamey', ville: 'Niamey', pays: 'Niger', annee: 1996 },
-  { sigle: 'LMJF-GMK', nom: 'Lycée Militaire des Jeunes Filles Général Mathieu Kérékou', ville: 'Natitingou', pays: 'Bénin', annee: 2000 },
-  { sigle: 'PML', nom: 'Prytanée Militaire de Libreville', ville: 'Libreville', pays: 'Gabon', annee: 2001 },
-]
-const fichierEcole = (sigle: string) =>
-  sigle
-    .toLowerCase()
-    .replace(/[()]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+const ECOLES = ECOLES_KIT
 
 /* ─────────── La page ─────────── */
 
@@ -344,12 +331,14 @@ function logo(ton: 'vert' | 'creme') {
 
 /* ─────────── Rendu ─────────── */
 
-type Visuel = { chemin: string; html: string; l: number; h: number; transparent?: boolean; groupe: string; usage: string }
+type Visuel = { chemin: string; html: string; l: number; h: number; transparent?: boolean; groupe: GroupeKit; usage: string; format: string; ecole?: string }
 
 function visuels(): Visuel[] {
   const v: Visuel[] = []
-  const ajouter = (groupe: string, usage: string, chemin: string, html: string, l: number, h: number, transparent = false) =>
-    v.push({ groupe, usage, chemin, html, l, h, transparent })
+  const ajouter = (groupe: GroupeKit, usage: string, chemin: string, html: string, l: number, h: number, transparent = false, ecole?: string) => {
+    const format = chemin.match(/-(carre|portrait|story|paysage)\.png$/)?.[1] ?? (groupe === 'carrousel' ? 'portrait' : 'autre')
+    v.push({ groupe, usage, chemin, html, l, h, transparent, format, ecole })
+  }
   const formats = [CARRE, PORTRAIT, STORY, PAYSAGE]
   const USAGE: Record<string, string> = {
     carre: 'Publication Facebook, Instagram, LinkedIn (1080 × 1080)',
@@ -361,7 +350,7 @@ function visuels(): Visuel[] {
   const affiches = [
     {
       dossier: '01-lancement',
-      groupe: '1. Lancement',
+      groupe: 'lancement' as const,
       titre: 'AET un jour, AET toujours',
       texte: 'AET Connect, l’annuaire des Anciens Enfants de Troupe, est en ligne. Sur invitation.',
       photo: PHOTO.ceremonie,
@@ -369,7 +358,7 @@ function visuels(): Visuel[] {
     },
     {
       dossier: '02-votre-promo',
-      groupe: '2. Retrouver sa promo',
+      groupe: 'promo' as const,
       titre: 'Votre promo vous attend',
       texte: 'Retrouvez vos collègues de promotion, entrés dans la même école la même année que vous.',
       photo: PHOTO.promo,
@@ -377,7 +366,7 @@ function visuels(): Visuel[] {
     },
     {
       dossier: '04-ambassadeur',
-      groupe: '4. Ambassadeurs',
+      groupe: 'ambassadeur' as const,
       titre: 'Ouvrir la voie pour sa promo',
       texte: 'Personne de votre promo n’est inscrit ? Vous pouvez demander l’accès et proposer de la représenter : 15 invitations pour rassembler les autres.',
       photo: PHOTO.accueil,
@@ -385,7 +374,7 @@ function visuels(): Visuel[] {
     },
     {
       dossier: '05-entraide',
-      groupe: '5. Entraide',
+      groupe: 'entraide' as const,
       titre: 'Un AET dans chaque ville',
       texte: 'Pour un conseil, une mise en relation ou un premier contact en arrivant : vous pouvez chercher un AET par école, promo, pays ou ville.',
       photo: PHOTO.secours,
@@ -395,44 +384,48 @@ function visuels(): Visuel[] {
   for (const a of affiches) {
     for (const f of formats) ajouter(a.groupe, USAGE[f.nom], `visuels/${a.dossier}/${a.dossier.slice(3)}-${f.nom}.png`, affiche(f, a), f.l, f.h)
   }
-  for (const f of formats) ajouter('3. Les neuf écoles', USAGE[f.nom], `visuels/03-ecoles/neuf-ecoles-${f.nom}.png`, neufEcoles(f), f.l, f.h)
+  for (const f of formats) ajouter('ecoles', USAGE[f.nom], `visuels/03-ecoles/neuf-ecoles-${f.nom}.png`, neufEcoles(f), f.l, f.h)
   for (const e of ECOLES) {
     for (const f of [CARRE, STORY]) {
-      ajouter('3. Les neuf écoles', `${e.sigle} · ${USAGE[f.nom]}`, `visuels/03-ecoles/${fichierEcole(e.sigle)}-${f.nom}.png`, ecole(f, e), f.l, f.h)
+      ajouter('ecoles', `${e.sigle} · ${USAGE[f.nom]}`, `visuels/03-ecoles/${fichierEcole(e.sigle)}-${f.nom}.png`, ecole(f, e), f.l, f.h, false, e.sigle)
     }
   }
-  for (const s of carrousel()) ajouter('6. Carrousel « Rejoindre »', 'Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre', `visuels/06-carrousel-rejoindre/${s.nom}.png`, s.html, 1080, 1350)
-  for (const f of [CARRE, STORY]) ajouter('7. Devise', USAGE[f.nom], `visuels/07-devise/devise-${f.nom}.png`, devise(f), f.l, f.h)
+  for (const s of carrousel()) ajouter('carrousel', 'Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre', `visuels/06-carrousel-rejoindre/${s.nom}.png`, s.html, 1080, 1350)
+  for (const f of [CARRE, STORY]) ajouter('devise', USAGE[f.nom], `visuels/07-devise/devise-${f.nom}.png`, devise(f), f.l, f.h)
 
-  ajouter('Profils et couvertures', 'Photo de profil, fond vert (1080 × 1080, se recadre en rond)', 'profils-et-couvertures/photo-de-profil-vert.png', avatar('vert'), 1080, 1080)
-  ajouter('Profils et couvertures', 'Photo de profil, fond crème (1080 × 1080)', 'profils-et-couvertures/photo-de-profil-creme.png', avatar('creme'), 1080, 1080)
+  ajouter('profils', 'Photo de profil, fond vert (1080 × 1080, se recadre en rond)', 'profils-et-couvertures/photo-de-profil-vert.png', avatar('vert'), 1080, 1080)
+  ajouter('profils', 'Photo de profil, fond crème (1080 × 1080)', 'profils-et-couvertures/photo-de-profil-creme.png', avatar('creme'), 1080, 1080)
   // Les photos de profil recouvrent le bas à gauche des couvertures LinkedIn et X : le texte est décalé à droite
-  ajouter('Profils et couvertures', 'Couverture de page Facebook (1640 × 624)', 'profils-et-couvertures/couverture-facebook.png', couverture(1640, 624, { marge: '0 40px 0 110px', photos: 2 }), 1640, 624)
-  ajouter('Profils et couvertures', 'Bannière de profil LinkedIn (1584 × 396)', 'profils-et-couvertures/banniere-linkedin-profil.png', couverture(1584, 396, { marge: '0 40px 0 470px', photos: 1 }), 1584, 396)
-  ajouter('Profils et couvertures', 'Couverture de page LinkedIn (1128 × 191)', 'profils-et-couvertures/couverture-linkedin-page.png', couverture(1128, 191, { marge: '0 40px', photos: 0, centrer: true }), 1128, 191)
-  ajouter('Profils et couvertures', 'Bannière X (1500 × 500)', 'profils-et-couvertures/banniere-x.png', couverture(1500, 500, { marge: '0 40px 0 320px', photos: 1 }), 1500, 500)
-  ajouter('Profils et couvertures', 'Couverture de groupe WhatsApp ou Facebook (1640 × 856)', 'profils-et-couvertures/couverture-groupe.png', couverture(1640, 856, { marge: '0 40px 0 110px', photos: 2 }), 1640, 856)
+  ajouter('profils', 'Couverture de page Facebook (1640 × 624)', 'profils-et-couvertures/couverture-facebook.png', couverture(1640, 624, { marge: '0 40px 0 110px', photos: 2 }), 1640, 624)
+  ajouter('profils', 'Bannière de profil LinkedIn (1584 × 396)', 'profils-et-couvertures/banniere-linkedin-profil.png', couverture(1584, 396, { marge: '0 40px 0 470px', photos: 1 }), 1584, 396)
+  ajouter('profils', 'Couverture de page LinkedIn (1128 × 191)', 'profils-et-couvertures/couverture-linkedin-page.png', couverture(1128, 191, { marge: '0 40px', photos: 0, centrer: true }), 1128, 191)
+  ajouter('profils', 'Bannière X (1500 × 500)', 'profils-et-couvertures/banniere-x.png', couverture(1500, 500, { marge: '0 40px 0 320px', photos: 1 }), 1500, 500)
+  ajouter('profils', 'Couverture de groupe WhatsApp ou Facebook (1640 × 856)', 'profils-et-couvertures/couverture-groupe.png', couverture(1640, 856, { marge: '0 40px 0 110px', photos: 2 }), 1640, 856)
 
-  ajouter('Marque', 'Logo vert, fond transparent', 'marque/logo-vert.png', logo('vert'), 1600, 400, true)
-  ajouter('Marque', 'Logo crème, fond transparent (sur fond foncé)', 'marque/logo-creme.png', logo('creme'), 1600, 400, true)
-  ajouter('Marque', 'Soleil seul, fond transparent', 'marque/soleil.png', page(1024, 1024, `<div style="display:grid;place-items:center;height:100%">${soleil(960)}</div>`, 'transparent'), 1024, 1024, true)
+  ajouter('marque', 'Logo vert, fond transparent', 'marque/logo-vert.png', logo('vert'), 1600, 400, true)
+  ajouter('marque', 'Logo crème, fond transparent (sur fond foncé)', 'marque/logo-creme.png', logo('creme'), 1600, 400, true)
+  ajouter('marque', 'Soleil seul, fond transparent', 'marque/soleil.png', page(1024, 1024, `<div style="display:grid;place-items:center;height:100%">${soleil(960)}</div>`, 'transparent'), 1024, 1024, true)
   return v
 }
 
 /** Une page qui montre tous les visuels, à ouvrir dans un navigateur */
 function apercu(v: Visuel[]) {
-  // Les thèmes numérotés d'abord, dans l'ordre ; puis profils, couvertures et marque
-  const groupes = [...new Set(v.map((x) => x.groupe))].sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
+  const groupes = THEMES.map((t) => t.id).filter((id) => v.some((x) => x.groupe === id))
+  const titre = (id: GroupeKit) => {
+    const i = THEMES.findIndex((t) => t.id === id)
+    return THEMES[i].textes ? `${i + 1}. ${THEMES[i].titre}` : THEMES[i].titre
+  }
+  const src = (chemin: string) => `../../frontend/public/kit/${chemin}`
   const sections = groupes
     .map((g) => {
       const items = v
         .filter((x) => x.groupe === g)
         .map(
-          (x) => `<figure><a href="${x.chemin}"><img src="${x.chemin}" loading="lazy" style="aspect-ratio:${x.l}/${x.h}"></a>
+          (x) => `<figure><a href="${src(x.chemin)}"><img src="${src(x.chemin)}" loading="lazy" style="aspect-ratio:${x.l}/${x.h}"></a>
             <figcaption><strong>${x.chemin.split('/').pop()}</strong><br>${x.usage}</figcaption></figure>`,
         )
         .join('')
-      return `<section><h2>${g}</h2><div class="grille">${items}</div></section>`
+      return `<section><h2>${titre(g)}</h2><div class="grille">${items}</div></section>`
     })
     .join('')
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -453,13 +446,16 @@ figure img{display:block;width:100%;height:auto;border-radius:10px;background:${
 figcaption{font-size:.85rem;color:${C.olive};padding:10px 4px 4px;line-height:1.4}
 figcaption strong{color:${C.encre}}
 </style></head><body>
-<header><div><h1>Kit réseaux sociaux · AET Connect</h1><p>Tous les visuels prêts à publier, rangés par thème. Cliquez sur une image pour l’ouvrir en grand. Les textes à publier avec chaque visuel sont dans TEXTES.md.</p></div></header>
+<header><div><h1>Kit réseaux sociaux · AET Connect</h1><p>Tous les visuels prêts à publier, rangés par thème. Cliquez sur une image pour l’ouvrir en grand. Les textes à publier avec chaque visuel sont dans TEXTES.md, et sur la page « Kit réseaux sociaux » de l’administration du site.</p></div></header>
 <main>${sections}</main></body></html>`
 }
 
 async function main() {
   const v = visuels()
-  for (const d of ['visuels', 'profils-et-couvertures', 'marque']) rmSync(join(RACINE, d), { recursive: true, force: true })
+  rmSync(RACINE, { recursive: true, force: true })
+  // Les anciennes copies du dossier à partager : les visuels ne vivent plus que dans public/kit
+  for (const d of ['visuels', 'profils-et-couvertures']) rmSync(join(DOSSIER, d), { recursive: true, force: true })
+  for (const f of ['logo-vert.png', 'logo-creme.png', 'soleil.png']) rmSync(join(DOSSIER, 'marque', f), { force: true })
   const navigateur = await chromium.launch({ channel: 'chrome' })
   const contexte = await navigateur.newContext({ deviceScaleFactor: 1 })
   const p = await contexte.newPage()
@@ -473,7 +469,10 @@ async function main() {
     console.log(relative(RACINE, sortie))
   }
   await navigateur.close()
-  writeFileSync(join(RACINE, 'apercu.html'), apercu(v))
+  writeFileSync(join(DOSSIER, 'apercu.html'), apercu(v))
+  writeFileSync(join(DOSSIER, 'TEXTES.md'), textesMarkdown())
+  const manifeste = v.map(({ chemin, l, h, groupe, usage, format, ecole }) => ({ fichier: `/kit/${chemin}`, l, h, groupe, usage, format, ...(ecole ? { ecole } : {}) }))
+  writeFileSync(MANIFESTE, JSON.stringify(manifeste, null, 2) + '\n')
   console.log(`${v.length} visuels générés dans ${relative(process.cwd(), RACINE)}`)
 }
 

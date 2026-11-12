@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { supabase } from '@/config/database'
 import { invitations } from '@/invitations'
 import { asyncRoute, HttpError } from '@/utils/http'
+import { toutesLesLignes } from '@/utils/pages'
 
 // Demandes d'accès : une personne sans code demande à rejoindre sa promo.
 const router = Router()
@@ -20,12 +21,13 @@ router.get('/', asyncRoute(async (req, res) => {
   const demandes = data ?? []
 
   // L'ambassadeur actuel de chaque promo demandée : un seul par promo, l'admin le voit avant de choisir
-  const ecoles = [...new Set(demandes.map((d) => d.school_id).filter(Boolean))]
-  const { data: ambassadeurs, error: ambError } = ecoles.length
-    ? await supabase.from('users').select('first_name, last_name, school_id, entry_year').eq('is_ambassador', true).in('school_id', ecoles)
-    : { data: [], error: null }
-  if (ambError) throw ambError
-  const parPromo = new Map((ambassadeurs ?? []).map((a) => [`${a.school_id}|${a.entry_year}`, { first_name: a.first_name, last_name: a.last_name }]))
+  // Tous les ambassadeurs (un par promo au plus, donc peu nombreux), lus par lots : une liste d'écoles dans
+  // l'adresse de la requête dépasserait sa longueur maximale dès qu'il y a beaucoup de demandes
+  const ambassadeurs = demandes.length
+    ? await toutesLesLignes<{ first_name: string | null; last_name: string | null; school_id: string; entry_year: string }>((de, a) =>
+        supabase.from('users').select('first_name, last_name, school_id, entry_year').eq('is_ambassador', true).order('id').range(de, a))
+    : []
+  const parPromo = new Map(ambassadeurs.map((a) => [`${a.school_id}|${a.entry_year}`, { first_name: a.first_name, last_name: a.last_name }]))
 
   res.json(demandes.map((d) => ({ ...d, promo_ambassador: parPromo.get(`${d.school_id}|${d.entry_year}`) ?? null })))
 }))

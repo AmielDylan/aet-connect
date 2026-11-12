@@ -1,18 +1,18 @@
 # Kit réseaux sociaux · AET Connect
 
-Ce dossier contient tout ce qu'il faut pour parler d'AET Connect sur les réseaux sociaux et inviter d'autres AET : des visuels prêts à publier, les textes qui vont avec, un calendrier de publication et la charte de la marque.
+Tout ce qu'il faut pour parler d'AET Connect sur les réseaux sociaux et inviter d'autres AET : des visuels prêts à publier, les textes qui vont avec, un calendrier de publication et la charte de la marque.
 
-Pour voir tous les visuels d'un coup, ouvrez **`apercu.html`** dans un navigateur (double-clic).
+**Le plus simple : la page « Kit réseaux sociaux » de l'administration du site** (menu Administration). Chaque visuel s'y télécharge ou se partage directement ; sur téléphone, « Partager » envoie l'image et son texte dans WhatsApp, Instagram ou LinkedIn. Le bouton « Tout télécharger » donne un zip avec tous les visuels et les textes.
 
 ## Ce que contient le dossier
 
-| Dossier ou fichier | Contenu |
+| Fichier | Contenu |
 |---|---|
-| `apercu.html` | Tous les visuels sur une seule page, avec leur usage |
-| `TEXTES.md` | Les textes à publier avec chaque visuel, par réseau, le calendrier sur quatre semaines et des messages d'invitation |
-| `visuels/` | Les visuels des publications, rangés par thème |
-| `profils-et-couvertures/` | Photos de profil et images de couverture des pages et des groupes |
-| `marque/` | Logos sur fond transparent et charte (`CHARTE.md`) |
+| `TEXTES.md` | Les textes à publier avec chaque visuel, par réseau, le calendrier sur quatre semaines et des messages d'invitation (les mêmes que sur la page d'administration) |
+| `marque/CHARTE.md` | Les couleurs, les polices, le logo et ce qu'il faut éviter |
+| `apercu.html` | Tous les visuels sur une page, pour qui travaille sur le code du site |
+
+Les visuels eux-mêmes sont dans le zip de la page d'administration, rangés en `visuels/` (par thème), `profils-et-couvertures/` et `marque/` (logos).
 
 ### Les thèmes
 
@@ -72,7 +72,7 @@ Les AET qui ont reçu un code d'un collègue le saisissent directement. Les autr
 
 ## Pour l'équipe technique
 
-Les visuels sont générés à partir du design du site (couleurs, polices, soleil, drapeaux, photos). Après un changement de design ou d'adresse, il suffit de relancer :
+Les visuels sont générés à partir du design du site (couleurs, polices, soleil, drapeaux, photos) dans `frontend/public/kit/`, leur liste dans `frontend/lib/kit-visuels.json`. Les textes vivent dans `frontend/lib/kit-reseaux.ts` (la page d'administration et `TEXTES.md` en sont tirés). Après un changement de design, d'adresse ou de texte, il suffit de relancer :
 
 ```sh
 cd frontend && npx tsx scripts/kit-reseaux.tsx

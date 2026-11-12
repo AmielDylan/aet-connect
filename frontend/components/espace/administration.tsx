@@ -32,11 +32,14 @@ export function Filtres<T extends string>({
   valeur,
   onChange,
   libelle = 'Afficher',
+  surBlanc = false,
 }: {
   options: { valeur: T; texte: string; n?: number }[]
   valeur: T
   onChange: (v: T) => void
   libelle?: string
+  /** Posé sur un panneau blanc : la liste déroulante prend un fond sable pour rester visible */
+  surBlanc?: boolean
 }) {
   const avecNombre = (o: { texte: string; n?: number }) => (o.n === undefined ? o.texte : `${o.texte} (${o.n.toLocaleString('fr-FR')})`)
   return (
@@ -46,7 +49,7 @@ export function Filtres<T extends string>({
         <select
           value={valeur}
           onChange={(e) => onChange(e.target.value as T)}
-          className="h-14 w-full appearance-none rounded-full bg-white pl-6 pr-12 text-base text-encre outline-none ring-vert/30 focus-visible:ring-2"
+          className={`h-14 w-full appearance-none rounded-full pl-6 pr-12 text-base text-encre outline-none ring-vert/30 focus-visible:ring-2 ${surBlanc ? 'bg-sable/60' : 'bg-white'}`}
         >
           {options.map((o) => (
             <option key={o.valeur} value={o.valeur}>
