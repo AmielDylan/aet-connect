@@ -94,7 +94,7 @@ ${trame}
 .titre{font-family:Unbounded,sans-serif;font-weight:700;letter-spacing:-0.03em;line-height:1.06;text-wrap:balance}
 .marque{display:flex;align-items:center;white-space:nowrap}
 .photo{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.06)}
-.cadre{overflow:hidden;background:${C.vertNuit}}
+.cadre{--d:${Math.round(Math.min(l, h) / 72)}px;overflow:hidden;background:${C.vertNuit};box-shadow:var(--d) var(--d) 0 0 ${C.sable};margin-right:var(--d);margin-bottom:var(--d)}
 .or{color:${C.or}}.brume{color:${C.brume}}.olive{color:${C.olive}}.terre{color:${C.terre}}.vert{color:${C.vert}}.creme{color:${C.creme}}
 </style></head><body>${corps}</body></html>`
 }
@@ -123,7 +123,7 @@ function affiche(f: Format, o: { titre: string; texte: string; photo: string; po
           </div>
           <p class="or" style="font-size:24px;font-weight:600">${adresse}</p>
         </div>
-        <div style="padding:20px 20px 20px 0"><div class="cadre" style="height:100%;border-radius:28px 96px 28px 28px">
+        <div style="padding:20px 20px 20px 0;display:flex"><div class="cadre" style="flex:1;border-radius:28px 96px 28px 28px">
           <img class="photo" src="${o.photo}" style="object-position:${o.position ?? 'center'}"></div></div>
       </div>`,
     )
@@ -309,12 +309,12 @@ function couverture(l: number, h: number, o: { marge: string; photos: 0 | 1 | 2;
   const titre = Math.min(h * 0.11, 64)
   const bande =
     o.photos === 2
-      ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%;padding:24px 24px 24px 0">
+      ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;height:100%;padding:24px 24px 24px 0">
         <div class="cadre" style="border-radius:24px"><img class="photo" src="${PHOTO.ceremonie}"></div>
         <div class="cadre" style="border-radius:24px 80px 24px 24px"><img class="photo" src="${PHOTO.promo}" style="object-position:30% center"></div>
       </div>`
       : o.photos === 1
-        ? `<div style="height:100%;padding:20px 20px 20px 0"><div class="cadre" style="height:100%;border-radius:24px 72px 24px 24px"><img class="photo" src="${PHOTO.ceremonie}" style="object-position:center 40%"></div></div>`
+        ? `<div style="height:100%;padding:20px 20px 20px 0;display:flex"><div class="cadre" style="flex:1;border-radius:24px 72px 24px 24px"><img class="photo" src="${PHOTO.ceremonie}" style="object-position:center 40%"></div></div>`
         : ''
   return page(
     l,
@@ -381,15 +381,15 @@ function visuels(): Visuel[] {
       titre: 'Ouvrir la voie pour sa promo',
       texte: 'Personne de votre promo n’est inscrit ? Vous pouvez demander l’accès et proposer de la représenter : 15 invitations pour rassembler les autres.',
       photo: PHOTO.accueil,
-      position: 'center 40%',
+      position: 'center 12%',
     },
     {
       dossier: '05-entraide',
       groupe: '5. Entraide',
       titre: 'Un AET dans chaque ville',
-      texte: 'Pour un conseil, une mise en relation ou un premier contact en arrivant : cherchez un AET par école, promo, pays ou ville.',
+      texte: 'Pour un conseil, une mise en relation ou un premier contact en arrivant : vous pouvez chercher un AET par école, promo, pays ou ville.',
       photo: PHOTO.secours,
-      position: 'center 40%',
+      position: 'center 8%',
     },
   ]
   for (const a of affiches) {
