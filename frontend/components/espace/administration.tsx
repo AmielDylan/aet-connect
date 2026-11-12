@@ -32,7 +32,8 @@ export function Filtres<T extends string>({
   valeur,
   onChange,
 }: {
-  options: { valeur: T; texte: string; n?: number }[]
+  /** Sur mobile, pour que tout tienne sur une ligne : une icône (le texte reste lu et s'affiche au survol), ou un libellé court */
+  options: { valeur: T; texte: string; court?: string; icone?: React.ReactNode; n?: number }[]
   valeur: T
   onChange: (v: T) => void
 }) {
@@ -46,12 +47,27 @@ export function Filtres<T extends string>({
             type="button"
             role="radio"
             aria-checked={actif}
+            title={o.icone ? o.texte : undefined}
             onClick={() => onChange(o.valeur)}
-            className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm transition-colors sm:gap-2 sm:px-4 ${
+            className={`inline-flex min-h-10 shrink-0 items-center gap-1 rounded-full px-2.5 text-sm transition-colors sm:gap-2 sm:px-4 ${
               actif ? 'bg-white font-semibold text-vert' : 'text-encre hover:text-terre'
             }`}
           >
-            {o.texte}
+            {o.icone ? (
+              <>
+                <span className="sm:hidden" aria-hidden="true">
+                  {o.icone}
+                </span>
+                <span className="sr-only sm:not-sr-only">{o.texte}</span>
+              </>
+            ) : o.court ? (
+              <>
+                <span className="sm:hidden">{o.court}</span>
+                <span className="hidden sm:inline">{o.texte}</span>
+              </>
+            ) : (
+              o.texte
+            )}
             {o.n !== undefined && <span className="tabular-nums text-olive">{o.n}</span>}
           </button>
         )

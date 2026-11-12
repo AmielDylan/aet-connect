@@ -4,7 +4,7 @@
 // et un état local qui imite les changements de rôle, le statut d'ambassadeur et la suppression.
 import { useId, useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, Search } from 'lucide-react'
+import { ChevronDown, Search, Shield, ShieldCheck, Star, User } from 'lucide-react'
 import { Brand } from '@/components/landing/site-header'
 import { Portrait } from '@/components/espace/portrait'
 
@@ -14,10 +14,10 @@ export { Filtres, N, boutonAlerte, boutonVert, lienAlerte, lienSimple, depuis, d
 export const titre2 = 'font-titre text-xl font-semibold tracking-[-0.02em] text-vert'
 
 export type Role = 'alumni' | 'moderator' | 'admin'
-export const ROLES: { valeur: Role; texte: string; pluriel: string }[] = [
-  { valeur: 'alumni', texte: 'Membre', pluriel: 'Membres' },
-  { valeur: 'moderator', texte: 'Modérateur', pluriel: 'Modérateurs' },
-  { valeur: 'admin', texte: 'Administrateur', pluriel: 'Administrateurs' },
+export const ROLES: { valeur: Role; texte: string; court: string; pluriel: string; plurielCourt: string }[] = [
+  { valeur: 'alumni', texte: 'Membre', court: 'Membre', pluriel: 'Membres', plurielCourt: 'Membres' },
+  { valeur: 'moderator', texte: 'Modérateur', court: 'Modér.', pluriel: 'Modérateurs', plurielCourt: 'Modér.' },
+  { valeur: 'admin', texte: 'Administrateur', court: 'Admin.', pluriel: 'Administrateurs', plurielCourt: 'Admin.' },
 ]
 export const libelleRole = (r: Role) => ROLES.find((x) => x.valeur === r)!.texte
 
@@ -96,7 +96,17 @@ export function useMembres() {
 }
 export type Etat = ReturnType<typeof useMembres>
 
-export const FILTRES: Filtre[] = ['tous', 'admin', 'moderator', 'ambassadeurs']
+// Tous = membres + modérateurs + administrateurs ; les ambassadeurs ont aussi l'un de ces rôles
+export const FILTRES: Filtre[] = ['tous', 'alumni', 'moderator', 'admin', 'ambassadeurs']
+const icone = 'size-[18px]'
+const ICONES: Partial<Record<Filtre, React.ReactNode>> = {
+  alumni: <User className={icone} />,
+  moderator: <Shield className={icone} />,
+  admin: <ShieldCheck className={icone} />,
+  ambassadeurs: <Star className={icone} />,
+}
+const texteCourt = (f: Filtre) =>
+  f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Ambass.' : ROLES.find((r) => r.valeur === f)!.plurielCourt
 export const texteFiltre = (f: Filtre) =>
   f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Ambassadeurs' : ROLES.find((r) => r.valeur === f)!.pluriel
 
@@ -132,7 +142,7 @@ export function Outils({ e }: { e: Etat }) {
         </label>
       </div>
       <div className="min-w-0">
-        <Filtres valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), n: e.compte(f) }))} />
+        <Filtres valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), court: texteCourt(f), icone: ICONES[f], n: e.compte(f) }))} />
       </div>
     </div>
   )
@@ -145,7 +155,7 @@ export function ChoixRole({ m, e, moi }: { m: Membre; e: Etat; moi: boolean }) {
   return (
     <fieldset>
       <legend className="text-sm text-olive">Rôle</legend>
-      <div role="radiogroup" className="mt-2 inline-flex max-w-full flex-wrap gap-1 rounded-full bg-sable/60 p-1">
+      <div role="radiogroup" className="mt-2 inline-flex max-w-full gap-1 rounded-full bg-sable/60 p-1">
         {ROLES.map((r) => {
           const actif = m.role === r.valeur
           const interdit = moi && r.valeur !== 'admin'
@@ -157,11 +167,12 @@ export function ChoixRole({ m, e, moi }: { m: Membre; e: Etat; moi: boolean }) {
               aria-checked={actif}
               disabled={interdit}
               onClick={() => e.changerRole(m, r.valeur)}
-              className={`inline-flex min-h-10 items-center rounded-full px-4 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`inline-flex min-h-10 shrink-0 items-center rounded-full px-3.5 text-sm transition-colors disabled:cursor-not-allowed sm:px-4 disabled:opacity-40 ${
                 actif ? 'bg-white font-semibold text-vert' : 'text-encre hover:text-terre'
               }`}
             >
-              {r.texte}
+              <span className="sm:hidden">{r.court}</span>
+              <span className="hidden sm:inline">{r.texte}</span>
             </button>
           )
         })}
