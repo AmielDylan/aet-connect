@@ -1,6 +1,6 @@
 # Reprise : refonte « Esprit de corps » d’AET Connect
 
-Point d’étape au 11 novembre 2026, pour reprendre la refonte dans une nouvelle conversation.
+Point d’étape au 12 novembre 2026, pour reprendre la refonte dans une nouvelle conversation.
 À lire avec [PRODUCT.md](../PRODUCT.md) (le produit, le vocabulaire, la politique d’images) et [frontend/DESIGN.md](../frontend/DESIGN.md) (le système visuel et chaque composant).
 
 ## Où on en est
@@ -16,11 +16,12 @@ Point d’étape au 11 novembre 2026, pour reprendre la refonte dans une nouvell
 | Annuaire `/dashboard/directory` | C « La recherche » : bandeau vert « Retrouver un AET », grand champ (nom ou promo), raccourcis Ma promo / Mon école / Ma ville, filtres, fiches, « Voir plus d’AET » | oui (PR #10) |
 | Profil d’un membre `/profile/[id]` | B « Le bandeau » : bandeau à hauteur fixe (c’est le portrait qui la donne), en quelques mots, sa promo, coordonnées (seules celles que le membre montre) ; le profil est dans le cadre de l’espace membre | oui (PR #11) |
 | Mon profil `/dashboard/profile` | B « Le bandeau » : le bandeau du profil d’un membre avec la photo à changer sur place, vos informations, ce que voient les AET (dont « Apparaître dans l’annuaire »), mot de passe, départ | oui (PR #12) |
-| Écoles `/dashboard/schools` | A « Les cartes » : bandeau vert avec trois chiffres et la cérémonie, une carte par école (la vôtre en premier), « N membres » et « Voir » vers l’annuaire | PR #12 |
+| Écoles `/dashboard/schools` | A « Les cartes » : bandeau vert avec trois chiffres et la cérémonie, une carte par école (la vôtre en premier), « N membres » et « Voir » vers l’annuaire | oui (PR #12) |
+| Administration, vue d’ensemble `/dashboard/admin` | B « Les chiffres » : quatre chiffres en tuiles blanches (sans cercle), panneau vert des membres par école (barres d’or) et par rôle, demandes d’accès en attente | branche `feature/admin-ensemble` |
 | Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | oui (PR #9) |
 
 **Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :
-1. Administration : `/dashboard/admin` (149), `pending` (470), `users` (349), `schools` (388), `deletions` (337)
+1. Administration : `pending` (470), `users` (349), `schools` (388), `deletions` (337)
 
 ## Comment on travaille
 
@@ -78,6 +79,7 @@ git checkout main && git merge --ff-only origin/main && git checkout develop && 
 - Le test e2e « profil d’un membre masqué en moins de 2 secondes » peut échouer juste après un redémarrage de l’API.
 - En local, la base compte des centaines d’écoles créées par les tests (une par membre). `GET /api/schools` calculait les statistiques école par école (4 requêtes chacune) et saturait la connexion locale ; elles sont désormais comptées en trois requêtes.
 - Rien n’empêche deux ambassadeurs dans la même promo : l’administration attribue le rôle membre par membre.
+- Les statistiques de l’administration (`GET /api/admin/stats`) ne comptaient par rôle et par école que les 1 000 premiers membres (limite de lignes de l’API de la base) ; elles lisent désormais toute la table par lots (`backend/src/utils/pages.ts`). Les graphiques Recharts ont été retirés.
 - En local, les toutes premières requêtes d’un compte tout juste créé peuvent renvoyer 401 ; React Query réessaie.
 - Dette de lint dans les pages pas encore refaites (`any`, apostrophes), hors des fichiers de la refonte.
 - Les boutons `mailto:admin@aetconnect.com` ont été retirés : domaine non vérifié.

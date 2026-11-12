@@ -104,3 +104,15 @@ describe('garde-fous', () => {
     expect([first.status, second.status]).toEqual([200, 409])
   })
 })
+
+describe('statistiques', () => {
+  it('la répartition par rôle compte tous les membres, au-delà des 1 000 premières lignes', async () => {
+    const admin = await session('admin')
+
+    const res = await api().get('/api/admin/stats').set('Authorization', admin.auth)
+
+    expect(res.status).toBe(200)
+    const parRole = Object.values(res.body.roles as Record<string, number>).reduce((a, b) => a + b, 0)
+    expect(parRole).toBe(res.body.overview.totalUsers)
+  })
+})

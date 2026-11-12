@@ -1,4 +1,5 @@
 import { supabase } from '@/config/database'
+import { toutesLesLignes } from '@/utils/pages'
 import { AdminStats, UpdateUserRequest, IncreaseCodeLimitRequest } from '@/models/admin.model'
 // bcrypt supprimé - plus nécessaire avec Supabase Auth
 
@@ -57,37 +58,24 @@ export class AdminService {
       .select('*', { count: 'exact', head: true })
       .eq('status', 'approved')
     
-    // Répartition par rôle
-    const { data: allUsers } = await supabase
-      .from('users')
-      .select('role')
-    
-    const roles = allUsers?.reduce((acc: any, user: any) => {
-      acc[user.role] = (acc[user.role] || 0) + 1
-      return acc
-    }, {}) || {}
-    
-    // Top 10 écoles (avec acronymes)
-    const { data: usersWithSchools } = await supabase
-      .from('users')
-      .select('school_id, schools!inner(name_fr, acronym)')
-    
+    // Répartition par rôle et par école (les dix plus grandes), sur tous les membres
+    const membres = await toutesLesLignes<{ role: string; schools: { name_fr: string; acronym: string | null } | null }>((de, a) =>
+      supabase.from('users').select('role, schools!left(name_fr, acronym)').order('id').range(de, a))
+
+    const roles: Record<string, number> = {}
     const schoolCounts: Record<string, number> = {}
-    usersWithSchools?.forEach((user: any) => {
-      const school = Array.isArray(user.schools) ? user.schools[0] : user.schools
-      // Utiliser le sigle si disponible, sinon le nom
-      const schoolLabel = school?.acronym || school?.name_fr || 'Non spécifiée'
-      schoolCounts[schoolLabel] = (schoolCounts[schoolLabel] || 0) + 1
-    })
-    
-    const topSchools = Object.entries(schoolCounts)
-      .sort(([, a], [, b]) => (b as number) - (a as number))
-      .slice(0, 10)
-      .reduce((acc, [school, count]) => {
-        acc[school] = count as number
-        return acc
-      }, {} as Record<string, number>)
-    
+    for (const m of membres) {
+      roles[m.role] = (roles[m.role] || 0) + 1
+      const school = Array.isArray(m.schools) ? m.schools[0] : m.schools
+      if (!school) continue
+      const label = school.acronym || school.name_fr
+      schoolCounts[label] = (schoolCounts[label] || 0) + 1
+    }
+
+    const topSchools = Object.fromEntries(
+      Object.entries(schoolCounts).sort(([, a], [, b]) => b - a).slice(0, 10)
+    )
+
     return {
       overview: {
         totalUsers: totalUsers || 0,

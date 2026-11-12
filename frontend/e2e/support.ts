@@ -93,3 +93,17 @@ export async function logout(page: Page) {
   await page.getByRole('menuitem', { name: 'Se déconnecter' }).click()
   await expect(page).toHaveURL(/\/(login)?$/)
 }
+
+/** Demande d'accès en attente, comme une personne sans code l'aurait envoyée. */
+export async function createAccessRequest(opts: { firstName: string; lastName: string; schoolId: string; wantsAmbassador?: boolean }) {
+  const { data, error } = await admin
+    .from('access_requests')
+    .insert({
+      school_id: opts.schoolId, entry_year: '2005', first_name: opts.firstName, last_name: opts.lastName,
+      email: `demande-${randomUUID()}@aetconnect.test`, wants_ambassador: opts.wantsAmbassador ?? false, status: 'pending'
+    })
+    .select('id')
+    .single()
+  if (error) throw error
+  return data.id as string
+}
