@@ -94,7 +94,7 @@ ${trame}
 .titre{font-family:Unbounded,sans-serif;font-weight:700;letter-spacing:-0.03em;line-height:1.06;text-wrap:balance}
 .marque{display:flex;align-items:center;white-space:nowrap}
 .photo{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.06)}
-.cadre{--d:${Math.round(Math.min(l, h) / 72)}px;overflow:hidden;background:${C.vertNuit};box-shadow:var(--d) var(--d) 0 0 ${C.sable};margin-right:var(--d);margin-bottom:var(--d)}
+.cadre{--d:${Math.max(3, Math.round(Math.min(l, h) / 135))}px;overflow:hidden;background:${C.vertNuit};box-shadow:var(--d) var(--d) 0 0 ${C.sable};margin-right:var(--d);margin-bottom:var(--d)}
 .or{color:${C.or}}.brume{color:${C.brume}}.olive{color:${C.olive}}.terre{color:${C.terre}}.vert{color:${C.vert}}.creme{color:${C.creme}}
 </style></head><body>${corps}</body></html>`
 }
