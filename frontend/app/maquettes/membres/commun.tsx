@@ -70,12 +70,10 @@ export function useMembres() {
   const [ecole, setEcole] = useState('')
 
   const t = recherche.trim().toLowerCase()
-  const visibles = membres.filter(
-    (m) =>
-      (!t || `${nom(m)} ${m.email}`.toLowerCase().includes(t)) &&
-      (!ecole || m.ecole === ecole) &&
-      (filtre === 'tous' || (filtre === 'ambassadeurs' ? m.is_ambassador : m.role === filtre)),
-  )
+  // Les nombres des filtres portent sur la recherche et l'école choisies
+  const trouves = membres.filter((m) => (!t || `${nom(m)} ${m.email}`.toLowerCase().includes(t)) && (!ecole || m.ecole === ecole))
+  const garde = (m: Membre, f: Filtre) => f === 'tous' || (f === 'ambassadeurs' ? m.is_ambassador : m.role === f)
+  const visibles = trouves.filter((m) => garde(m, filtre))
   const maj = (id: string, p: Partial<Membre>) => setMembres((l) => l.map((m) => (m.id === id ? { ...m, ...p } : m)))
 
   return {
@@ -88,8 +86,7 @@ export function useMembres() {
     ecole,
     setEcole,
     ecoles: [...new Set(membres.map((m) => m.ecole))].sort(),
-    compte: (f: Filtre) =>
-      f === 'tous' ? membres.length : f === 'ambassadeurs' ? membres.filter((m) => m.is_ambassador).length : membres.filter((m) => m.role === f).length,
+    compte: (f: Filtre) => trouves.filter((m) => garde(m, f)).length,
     /** L'ambassadeur de sa promo, si c'est quelqu'un d'autre */
     ambassadeurDe: (m: Membre) => membres.find((x) => x.id !== m.id && x.is_ambassador && memePromo(x, m)) ?? null,
     changerRole: (m: Membre, role: Role) => maj(m.id, { role, max_codes_allowed: quota(role, m.is_ambassador) }),
@@ -106,7 +103,7 @@ export const texteFiltre = (f: Filtre) =>
 /** Recherche, filtre par rôle et choix de l'école */
 export function Outils({ e }: { e: Etat }) {
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
       <div className="flex flex-col gap-3 sm:flex-row">
         <label className="relative flex-1">
           <span className="sr-only">Rechercher un membre</span>
@@ -134,7 +131,7 @@ export function Outils({ e }: { e: Etat }) {
           <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-5 -translate-y-1/2 text-olive" aria-hidden="true" />
         </label>
       </div>
-      <div>
+      <div className="min-w-0">
         <Filtres valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), n: e.compte(f) }))} />
       </div>
     </div>
