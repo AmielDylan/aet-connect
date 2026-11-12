@@ -34,6 +34,7 @@ import type {
   RequestCodeFromPeerResponse,
   ApiError,
   ApproveAccessRequestResponse,
+  AccessRequest,
   DashboardStats,
   RecentMember
 } from '@/types'
@@ -330,8 +331,8 @@ class ApiClient {
    * Get access requests (requires admin role)
    * GET /api/admin/access-requests
    */
-  async getAccessRequests(status: string = 'pending'): Promise<any[]> {
-    return this.fetch<any[]>(`/api/admin/access-requests?status=${status}`)
+  async getAccessRequests(status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending'): Promise<AccessRequest[]> {
+    return this.fetch<AccessRequest[]>(`/api/admin/access-requests?status=${status}`)
   }
 
   /**

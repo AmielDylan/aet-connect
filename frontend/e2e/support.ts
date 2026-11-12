@@ -107,3 +107,10 @@ export async function createAccessRequest(opts: { firstName: string; lastName: s
   if (error) throw error
   return data.id as string
 }
+
+/** Où en est une demande d'accès, et ce que son code accorde */
+export async function accessRequestOf(id: string): Promise<{ status: string; grants_ambassador: boolean | null }> {
+  const { data } = await admin.from('access_requests').select('status, invitation_codes(grants_ambassador)').eq('id', id).single()
+  const code = (data as { invitation_codes: { grants_ambassador: boolean } | null } | null)?.invitation_codes
+  return { status: (data as { status: string } | null)?.status ?? '', grants_ambassador: code?.grants_ambassador ?? null }
+}
