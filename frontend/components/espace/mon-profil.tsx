@@ -8,7 +8,7 @@ import { apiClient } from '@/lib/api'
 import { uploadAvatar, deleteAvatar } from '@/lib/supabase-storage'
 import { COUNTRY_FLAGS } from '@/lib/countries'
 import { useMemberCache } from '@/hooks/use-current-member'
-import { Champ, ZoneTexte, messageApi } from '@/components/registration/kit'
+import { Champ, REGLES_INSCRIPTION, ZoneTexte, messageApi } from '@/components/registration/kit'
 import type { UserPrivacySettings } from '@/types'
 
 export const N = ' '
@@ -27,8 +27,8 @@ export type Etat = 'repos' | 'envoi' | 'fait'
 export type Vie = Omit<UserPrivacySettings, never>
 
 /** Ce que chaque réglage montre ou masque, dans l'ordre où le profil l'affiche */
-export const REGLAGES: { cle: Exclude<keyof Vie, 'show_in_directory'>; label: string; detail: string }[] = [
-  { cle: 'show_entry_year', label: 'Votre promo', detail: 'L’année d’entrée à l’école' },
+// La promo n'y figure pas : elle se voit toujours, c'est ainsi que les AET se retrouvent
+export const REGLAGES: { cle: Exclude<keyof Vie, 'show_in_directory' | 'show_entry_year'>; label: string; detail: string }[] = [
   { cle: 'show_current_location', label: 'Votre ville', detail: 'La ville et le pays où vous vivez' },
   { cle: 'show_bio', label: 'En quelques mots', detail: 'Votre présentation' },
   { cle: 'show_email', label: 'Votre email', detail: 'Pour qu’on puisse vous écrire' },
@@ -287,16 +287,8 @@ export function usePhotoProfil(member: { id: string; avatar_url: string | null }
 
 /* ─────────── Mot de passe ─────────── */
 
-// Les règles du serveur pour un changement de mot de passe
-const REGLES = [
-  { label: '8 caractères au moins', test: (p: string) => p.length >= 8 },
-  { label: 'une majuscule', test: (p: string) => /[A-Z]/.test(p) },
-  { label: 'une minuscule', test: (p: string) => /[a-z]/.test(p) },
-  { label: 'un chiffre', test: (p: string) => /\d/.test(p) },
-  { label: 'un caractère spécial (@$!%*?&)', test: (p: string) => /[@$!%*?&]/.test(p) },
-]
-// Le serveur n'accepte que ces caractères
-const PERMIS = /^[A-Za-z\d@$!%*?&]*$/
+// Les mêmes règles qu'à l'inscription (le serveur applique les mêmes)
+const REGLES = REGLES_INSCRIPTION
 
 function ChampSecret({
   id,
@@ -354,7 +346,6 @@ export function MotDePasse() {
     e.preventDefault()
     if (!ancien) return setErreur('Il manque votre mot de passe actuel.')
     if (!REGLES.every((r) => r.test(nouveau))) return setErreur('Le nouveau mot de passe ne respecte pas encore toutes les règles.')
-    if (!PERMIS.test(nouveau)) return setErreur('Le nouveau mot de passe contient un caractère non accepté : seuls les lettres sans accent, les chiffres et @$!%*?& le sont.')
     if (nouveau !== confirme) return setErreur('Les deux nouveaux mots de passe ne sont pas identiques.')
     setErreur('')
     setEtat('envoi')

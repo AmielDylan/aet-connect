@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { columnOf, createMember, login } from './support'
+import { PASSWORD, columnOf, createMember, login } from './support'
 
 // « Mon profil » : ce que le membre efface est effacé, ce qu'il masque reste masqué.
 
@@ -60,4 +60,26 @@ test('une photo en paysage reste carrée dans le bandeau et laisse sa place au n
   const p = (await portrait.boundingBox())!
   expect(Math.abs(p.width - p.height)).toBeLessThan(2)
   expect((await bandeau.getByRole('heading', { level: 1 }).boundingBox())!.width).toBeGreaterThan(400)
+})
+
+test('la promo ne se masque pas', async ({ page }) => {
+  const member = await createMember()
+  await login(page, member.email)
+
+  await page.goto('/dashboard/profile')
+  await expect(page.locator('#show_email')).toBeVisible()
+  await expect(page.locator('#show_entry_year')).toHaveCount(0)
+  await expect(page.getByText(/votre promo se voient toujours/)).toBeVisible()
+})
+
+test('un nouveau mot de passe suit les règles de l’inscription, tout caractère permis', async ({ page }) => {
+  const member = await createMember()
+  await login(page, member.email)
+
+  await page.goto('/dashboard/profile')
+  await page.locator('#old_password').fill(PASSWORD)
+  await page.locator('#new_password').fill('Nouveau#mot2passe')
+  await page.locator('#confirm_password').fill('Nouveau#mot2passe')
+  await page.getByRole('button', { name: 'Changer le mot de passe' }).click()
+  await expect(page.getByText('Votre mot de passe a changé')).toBeVisible()
 })
