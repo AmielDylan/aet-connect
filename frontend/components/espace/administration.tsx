@@ -2,7 +2,7 @@
 
 // Briques des pages de l'administration : filtre par statut, choix de l'ambassadeur, message à transmettre.
 import { useId, useState } from 'react'
-import { Check, Copy } from 'lucide-react'
+import { Check, ChevronDown, Copy } from 'lucide-react'
 
 export const N = ' '
 export const boutonVert =
@@ -26,37 +26,57 @@ export const nomComplet = (p: { first_name: string | null; last_name: string | n
 
 /* ─────────── Filtre par statut ─────────── */
 
-/** Un choix parmi quelques statuts, chacun avec son nombre */
+/** Un choix parmi quelques statuts, chacun avec son nombre : une liste déroulante sur mobile, des pastilles au-delà */
 export function Filtres<T extends string>({
   options,
   valeur,
   onChange,
+  libelle = 'Afficher',
 }: {
   options: { valeur: T; texte: string; n?: number }[]
   valeur: T
   onChange: (v: T) => void
+  libelle?: string
 }) {
+  const avecNombre = (o: { texte: string; n?: number }) => (o.n === undefined ? o.texte : `${o.texte} (${o.n.toLocaleString('fr-FR')})`)
   return (
-    <div role="radiogroup" aria-label="Afficher" className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-sable/60 p-1">
-      {options.map((o) => {
-        const actif = valeur === o.valeur
-        return (
-          <button
-            key={o.valeur}
-            type="button"
-            role="radio"
-            aria-checked={actif}
-            onClick={() => onChange(o.valeur)}
-            className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm transition-colors sm:gap-2 sm:px-4 ${
-              actif ? 'bg-white font-semibold text-vert' : 'text-encre hover:text-terre'
-            }`}
-          >
-            {o.texte}
-            {o.n !== undefined && <span className="tabular-nums text-olive">{o.n}</span>}
-          </button>
-        )
-      })}
-    </div>
+    <>
+      <label className="relative block sm:hidden">
+        <span className="sr-only">{libelle}</span>
+        <select
+          value={valeur}
+          onChange={(e) => onChange(e.target.value as T)}
+          className="h-14 w-full appearance-none rounded-full bg-white pl-6 pr-12 text-base text-encre outline-none ring-vert/30 focus-visible:ring-2"
+        >
+          {options.map((o) => (
+            <option key={o.valeur} value={o.valeur}>
+              {avecNombre(o)}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-5 top-1/2 size-5 -translate-y-1/2 text-olive" aria-hidden="true" />
+      </label>
+      <div role="radiogroup" aria-label={libelle} className="hidden max-w-full gap-1 overflow-x-auto rounded-full bg-sable/60 p-1 sm:inline-flex">
+        {options.map((o) => {
+          const actif = valeur === o.valeur
+          return (
+            <button
+              key={o.valeur}
+              type="button"
+              role="radio"
+              aria-checked={actif}
+              onClick={() => onChange(o.valeur)}
+              className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm transition-colors ${
+                actif ? 'bg-white font-semibold text-vert' : 'text-encre hover:text-terre'
+              }`}
+            >
+              {o.texte}
+              {o.n !== undefined && <span className="tabular-nums text-olive">{o.n.toLocaleString('fr-FR')}</span>}
+            </button>
+          )
+        })}
+      </div>
+    </>
   )
 }
 

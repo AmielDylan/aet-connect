@@ -8,6 +8,7 @@ import { asyncRoute, HttpError } from '@/utils/http'
 import { plainSearchTerm } from '@/utils/search'
 import { logger } from '@/utils/logger'
 import { ambassadeurDeLaPromo, nomComplet } from '@/utils/ambassadeurs'
+import { toutesLesLignes } from '@/utils/pages'
 
 // Gestion des membres par un admin. Montées sous /api/admin/users.
 const router = Router()
@@ -22,27 +23,86 @@ async function member(id: string) {
 }
 
 // GET /api/admin/users?search=&role=&school_id=&is_ambassador=&page=&limit=
+// Renvoie aussi, pour la recherche et l'école choisies, le nombre de membres par type (counts),
+// et pour chaque membre : l'ambassadeur de sa promo s'il en a un autre, et ses invitations utilisées.
 router.get('/', asyncRoute(async (req, res) => {
   const { search, role, school_id, is_ambassador } = req.query as Record<string, string | undefined>
-  const page = parseInt((req.query.page as string) ?? '1')
-  const limit = parseInt((req.query.limit as string) ?? '50')
+  const page = Math.max(1, parseInt((req.query.page as string) ?? '1') || 1)
+  const limit = Math.min(100, Math.max(1, parseInt((req.query.limit as string) ?? '50') || 50))
 
-  let query = supabase
-    .from('users')
-    .select('*, schools(id, name_fr, acronym, country)', { count: 'exact' })
   // Texte nettoyé : sans virgule ni parenthèse, il ne peut pas ajouter de condition au or()
   const term = plainSearchTerm(search)
-  if (term) query = query.or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,email.ilike.%${term}%`)
+  const ecole = school_id && school_id !== 'all' ? school_id : null
+  const filtrer = <Q extends { or: (f: string) => Q; eq: (c: string, v: unknown) => Q }>(q: Q): Q => {
+    if (term) q = q.or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,email.ilike.%${term}%`)
+    if (ecole) q = q.eq('school_id', ecole)
+    return q
+  }
+  const compter = async (extra?: (q: any) => any) => {
+    let q = filtrer(supabase.from('users').select('id', { count: 'exact', head: true }) as any)
+    if (extra) q = extra(q)
+    const { count, error } = await q
+    if (error) throw error
+    return count ?? 0
+  }
+
+  let query = filtrer(
+    supabase
+      .from('users')
+      .select(
+        'id, first_name, last_name, email, role, is_ambassador, max_codes_allowed, current_city, entry_year, school_id, avatar_url, created_at, schools(id, name_fr, acronym, country)',
+        { count: 'exact' }
+      ) as any
+  )
   if (role && role !== 'all') query = query.eq('role', role)
-  if (school_id && school_id !== 'all') query = query.eq('school_id', school_id)
   if (is_ambassador === 'true') query = query.eq('is_ambassador', true)
 
   const from = (page - 1) * limit
-  const { data, error, count } = await query.order('created_at', { ascending: false }).range(from, from + limit - 1)
+  const [{ data, error, count }, all, alumni, moderator, admin, ambassadors] = await Promise.all([
+    query.order('created_at', { ascending: false }).range(from, from + limit - 1),
+    compter(),
+    compter((q) => q.eq('role', 'alumni')),
+    compter((q) => q.eq('role', 'moderator')),
+    compter((q) => q.eq('role', 'admin')),
+    compter((q) => q.eq('is_ambassador', true)),
+  ])
   if (error) throw error
+  const membres = (data ?? []) as { id: string; school_id: string | null; entry_year: string | null }[]
+  const ids = membres.map((m) => m.id)
+  const ecoles = [...new Set(membres.map((m) => m.school_id).filter(Boolean))] as string[]
+
+  const [ambassadeurs, codes] = await Promise.all([
+    ecoles.length
+      ? supabase.from('users').select('id, first_name, last_name, school_id, entry_year').eq('is_ambassador', true).in('school_id', ecoles)
+      : Promise.resolve({ data: [], error: null }),
+    ids.length
+      ? toutesLesLignes<{ created_by_user_id: string; current_uses: number; status: string }>((de, a) =>
+          supabase
+            .from('invitation_codes')
+            .select('created_by_user_id, current_uses, status:invitation_code_status')
+            .in('created_by_user_id', ids)
+            .order('id')
+            .range(de, a))
+      : Promise.resolve([]),
+  ])
+  if (ambassadeurs.error) throw ambassadeurs.error
+
+  // Les invitations qui comptent dans le quota : déjà utilisées, ou encore valables
+  const utilisees = new Map<string, number>()
+  for (const c of codes) {
+    if (c.current_uses > 0 || c.status === 'valid') utilisees.set(c.created_by_user_id, (utilisees.get(c.created_by_user_id) ?? 0) + 1)
+  }
 
   res.json({
-    users: data ?? [],
+    users: membres.map((m) => {
+      const amb = (ambassadeurs.data ?? []).find((a) => a.school_id === m.school_id && a.entry_year === m.entry_year && a.id !== m.id)
+      return {
+        ...m,
+        invitations_used: utilisees.get(m.id) ?? 0,
+        promo_ambassador: amb ? { first_name: amb.first_name, last_name: amb.last_name } : null,
+      }
+    }),
+    counts: { all, alumni, moderator, admin, ambassadors },
     pagination: { page, limit, total: count ?? 0, totalPages: Math.ceil((count ?? 0) / limit) }
   })
 }))
