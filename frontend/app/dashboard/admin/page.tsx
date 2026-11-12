@@ -8,7 +8,8 @@ import { useAdminCheck } from '@/hooks/use-admin-check'
 import { apiClient } from '@/lib/api'
 import { Drapeau } from '@/components/landing/drapeau'
 import { LienFleche } from '@/components/landing/lien-fleche'
-import type { AdminStats } from '@/types'
+import { depuis } from '@/components/espace/administration'
+import type { AccessRequest, AdminStats } from '@/types'
 
 const titre2 = 'font-titre text-xl font-semibold tracking-[-0.02em]'
 const chiffre = 'font-titre text-[2.5rem] font-semibold leading-none tabular-nums tracking-[-0.03em] text-vert'
@@ -21,22 +22,6 @@ const ROLES: [string, string, string][] = [
   ['moderator', 'modérateur', 'modérateurs'],
   ['admin', 'administrateur', 'administrateurs'],
 ]
-
-type DemandeAcces = {
-  id: string
-  first_name: string
-  last_name: string
-  entry_year: string
-  wants_ambassador: boolean
-  created_at: string
-  schools: { name_fr: string; acronym: string | null; country: string } | null
-}
-
-/** « aujourd'hui », « hier », « il y a 5 jours » */
-function depuis(date: string) {
-  const jours = Math.max(0, Math.floor((Date.now() - new Date(date).getTime()) / 86_400_000))
-  return new Intl.RelativeTimeFormat('fr', { numeric: 'auto' }).format(-jours, 'day')
-}
 
 /** Les membres par école, en barres d'or : la plus grande école donne la longueur */
 function Barres({ ecoles }: { ecoles: [string, number][] }) {
@@ -61,7 +46,7 @@ function Barres({ ecoles }: { ecoles: [string, number][] }) {
 export default function Administration() {
   const { isAdmin } = useAdminCheck()
   const stats = useQuery<AdminStats>({ queryKey: ['admin-stats'], queryFn: () => apiClient.getAdminStats(), enabled: isAdmin })
-  const demandes = useQuery<DemandeAcces[]>({
+  const demandes = useQuery<AccessRequest[]>({
     queryKey: ['access-requests', 'pending'],
     queryFn: () => apiClient.getAccessRequests('pending'),
     enabled: isAdmin,
