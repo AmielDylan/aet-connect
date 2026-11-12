@@ -11,7 +11,7 @@ import { useMemberCache } from '@/hooks/use-current-member'
 import { Champ, REGLES_INSCRIPTION, ZoneTexte, messageApi } from '@/components/registration/kit'
 import type { UserPrivacySettings } from '@/types'
 
-export const N = ' '
+export const N = '\u00a0'
 export const boutonVert =
   'inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-vert px-7 text-base font-semibold text-creme transition-colors duration-200 hover:bg-vert-carte disabled:opacity-50'
 export const boutonCreme =

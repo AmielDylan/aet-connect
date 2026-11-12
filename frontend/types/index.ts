@@ -413,6 +413,52 @@ export interface GenerateCodeResponse {
   codes_remaining: number | null
 }
 
+/** Un membre vu par l'administration (GET /api/admin/users) */
+export interface AdminMember {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  email: string
+  role: 'alumni' | 'moderator' | 'admin'
+  is_ambassador: boolean
+  max_codes_allowed: number | null
+  current_city: string | null
+  entry_year: string | null
+  school_id: string | null
+  avatar_url: string | null
+  created_at: string
+  schools: { id: string; name_fr: string; acronym: string | null; country: string } | null
+  /** Invitations qui comptent dans son quota (utilisées ou encore valables) */
+  invitations_used: number
+  /** L'ambassadeur de sa promo, si c'est quelqu'un d'autre */
+  promo_ambassador: { first_name: string | null; last_name: string | null } | null
+}
+
+export interface AdminMembersPage {
+  users: AdminMember[]
+  /** Pour la recherche et l'école choisies : le nombre de membres par type */
+  counts: { all: number; alumni: number; moderator: number; admin: number; ambassadors: number }
+  pagination: { page: number; limit: number; total: number; totalPages: number }
+}
+
+/** Demande d'accès d'une personne sans code (GET /api/admin/access-requests) */
+export interface AccessRequest {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  school_id: string | null
+  entry_year: string
+  message: string | null
+  wants_ambassador: boolean
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  processed_at: string | null
+  schools: { id: string; name_fr: string; acronym: string | null; country: string } | null
+  /** L'ambassadeur actuel de sa promo : il n'y en a qu'un par promo */
+  promo_ambassador: { first_name: string | null; last_name: string | null } | null
+}
+
 export interface ApproveAccessRequestResponse {
   success: boolean
   code: string

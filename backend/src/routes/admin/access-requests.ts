@@ -17,7 +17,17 @@ router.get('/', asyncRoute(async (req, res) => {
 
   const { data, error } = await query
   if (error) throw error
-  res.json(data ?? [])
+  const demandes = data ?? []
+
+  // L'ambassadeur actuel de chaque promo demandée : un seul par promo, l'admin le voit avant de choisir
+  const ecoles = [...new Set(demandes.map((d) => d.school_id).filter(Boolean))]
+  const { data: ambassadeurs, error: ambError } = ecoles.length
+    ? await supabase.from('users').select('first_name, last_name, school_id, entry_year').eq('is_ambassador', true).in('school_id', ecoles)
+    : { data: [], error: null }
+  if (ambError) throw ambError
+  const parPromo = new Map((ambassadeurs ?? []).map((a) => [`${a.school_id}|${a.entry_year}`, { first_name: a.first_name, last_name: a.last_name }]))
+
+  res.json(demandes.map((d) => ({ ...d, promo_ambassador: parPromo.get(`${d.school_id}|${d.entry_year}`) ?? null })))
 }))
 
 // POST /api/admin/access-requests/:id/approve { grants_ambassador? }

@@ -34,6 +34,8 @@ import type {
   RequestCodeFromPeerResponse,
   ApiError,
   ApproveAccessRequestResponse,
+  AccessRequest,
+  AdminMembersPage,
   DashboardStats,
   RecentMember
 } from '@/types'
@@ -240,7 +242,7 @@ class ApiClient {
     is_ambassador?: boolean
     page?: number
     limit?: number
-  }): Promise<{ users: any[]; pagination: any }> {
+  }): Promise<AdminMembersPage> {
     const queryParams = new URLSearchParams()
     if (params?.search) queryParams.append('search', params.search)
     if (params?.role) queryParams.append('role', params.role)
@@ -249,7 +251,7 @@ class ApiClient {
     if (params?.page) queryParams.append('page', params.page.toString())
     if (params?.limit) queryParams.append('limit', params.limit.toString())
 
-    return this.fetch<{ users: any[]; pagination: any }>(`/api/admin/users?${queryParams}`)
+    return this.fetch<AdminMembersPage>(`/api/admin/users?${queryParams}`)
   }
 
   /**
@@ -330,8 +332,8 @@ class ApiClient {
    * Get access requests (requires admin role)
    * GET /api/admin/access-requests
    */
-  async getAccessRequests(status: string = 'pending'): Promise<any[]> {
-    return this.fetch<any[]>(`/api/admin/access-requests?status=${status}`)
+  async getAccessRequests(status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending'): Promise<AccessRequest[]> {
+    return this.fetch<AccessRequest[]>(`/api/admin/access-requests?status=${status}`)
   }
 
   /**

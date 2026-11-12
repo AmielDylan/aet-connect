@@ -12,7 +12,8 @@ const STATUS: Record<InvitationErrorReason, number> = {
   not_allowed: 403,
   not_owner: 403,
   already_used: 409,
-  request_not_pending: 409
+  request_not_pending: 409,
+  promo_has_ambassador: 409
 }
 
 /** Traduit une erreur du module en réponse HTTP ; toute autre erreur devient un 500. */
