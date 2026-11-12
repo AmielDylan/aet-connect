@@ -98,15 +98,13 @@ export type Etat = ReturnType<typeof useMembres>
 
 // Tous = membres + modérateurs + administrateurs ; les ambassadeurs ont aussi l'un de ces rôles
 export const FILTRES: Filtre[] = ['tous', 'alumni', 'moderator', 'admin', 'ambassadeurs']
-const texteCourt = (f: Filtre) =>
-  f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Amb.' : ROLES.find((r) => r.valeur === f)!.plurielCourt
 export const texteFiltre = (f: Filtre) =>
   f === 'tous' ? 'Tous' : f === 'ambassadeurs' ? 'Ambassadeurs' : ROLES.find((r) => r.valeur === f)!.pluriel
 
 /** Recherche, filtre par rôle et choix de l'école */
 export function Outils({ e }: { e: Etat }) {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:gap-4">
       <div className="flex flex-col gap-3 sm:flex-row">
         <label className="relative flex-1">
           <span className="sr-only">Rechercher un membre</span>
@@ -135,7 +133,7 @@ export function Outils({ e }: { e: Etat }) {
         </label>
       </div>
       <div className="min-w-0">
-        <Filtres valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), court: texteCourt(f), n: e.compte(f) }))} />
+        <Filtres libelle="Type de membre" valeur={e.filtre} onChange={e.setFiltre} options={FILTRES.map((f) => ({ valeur: f, texte: texteFiltre(f), n: e.compte(f) }))} />
       </div>
     </div>
   )
