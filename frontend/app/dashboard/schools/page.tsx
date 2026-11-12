@@ -1,221 +1,126 @@
-'use client';
+'use client'
 
-// ═══════════════════════════════════════════════════
-// SCHOOLS PAGE
-// Liste de toutes les écoles militaires africaines
-// ═══════════════════════════════════════════════════
+// « Les écoles » · proposition A « Les cartes » : un bandeau vert (le titre, trois chiffres tirés de la base, la
+// cérémonie au drapeau), puis les écoles en cartes blanches de même importance, la vôtre en premier. Sur mobile,
+// les cartes se resserrent : sans la description, l'essentiel tient en quelques lignes.
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api'
+import { useAuth } from '@/hooks/use-auth'
+import { PHOTOS, realSchools, schoolFacts } from '@/lib/landing'
+import { Drapeau } from '@/components/landing/drapeau'
+import { LienFleche } from '@/components/landing/lien-fleche'
+import { PhotoFrame } from '@/components/landing/photo-frame'
+import type { SchoolWithStats } from '@/types'
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import {
-  School as SchoolIcon,
-  MapPin,
-  Users,
-  Award,
-  Calendar,
-  Search,
-  RefreshCw,
-  AlertCircle,
-} from 'lucide-react';
-import type { SchoolWithStats } from '@/types';
+const EN_LETTRES = ['Zéro', 'Une', 'Deux', 'Trois', 'Quatre', 'Cinq', 'Six', 'Sept', 'Huit', 'Neuf', 'Dix', 'Onze', 'Douze']
+const membres = (n: number) => `${n.toLocaleString('fr-FR')} ${n > 1 ? 'membres' : 'membre'}`
 
-function SchoolCard({ school }: { school: SchoolWithStats }) {
+function Carte({ e, mienne = false }: { e: SchoolWithStats; mienne?: boolean }) {
   return (
-    <Card className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <SchoolIcon className="h-5 w-5 text-primary" />
-            <span className="line-clamp-2">{school.name_fr}</span>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {/* Location */}
-        <div className="flex items-center gap-2 text-sm">
-          <MapPin className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium">{school.country}</span>
-          {school.city && <span className="text-muted-foreground">• {school.city}</span>}
-        </div>
-
-        {/* Established Year */}
-        {school.established_year && (
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Fondée en {school.established_year}</span>
-          </div>
-        )}
-
-        {/* Stats */}
-        <div className="flex flex-wrap gap-2 pt-2">
-          <Badge variant="secondary" className="flex items-center gap-1">
-            <Users className="h-3 w-3" />
-            {school.total_members || 0} membres
-          </Badge>
-          {school.total_ambassadors > 0 && (
-            <Badge variant="secondary" className="flex items-center gap-1 bg-yellow-100 text-yellow-800">
-              <Award className="h-3 w-3" />
-              {school.total_ambassadors} ambassadeurs
-            </Badge>
-          )}
-        </div>
-
-        {/* English Name if different */}
-        {school.name_en && school.name_en !== school.name_fr && (
-          <p className="text-xs text-muted-foreground italic">
-            {school.name_en}
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
+    <li className={`flex flex-col rounded-3xl bg-white p-4 sm:p-6 ${mienne ? 'ring-2 ring-terre' : ''}`}>
+      {/* Sur mobile, pays, ville et année tiennent sur cette seule ligne */}
+      <p className="flex flex-wrap items-center gap-x-2 text-sm text-olive">
+        <Drapeau pays={e.country} className="h-3.5 w-auto" />
+        {e.country}
+        <span className="sm:hidden">
+          · {e.city}
+          {e.established_year && ` · ${e.established_year}`}
+        </span>
+        {mienne && <span className="text-terre">· Votre école</span>}
+      </p>
+      <h2 className="mt-1.5 font-titre text-2xl font-bold tracking-[-0.03em] text-vert sm:mt-4 sm:text-3xl">{e.acronym || e.name_fr}</h2>
+      <p className="mt-0.5 text-base leading-snug text-encre sm:mt-1">{e.name_fr}</p>
+      <p className="mt-1 hidden text-sm text-olive sm:block">
+        {e.city}
+        {e.established_year && ` · fondée en ${e.established_year}`}
+      </p>
+      {e.description && <p className="mt-4 hidden text-base leading-relaxed text-olive sm:line-clamp-3">{e.description}</p>}
+      <div className="mt-auto flex flex-wrap items-end justify-between gap-x-4 pt-2 sm:pt-6">
+        <p className="text-base text-encre">
+          <span className="font-titre text-xl font-semibold tabular-nums tracking-[-0.03em] text-vert sm:text-2xl">
+            {(e.total_members ?? 0).toLocaleString('fr-FR')}
+          </span>{' '}
+          {(e.total_members ?? 0) > 1 ? 'membres' : 'membre'}
+        </p>
+        <LienFleche href={`/dashboard/directory?school=${e.id}`} visible>
+          Voir<span className="sr-only"> les {membres(e.total_members ?? 0)} de {e.acronym || e.name_fr}</span>
+        </LienFleche>
+      </div>
+    </li>
+  )
 }
 
-export default function SchoolsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+export default function Ecoles() {
+  const { user } = useAuth()
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['schools'], queryFn: () => apiClient.getSchools() })
 
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ['schools'],
-    queryFn: () => apiClient.getSchools(),
-  });
-
-  // Filter schools based on search
-  const filteredSchools = data?.schools.filter((school) => {
-    if (!searchQuery) return true;
-    
-    const query = searchQuery.toLowerCase();
-    return (
-      school.name_fr.toLowerCase().includes(query) ||
-      school.name_en?.toLowerCase().includes(query) ||
-      school.country.toLowerCase().includes(query) ||
-      school.city.toLowerCase().includes(query)
-    );
-  });
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-10 w-full max-w-md" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-48" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-destructive" />
-              <CardTitle>Erreur de chargement</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {error instanceof Error ? error.message : 'Impossible de charger les écoles'}
-            </p>
-            <Button onClick={() => refetch()} variant="outline" className="w-full">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Réessayer
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!data || data.schools.length === 0) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6 text-center">
-            <SchoolIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">Aucune école trouvée</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const ecoles = realSchools(data?.schools ?? []) as SchoolWithStats[]
+  const faits = schoolFacts(data?.schools ?? [])
+  const mienne = ecoles.find((e) => e.id === user?.school_id)
+  const autres = ecoles.filter((e) => e !== mienne)
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Écoles Militaires Africaines
-        </h1>
-        <p className="text-muted-foreground">
-          Découvrez les établissements de formation militaire à travers l&apos;Afrique
-        </p>
-      </div>
+    <div>
+      <section className="sur-vert trame trame-sur-vert grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme lg:grid-cols-[1.1fr_1fr] lg:rounded-tr-[76px]">
+        <div className="flex flex-col justify-center gap-6 px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
+          <h1 className="font-titre text-[clamp(2rem,3.4vw,2.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-balance">
+            {faits.count ? `${EN_LETTRES[faits.count] ?? faits.count} écoles, une seule famille` : 'Les écoles du réseau'}
+          </h1>
+          <p className="max-w-[44ch] text-lg leading-relaxed text-brume">
+            {`Des prytanées et des écoles militaires${faits.countries > 1 ? ` de ${faits.countries} pays` : ''}, où chacun a appris la même discipline et la même entraide.`}
+          </p>
+          {faits.count > 0 && (
+            <dl className="flex flex-wrap gap-x-10 gap-y-4">
+              {[
+                [String(faits.count), faits.count > 1 ? 'écoles' : 'école'],
+                [String(faits.countries), 'pays'],
+                ...(faits.oldest ? [[String(faits.oldest.year), 'la plus ancienne']] : []),
+              ].map(([chiffre, texte]) => (
+                <div key={texte} className="flex flex-col-reverse">
+                  <dt className="mt-1 text-base text-brume">{texte}</dt>
+                  <dd className="font-titre text-[2.5rem] font-semibold leading-none tabular-nums tracking-[-0.03em] text-or">{chiffre}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
+        {/* Le texte donne la hauteur du bandeau ; la photo remplit la place qui reste */}
+        <div className="relative m-3 mt-0 lg:mt-3">
+          <div className="lg:absolute lg:inset-0">
+            <PhotoFrame
+              photo={PHOTOS.ceremonie}
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="aspect-[1600/966] rounded-[1.25rem] lg:aspect-auto lg:h-full lg:rounded-tr-[64px]"
+            />
+          </div>
+        </div>
+      </section>
 
-      {/* Stats Badge */}
-      <div className="flex items-center gap-2">
-        <Badge variant="secondary" className="text-base">
-          {data.total} écoles enregistrées
-        </Badge>
-        {filteredSchools && filteredSchools.length !== data.total && (
-          <Badge variant="outline">
-            {filteredSchools.length} résultat{filteredSchools.length > 1 ? 's' : ''}
-          </Badge>
-        )}
-      </div>
-
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Rechercher par nom, pays ou ville..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div>
-
-      {/* Schools Grid */}
-      {filteredSchools && filteredSchools.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredSchools.map((school) => (
-            <SchoolCard key={school.id} school={school} />
+      {isLoading ? (
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+          {Array.from({ length: 6 }, (_, i) => (
+            <li key={i} className="h-44 animate-pulse rounded-3xl bg-sable/50 sm:h-80" />
           ))}
+        </ul>
+      ) : isError ? (
+        <div className="mt-12 rounded-3xl bg-white p-8 text-center">
+          <p className="text-base text-olive">Les écoles n’ont pas pu être chargées.</p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-4 inline-flex min-h-12 items-center rounded-full bg-vert px-7 text-base font-semibold text-creme transition-colors hover:bg-vert-carte"
+          >
+            Réessayer
+          </button>
         </div>
       ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Search className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">
-              Aucune école ne correspond à votre recherche
-            </p>
-            <Button
-              variant="link"
-              onClick={() => setSearchQuery('')}
-              className="mt-2"
-            >
-              Réinitialiser la recherche
-            </Button>
-          </CardContent>
-        </Card>
+        <ul className="mt-12 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          {mienne && <Carte e={mienne} mienne />}
+          {autres.map((e) => (
+            <Carte key={e.id} e={e} />
+          ))}
+        </ul>
       )}
     </div>
-  );
+  )
 }

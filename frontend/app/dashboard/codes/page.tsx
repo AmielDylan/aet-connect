@@ -46,9 +46,10 @@ export default function MesCodes() {
 
   return (
     <div>
-      {/* Bandeau : coin haut droit exagéré, la photo lui est concentrique ; la bulle porte le dernier code en attente */}
-      <section className="sur-vert trame trame-sur-vert grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:grid-cols-[1.1fr_1fr] md:items-start md:rounded-tr-[76px]">
-        <div className="flex flex-col justify-center gap-6 self-stretch px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
+      {/* Bandeau : côte à côte dès lg seulement (la photo, plus large, donne la hauteur ; le texte est centré) ;
+          avant, la photo passe sous le texte. Coin haut droit 76px, photo concentrique 64px ; la bulle porte le dernier code */}
+      <section className="sur-vert trame trame-sur-vert grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start lg:rounded-tr-[76px]">
+        <div className="flex flex-col justify-center gap-6 self-center px-6 py-10 sm:px-10 lg:px-12">
           <h1 className="font-titre text-[clamp(2rem,3.4vw,2.8rem)] font-bold leading-[1.05] tracking-[-0.03em]">Vos invitations</h1>
           {isAdmin ? (
             <div className="sur-creme rounded-2xl bg-creme p-5 text-encre">
@@ -56,7 +57,7 @@ export default function MesCodes() {
             </div>
           ) : (
             quota && (
-              <div className="grid gap-3">
+              <div className="grid max-w-xl gap-3">
                 {plusAucune ? (
                   <p className="text-lg leading-relaxed text-brume">
                     Vos {quota.limit} invitations sont en cours ou utilisées. Un code qui expire ou que vous révoquez sans qu’il ait servi vous en rend
@@ -103,11 +104,11 @@ export default function MesCodes() {
             )
           )}
         </div>
-        <div className="md:m-3">
+        <div className="m-3 mt-0 lg:mt-3">
           <PhotoFrame
             photo={PHOTOS.parcoursCode}
-            sizes="(min-width: 768px) 40vw, 100vw"
-            className="aspect-[1312/816] md:rounded-[1.25rem] md:rounded-tr-[64px]"
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="aspect-[1312/816] rounded-[1.25rem] lg:rounded-tr-[64px]"
             bulle={enAttente[0]?.code ?? nouveau ?? undefined}
           />
         </div>

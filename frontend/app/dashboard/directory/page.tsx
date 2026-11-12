@@ -221,11 +221,8 @@ function Annuaire() {
               </li>
             ))}
           </ul>
-          <div className="mt-10 grid justify-items-center gap-3">
-            <p className="text-sm text-olive">
-              {liste.length.toLocaleString('fr-FR')} sur {total.toLocaleString('fr-FR')} AET
-            </p>
-            {membres.hasNextPage && (
+          {membres.hasNextPage && (
+            <div className="mt-10 grid justify-items-center">
               <button
                 type="button"
                 onClick={() => membres.fetchNextPage()}
@@ -235,8 +232,8 @@ function Annuaire() {
                 {membres.isFetchingNextPage && <Loader2 className="size-[18px] animate-spin" aria-hidden="true" />}
                 Voir plus d’AET
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -1,6 +1,18 @@
 import { supabase } from '@/config/database'
 import { SchoolFilters, SchoolWithStats, SchoolStatistics } from '@/models/school.model'
 
+/** Toutes les lignes d'une requête, par pages de 1000 (la limite de lignes de l'API de la base) */
+async function toutesLesLignes<T>(page: (de: number, a: number) => PromiseLike<{ data: unknown; error: unknown }>): Promise<T[]> {
+  const lignes: T[] = []
+  for (let de = 0; ; de += 1000) {
+    const { data, error } = await page(de, de + 999)
+    if (error) throw error
+    const lot = (data ?? []) as T[]
+    lignes.push(...lot)
+    if (lot.length < 1000) return lignes
+  }
+}
+
 export class SchoolsService {
   
   // Liste écoles avec stats agrégées
@@ -23,47 +35,38 @@ export class SchoolsService {
     
     if (error) throw error
     
-    // Ajouter stats pour chaque école
-    const schoolsWithStats = await Promise.all(
-      schools.map(async (school) => {
-        // Compter membres
-        const { count: memberCount } = await supabase
-          .from('users')
-          .select('*', { count: 'exact', head: true })
-          .eq('school_id', school.id)
-          .eq('is_active', true)
-        
-        // Compter ambassadeurs
-        const { count: ambassadorCount } = await supabase
-          .from('users')
-          .select('*', { count: 'exact', head: true })
-          .eq('school_id', school.id)
-          .eq('is_ambassador', true)
-          .eq('is_active', true)
-        
-        // Compter événements créés par membres de cette école
-        const { data: userIds } = await supabase
-          .from('users')
-          .select('id')
-          .eq('school_id', school.id)
-        
-        const ids = userIds?.map(u => u.id) || []
-        
-        const { count: eventCount } = await supabase
-          .from('events')
-          .select('*', { count: 'exact', head: true })
-          .in('created_by_user_id', ids)
-          .eq('is_active', true)
-        
-        return {
-          ...school,
-          total_members: memberCount || 0,
-          total_ambassadors: ambassadorCount || 0,
-          total_events: eventCount || 0
-        }
-      })
+    // Statistiques de toutes les écoles en trois requêtes (et non quatre par école) : les membres, puis les
+    // événements actifs, comptés en mémoire
+    const membres = await toutesLesLignes<{ id: string; school_id: string | null; is_active: boolean; is_ambassador: boolean }>((de, a) =>
+      supabase.from('users').select('id, school_id, is_active, is_ambassador').order('id').range(de, a)
     )
-    
+    const evenements = await toutesLesLignes<{ created_by_user_id: string | null }>((de, a) =>
+      supabase.from('events').select('created_by_user_id').eq('is_active', true).order('id').range(de, a)
+    )
+
+    const parEcole = new Map<string, { total_members: number; total_ambassadors: number; total_events: number }>()
+    const stats = (id: string) => {
+      if (!parEcole.has(id)) parEcole.set(id, { total_members: 0, total_ambassadors: 0, total_events: 0 })
+      return parEcole.get(id)!
+    }
+    const ecoleDe = new Map<string, string>()
+    for (const m of membres) {
+      if (!m.school_id) continue
+      ecoleDe.set(m.id, m.school_id)
+      if (!m.is_active) continue
+      stats(m.school_id).total_members++
+      if (m.is_ambassador) stats(m.school_id).total_ambassadors++
+    }
+    for (const e of evenements) {
+      const ecole = e.created_by_user_id ? ecoleDe.get(e.created_by_user_id) : undefined
+      if (ecole) stats(ecole).total_events++
+    }
+
+    const schoolsWithStats = schools.map((school) => ({
+      ...school,
+      ...(parEcole.get(school.id) ?? { total_members: 0, total_ambassadors: 0, total_events: 0 }),
+    }))
+
     return schoolsWithStats
   }
   

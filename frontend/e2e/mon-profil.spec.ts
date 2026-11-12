@@ -44,22 +44,27 @@ test('masquer son email persiste après rechargement', async ({ page }) => {
   await expect(page.locator('#show_email')).toHaveAttribute('aria-checked', 'false')
 })
 
-test('une photo en paysage reste carrée dans le bandeau et laisse sa place au nom', async ({ page }) => {
+test('le portrait garde la même taille de la tablette au grand écran, sans toucher le bas du bandeau', async ({ page }) => {
   const member = await createMember({ firstName: 'Koffi', lastName: 'Mensah' })
-  await page.setViewportSize({ width: 1024, height: 1366 })
   await login(page, member.email)
 
   await page.goto('/dashboard/profile')
+  // Une photo en paysage : elle ne doit ni élargir le portrait, ni déborder du bandeau
   await page.locator('input[type=file]').setInputFiles('public/images/accueil/garde-honneur.jpg')
   await expect(page.getByRole('button', { name: 'Retirer la photo' })).toBeVisible({ timeout: 15_000 })
   await expect.poll(() => columnOf(member.id, 'avatar_url')).not.toBeNull()
 
-  const bandeau = page.locator('main section').first()
-  const portrait = bandeau.locator('> div').last()
-  await expect(portrait.locator('img')).toBeVisible()
-  const p = (await portrait.boundingBox())!
-  expect(Math.abs(p.width - p.height)).toBeLessThan(2)
-  expect((await bandeau.getByRole('heading', { level: 1 }).boundingBox())!.width).toBeGreaterThan(400)
+  for (const largeur of [768, 1024, 1440]) {
+    await page.setViewportSize({ width: largeur, height: 1000 })
+    const bandeau = page.locator('main section').first()
+    const portrait = bandeau.locator('> div').last()
+    await expect(portrait.locator('img')).toBeVisible()
+    const b = (await bandeau.boundingBox())!
+    const p = (await portrait.boundingBox())!
+    expect(Math.round(p.width), `largeur ${largeur}`).toBe(264)
+    expect(Math.round(p.height), `largeur ${largeur}`).toBe(264)
+    expect(b.y + b.height - (p.y + p.height), `largeur ${largeur}`).toBeGreaterThanOrEqual(11)
+  }
 })
 
 test('la promo ne se masque pas', async ({ page }) => {

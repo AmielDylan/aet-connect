@@ -2,8 +2,8 @@
 
 // « Mon profil » · proposition B « Le bandeau » : le même bandeau que le profil d'un membre (votre portrait, votre
 // nom, votre promo), avec la photo à changer sur place ; dessous, vos informations à gauche, ce que voient les AET,
-// le mot de passe et le départ à droite. Le grand portrait n'apparaît qu'à partir de lg : sur tablette, il prenait
-// la moitié du bandeau ; jusque-là, une vignette précède le nom.
+// le mot de passe et le départ à droite. Le portrait garde la même taille dès md (264px) ; sur mobile, une
+// vignette précède le nom.
 import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -70,7 +70,7 @@ export default function MonProfil() {
   if (isLoading || !member) {
     return (
       <div aria-hidden="true">
-        <div className="h-[18rem] animate-pulse rounded-3xl rounded-tr-[56px] bg-sable/60 lg:h-[24rem] lg:rounded-tr-[76px]" />
+        <div className="h-[18rem] animate-pulse rounded-3xl rounded-tr-[56px] bg-sable/60 md:rounded-tr-[76px]" />
         <div className="mt-12 grid gap-10 lg:grid-cols-[1.3fr_1fr]">
           <div className="h-[36rem] animate-pulse rounded-3xl bg-sable/40" />
           <div className="h-[28rem] animate-pulse rounded-3xl bg-sable/40" />
@@ -140,17 +140,17 @@ export default function MonProfil() {
 
   return (
     <div>
-      {/* Bandeau : hauteur fixe dès lg (le portrait la donne) ; coin haut droit 76px, portrait concentrique 64px */}
-      <section className="sur-vert trame trame-sur-vert grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme lg:h-[24rem] lg:grid-cols-[1fr_auto] lg:rounded-tr-[76px]">
-        <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 lg:px-12">
+      {/* Bandeau : au moins la hauteur du portrait (264px + marges) ; coin haut droit 76px, portrait concentrique 64px */}
+      <section className="sur-vert trame trame-sur-vert grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:min-h-[18rem] md:grid-cols-[minmax(0,1fr)_auto] md:rounded-tr-[76px]">
+        <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 md:gap-3 md:py-7 lg:px-12">
           <Portrait
             prenom={member.first_name}
             nom={member.last_name}
             src={member.avatar_url}
-            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert lg:hidden"
+            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert md:hidden"
           />
           <p className="text-base text-or">Votre profil{member.is_ambassador && ' · Représente sa promo'}</p>
-          <h1 className="font-titre text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] lg:line-clamp-2">
+          <h1 className="font-titre text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] md:line-clamp-2">
             {member.first_name} {member.last_name}
           </h1>
           <p className="flex flex-wrap items-center gap-x-2 text-base text-brume lg:text-lg">
@@ -193,8 +193,8 @@ export default function MonProfil() {
           )}
           {photo.champ}
         </div>
-        {/* Cadre carré fixe (24rem - 2 × 12px) : une photo en paysage garde sa place, elle est recadrée */}
-        <div className="hidden lg:m-3 lg:block lg:size-[22.5rem]">
+        {/* Portrait de taille fixe dès md (264px, marge 12px) : il ne grandit pas avec l'écran ; une photo en paysage est recadrée */}
+        <div className="hidden md:m-3 md:block md:size-[16.5rem] md:self-start">
           <button type="button" onClick={photo.choisir} className="group relative block size-full" aria-hidden="true" tabIndex={-1}>
             <Portrait
               prenom={member.first_name}

@@ -1,7 +1,7 @@
 'use client'
 
 // Le profil d'un membre · proposition B « Le bandeau ».
-// Le bandeau a une hauteur fixe dès lg (1024px) : c'est le portrait qui la donne, jamais le texte. Le texte est
+// Le bandeau a la même hauteur dès md : c'est le portrait, de taille fixe, qui la donne, jamais le texte. Le texte est
 // donc ramassé (le lien et « Représente sa promo » sur une ligne ; école, promo et ville sur une autre ; le nom
 // sur deux lignes au plus), quelles que soient les informations que le membre a choisi de montrer.
 import Link from 'next/link'
@@ -42,7 +42,7 @@ export default function ProfilMembre() {
     return (
       <div aria-hidden="true">
         <div className="h-11" />
-        <div className="mt-4 h-[22rem] animate-pulse rounded-3xl rounded-tr-[76px] bg-sable/60" />
+        <div className="mt-4 h-[18rem] animate-pulse rounded-3xl rounded-tr-[76px] bg-sable/60" />
       </div>
     )
   }
@@ -74,18 +74,18 @@ export default function ProfilMembre() {
     <div>
       <Retour />
 
-      {/* Bandeau : hauteur fixe dès lg (le portrait la donne ; sur tablette, il prenait la moitié du bandeau) ; coin haut droit 76px, portrait concentrique 64px */}
-      <section className="sur-vert trame trame-sur-vert mt-4 grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme lg:h-[24rem] lg:grid-cols-[1fr_auto] lg:rounded-tr-[76px]">
-        <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 lg:px-12">
-          {/* Sur mobile et tablette : une vignette avant le nom (le grand portrait n'apparaît qu'à partir de lg) */}
+      {/* Bandeau : le portrait (264px) donne la hauteur dès md, sans grandir avec l'écran ; coin haut droit 76px, portrait concentrique 64px */}
+      <section className="sur-vert trame trame-sur-vert mt-4 grid overflow-hidden rounded-3xl rounded-tr-[56px] bg-vert text-creme md:min-h-[18rem] md:grid-cols-[minmax(0,1fr)_auto] md:rounded-tr-[76px]">
+        <div className="flex min-h-0 min-w-0 flex-col justify-center gap-4 px-6 py-8 sm:px-10 md:gap-3 md:py-7 lg:px-12">
+          {/* Sur mobile : une vignette avant le nom (le portrait passe à droite à partir de md) */}
           <Portrait
             prenom={p.first_name}
             nom={p.last_name}
             src={p.avatar_url}
-            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert lg:hidden"
+            className="size-24 rounded-2xl rounded-tr-[36px] bg-sable text-2xl text-vert md:hidden"
           />
           {enTete && <p className="text-base text-or">{enTete}</p>}
-          <h1 className="font-titre lg:line-clamp-2 text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]">
+          <h1 className="font-titre md:line-clamp-2 text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em]">
             {p.first_name} {p.last_name}
           </h1>
           <p className="flex flex-wrap items-center gap-x-2 text-base text-brume lg:text-lg">
@@ -112,8 +112,8 @@ export default function ProfilMembre() {
             )
           )}
         </div>
-        {/* Cadre carré fixe (24rem - 2 × 12px) : une photo en paysage garde sa place, elle est recadrée */}
-        <div className="hidden lg:m-3 lg:block lg:size-[22.5rem]">
+        {/* Portrait de taille fixe dès md (264px, marge 12px) : il ne grandit pas avec l'écran ; une photo en paysage est recadrée */}
+        <div className="hidden md:m-3 md:block md:size-[16.5rem] md:self-start">
           <Portrait
             prenom={p.first_name}
             nom={p.last_name}
