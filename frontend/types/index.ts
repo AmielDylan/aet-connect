@@ -413,6 +413,22 @@ export interface GenerateCodeResponse {
   codes_remaining: number | null
 }
 
+/** Une école vue par l'administration (GET /api/admin/schools) */
+export interface AdminSchool {
+  id: string
+  name_fr: string
+  acronym: string | null
+  city: string
+  country: string
+  established_year: number | null
+  description: string | null
+  /** Membres rattachés : tant qu'il y en a, l'école ne se supprime pas */
+  user_count: number
+}
+
+/** Les champs qu'un admin écrit (POST /api/admin/schools, PATCH /api/admin/schools/:id) */
+export type AdminSchoolInput = Omit<AdminSchool, 'id' | 'user_count'>
+
 /** Un membre vu par l'administration (GET /api/admin/users) */
 export interface AdminMember {
   id: string

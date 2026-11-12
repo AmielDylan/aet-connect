@@ -6,23 +6,13 @@ export class SchoolsService {
   
   // Liste écoles avec stats agrégées
   async getSchools(filters: SchoolFilters): Promise<SchoolWithStats[]> {
-    let query = supabase
-      .from('schools')
-      .select('*')
-    
-    if (filters.country) {
-      query = query.eq('country', filters.country)
-    }
-    
-    if (filters.is_active !== undefined) {
-      query = query.eq('is_active', filters.is_active)
-    }
-    
-    query = query.order('name_fr', { ascending: true })
-    
-    const { data: schools, error } = await query
-    
-    if (error) throw error
+    // Toutes les écoles, par lots : une requête n'en renvoie que 1 000
+    const schools = await toutesLesLignes<any>((de, a) => {
+      let query = supabase.from('schools').select('*')
+      if (filters.country) query = query.eq('country', filters.country)
+      if (filters.is_active !== undefined) query = query.eq('is_active', filters.is_active)
+      return query.order('name_fr', { ascending: true }).order('id', { ascending: true }).range(de, a)
+    })
     
     // Statistiques de toutes les écoles en trois requêtes (et non quatre par école) : les membres, puis les
     // événements actifs, comptés en mémoire

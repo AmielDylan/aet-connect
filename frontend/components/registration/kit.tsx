@@ -13,7 +13,7 @@ import { Etapes, type Etape } from './etapes'
 export const N = ' '
 export const titreClasse = 'font-titre text-[clamp(1.6rem,2.8vw,2.2rem)] font-bold leading-[1.1] tracking-[-0.025em] text-vert text-balance'
 export const introClasse = 'mt-3 text-lg leading-relaxed text-olive'
-const champClasse =
+export const champClasse =
   'min-h-12 w-full rounded-xl border-2 border-trait bg-white px-4 text-base text-encre transition-colors duration-200 placeholder:text-olive hover:border-olive focus-visible:border-vert aria-[invalid=true]:border-alerte'
 
 /* ─────────── Mise en page ─────────── */

@@ -36,6 +36,8 @@ import type {
   ApproveAccessRequestResponse,
   AccessRequest,
   AdminMembersPage,
+  AdminSchool,
+  AdminSchoolInput,
   DashboardStats,
   RecentMember
 } from '@/types'
@@ -292,16 +294,16 @@ class ApiClient {
    * Get admin schools list (requires admin role)
    * GET /api/admin/schools
    */
-  async getAdminSchools(): Promise<any[]> {
-    return this.fetch<any[]>('/api/admin/schools')
+  async getAdminSchools(): Promise<AdminSchool[]> {
+    return this.fetch<AdminSchool[]>('/api/admin/schools')
   }
 
   /**
    * Create school (requires admin role)
    * POST /api/admin/schools
    */
-  async createSchool(data: any): Promise<any> {
-    return this.fetch<any>('/api/admin/schools', {
+  async createSchool(data: AdminSchoolInput): Promise<AdminSchool> {
+    return this.fetch<AdminSchool>('/api/admin/schools', {
       method: 'POST',
       body: JSON.stringify(data)
     })
@@ -311,8 +313,8 @@ class ApiClient {
    * Update school (requires admin role)
    * PATCH /api/admin/schools/:id
    */
-  async updateSchool(id: string, data: any): Promise<any> {
-    return this.fetch<any>(`/api/admin/schools/${id}`, {
+  async updateSchool(id: string, data: Partial<AdminSchoolInput>): Promise<AdminSchool> {
+    return this.fetch<AdminSchool>(`/api/admin/schools/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data)
     })
