@@ -54,10 +54,12 @@ export class UsersService {
     }
     
     // Ne garder que les champs autorisés
+    // Un champ facultatif vidé par le membre est effacé (null), pas enregistré comme chaîne vide
+    const effacables: (keyof UpdateProfileRequest)[] = ['current_city', 'current_country', 'bio', 'phone', 'linkedin_url']
     allowedFields.forEach(field => {
-      if (data[field] !== undefined) {
-        updateData[field] = data[field]
-      }
+      if (data[field] === undefined) return
+      const valeur = typeof data[field] === 'string' ? (data[field] as string).trim() : data[field]
+      updateData[field] = valeur === '' && effacables.includes(field) ? null : valeur
     })
     
     const { data: user, error } = await supabase
@@ -110,9 +112,16 @@ export class UsersService {
 
   // Modifier mes privacy settings - AUTH REQUIS
   async updateMyPrivacy(user_id: string, data: Partial<UserPrivacySettings>): Promise<UserPrivacySettings> {
+    // Seuls ces réglages s'écrivent (le corps de la requête n'est pas filtré par la validation) ;
+    // la promo se voit toujours : show_entry_year n'en fait plus partie
+    const modifiables: (keyof UserPrivacySettings)[] = ['show_email', 'show_phone', 'show_current_location', 'show_bio', 'show_linkedin', 'show_in_directory']
+    const changes: Partial<UserPrivacySettings> = {}
+    for (const cle of modifiables) {
+      if (typeof data[cle] === 'boolean') changes[cle] = data[cle]
+    }
     const { data: privacy, error } = await supabase
       .from('user_privacy_settings')
-      .update({ ...data, updated_at: new Date().toISOString() })
+      .update({ ...changes, updated_at: new Date().toISOString() })
       .eq('user_id', user_id)
       .select()
       .single()

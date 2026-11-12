@@ -6,7 +6,6 @@ test("après modification du profil, l'en-tête affiche le nouveau nom sans rech
   await login(page, member.email)
 
   await page.goto('/dashboard/profile')
-  await page.getByRole('button', { name: 'Modifier' }).click()
   await page.locator('#first_name').fill('Aïssatou')
   await page.locator('form').filter({ has: page.locator('#first_name') }).getByRole('button', { name: 'Enregistrer' }).click()
   await expect(page.getByText(/mis à jour|enregistré/i).first()).toBeVisible()
@@ -40,11 +39,11 @@ test("la suppression de l'avatar persiste après rechargement", async ({ page })
   await login(page, member.email)
 
   await page.goto('/dashboard/profile')
-  await page.getByRole('button', { name: "Supprimer l'avatar" }).click()
+  await page.getByRole('button', { name: 'Retirer la photo' }).click()
   await expect.poll(() => avatarUrlOf(member.id)).toBeNull()
 
   await page.reload()
-  await expect(page.getByRole('button', { name: "Supprimer l'avatar" })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Retirer la photo' })).toHaveCount(0)
 })
 
 test("le profil d'un membre masqué affiche son erreur en moins de 2 secondes", async ({ page }) => {

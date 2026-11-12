@@ -149,7 +149,7 @@ export const UpdateProfileSchema = z.object({
   current_country: z.string().max(100).optional(),
   bio: z.string().max(500).optional(),
   phone: z.string().max(20).optional(),
-  linkedin_url: z.string().url().optional(),
+  linkedin_url: z.union([z.string().url(), z.literal('')]).optional(), // '' : effacer le lien
   avatar_url: z.string().url().nullable().optional() // null : effacer l'avatar
 }).passthrough() // Permet les champs supplémentaires (comme email) qui seront ignorés
 
@@ -159,8 +159,7 @@ export const ChangePasswordSchema = z.object({
     .min(8, 'Mot de passe trop court (min 8 caractères)')
     .regex(/[A-Z]/, 'Doit contenir une majuscule')
     .regex(/[a-z]/, 'Doit contenir une minuscule')
-    .regex(/\d/, 'Doit contenir un chiffre')
-    .regex(/[@$!%*?&]/, 'Doit contenir un caractère spécial (@$!%*?&)'),
+    .regex(/\d/, 'Doit contenir un chiffre'), // mêmes règles qu'à l'inscription
 })
 
 export const RequestDeletionSchema = z.object({
@@ -173,7 +172,7 @@ export const UpdatePrivacySchema = z.object({
   show_current_location: z.boolean().optional(),
   show_bio: z.boolean().optional(),
   show_linkedin: z.boolean().optional(),
-  show_entry_year: z.boolean().optional(),
+  show_entry_year: z.literal(true).optional(), // la promo se voit toujours
   show_in_directory: z.boolean().optional()
 })
 

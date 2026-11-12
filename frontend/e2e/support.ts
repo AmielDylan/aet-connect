@@ -58,6 +58,12 @@ export async function createCode(memberId: string, schoolId: string): Promise<st
   return code
 }
 
+/** Une colonne du profil ou des réglages de visibilité, lue directement en base. */
+export async function columnOf(memberId: string, column: string, table: 'users' | 'user_privacy_settings' = 'users'): Promise<unknown> {
+  const { data } = await admin.from(table).select(column).eq(table === 'users' ? 'id' : 'user_id', memberId).single()
+  return (data as Record<string, unknown> | null)?.[column] ?? null
+}
+
 export async function avatarUrlOf(memberId: string): Promise<string | null> {
   const { data } = await admin.from('users').select('avatar_url').eq('id', memberId).single()
   return data?.avatar_url ?? null

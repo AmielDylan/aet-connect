@@ -21,11 +21,10 @@ export class AuthService {
       }
 
       // 2. Valider le nouveau mot de passe
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      //    Mêmes règles qu'à l'inscription ; tous les caractères sont permis
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
       if (!passwordRegex.test(newPassword)) {
-        throw new Error(
-          'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial'
-        )
+        throw new Error('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre')
       }
 
       // 3. Vérifier l'ancien mot de passe sur un client jetable
