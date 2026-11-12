@@ -114,3 +114,14 @@ export async function accessRequestOf(id: string): Promise<{ status: string; gra
   const code = (data as { invitation_codes: { grants_ambassador: boolean } | null } | null)?.invitation_codes
   return { status: (data as { status: string } | null)?.status ?? '', grants_ambassador: code?.grants_ambassador ?? null }
 }
+
+/** Une école, retrouvée par son nom (null si elle n'existe pas) */
+export async function schoolByName(name: string): Promise<Record<string, unknown> | null> {
+  const { data } = await admin.from('schools').select('*').eq('name_fr', name).maybeSingle()
+  return data
+}
+
+export async function schoolNameOf(id: string): Promise<string> {
+  const { data } = await admin.from('schools').select('name_fr').eq('id', id).single()
+  return data?.name_fr ?? ''
+}

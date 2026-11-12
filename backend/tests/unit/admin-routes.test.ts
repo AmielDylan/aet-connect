@@ -140,3 +140,58 @@ describe('liste des membres', () => {
     expect((parId.get(membre) as any).invitations_used).toBe(1)
   })
 })
+
+describe('écoles', () => {
+  it("créer une école vérifie les champs ; un sigle et une description vides sont enregistrés comme absents", async () => {
+    const admin = await session('admin')
+
+    const sansVille = await api().post('/api/admin/schools').set('Authorization', admin.auth).send({ name_fr: 'École sans ville', country: 'Bénin', city: ' ' })
+    const sigleTropLong = await api().post('/api/admin/schools').set('Authorization', admin.auth).send({ name_fr: 'École test', country: 'Bénin', city: 'Cotonou', acronym: 'ABCDEFGHIJK' })
+    const ok = await api().post('/api/admin/schools').set('Authorization', admin.auth)
+      .send({ name_fr: '  École de test  ', country: 'Bénin', city: 'Cotonou', acronym: '', description: '', established_year: 1990, flag: '🇧🇯' })
+
+    expect(sansVille.status).toBe(400)
+    expect(sansVille.body.error).toBe('Il manque la ville.')
+    expect(sigleTropLong.status).toBe(400)
+    expect(ok.status).toBe(200)
+    expect(ok.body).toMatchObject({ name_fr: 'École de test', acronym: null, description: null, established_year: 1990, flag: null })
+  })
+
+  it('modifier une école ne touche que les champs envoyés', async () => {
+    const admin = await session('admin')
+    const promo = await createPromo()
+
+    const res = await api().patch(`/api/admin/schools/${promo.schoolId}`).set('Authorization', admin.auth).send({ acronym: 'TST', established_year: 1975 })
+
+    // Sans sigle, l'école test ne s'affiche pas sur le site : on le retire
+    await api().patch(`/api/admin/schools/${promo.schoolId}`).set('Authorization', admin.auth).send({ acronym: '' })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toMatchObject({ acronym: 'TST', established_year: 1975, city: 'Testville' })
+  })
+})
+
+describe('liste des écoles', () => {
+  it('renvoie toutes les écoles, au-delà des 1 000 premières lignes', async () => {
+    const admin = await session('admin')
+    const { supabase } = await import('@/config/database')
+    const { count } = await supabase.from('schools').select('id', { count: 'exact', head: true })
+
+    const res = await api().get('/api/admin/schools').set('Authorization', admin.auth)
+
+    expect(res.status).toBe(200)
+    expect(res.body.length).toBe(count)
+  })
+})
+
+describe('écoles publiques', () => {
+  it('la liste publique renvoie aussi toutes les écoles', async () => {
+    const { supabase } = await import('@/config/database')
+    const { count } = await supabase.from('schools').select('id', { count: 'exact', head: true })
+
+    const res = await api().get('/api/schools')
+
+    expect(res.status).toBe(200)
+    expect(res.body.schools.length).toBe(count)
+  })
+})

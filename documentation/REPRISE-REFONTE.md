@@ -17,13 +17,14 @@ Point d’étape au 12 novembre 2026, pour reprendre la refonte dans une nouvell
 | Profil d’un membre `/profile/[id]` | B « Le bandeau » : bandeau à hauteur fixe (c’est le portrait qui la donne), en quelques mots, sa promo, coordonnées (seules celles que le membre montre) ; le profil est dans le cadre de l’espace membre | oui (PR #11) |
 | Mon profil `/dashboard/profile` | B « Le bandeau » : le bandeau du profil d’un membre avec la photo à changer sur place, vos informations, ce que voient les AET (dont « Apparaître dans l’annuaire »), mot de passe, départ | oui (PR #12) |
 | Écoles `/dashboard/schools` | A « Les cartes » : bandeau vert avec trois chiffres et la cérémonie, une carte par école (la vôtre en premier), « N membres » et « Voir » vers l’annuaire | oui (PR #12) |
-| Administration, vue d’ensemble `/dashboard/admin` | B « Les chiffres » : quatre chiffres en tuiles blanches (sans cercle), panneau vert des membres par école (barres d’or) et par rôle, demandes d’accès en attente | `develop` |
-| Administration, demandes d’accès `/dashboard/admin/pending` | B « Le tri » : liste à gauche, demande choisie à droite, décision sur place ; l’option ambassadeur n’apparaît que si la promo n’en a pas (sinon, qui la représente) ; sur mobile, filtre en liste déroulante et demandes dépliées comme une FAQ | `develop` |
-| Administration, membres `/dashboard/admin/users` | C « Le tri » : même disposition ; nombres par type selon la recherche et l’école, rôle, ambassadeur (une seule personne par promo), suppression, lien « Profil » | `develop` |
+| Administration, vue d’ensemble `/dashboard/admin` | B « Les chiffres » : quatre chiffres en tuiles blanches (sans cercle), panneau vert des membres par école (barres d’or) et par rôle, demandes d’accès en attente | oui (PR #13) |
+| Administration, demandes d’accès `/dashboard/admin/pending` | B « Le tri » : liste à gauche, demande choisie à droite, décision sur place ; l’option ambassadeur n’apparaît que si la promo n’en a pas (sinon, qui la représente) ; sur mobile, filtre en liste déroulante et demandes dépliées comme une FAQ | oui (PR #13) |
+| Administration, membres `/dashboard/admin/users` | C « Le tri » : même disposition ; nombres par type selon la recherche et l’école, rôle, ambassadeur (une seule personne par promo), suppression, lien « Profil » | oui (PR #13) |
+| Administration, écoles `/dashboard/admin/schools` | A « Le tri » : liste et fiche modifiable sur place, ajout, suppression (refusée tant que des membres y sont rattachés) ; une école sans sigle est signalée comme absente du site | `develop` |
 | Mes codes `/dashboard/codes` | B « Le bandeau » : bandeau vert avec l’officier (la bulle porte le dernier code), codes en attente à partager ou révoquer, « Ils ont rejoint grâce à vous » | oui (PR #9) |
 
 **Reste à refaire**, dans le nouvel en-tête mais encore dans l’ancien style gris :
-1. Administration : `schools` (388), `deletions` (337). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
+1. Administration : `deletions` (337). Briques communes dans `components/espace/administration.tsx` (`Filtres`, `ChoixAmbassadeur`, `MessageATransmettre`).
 
 ## Comment on travaille
 
@@ -81,6 +82,7 @@ git checkout main && git merge --ff-only origin/main && git checkout develop && 
 - Le test e2e « profil d’un membre masqué en moins de 2 secondes » peut échouer juste après un redémarrage de l’API.
 - En local, la base compte des centaines d’écoles créées par les tests (une par membre). `GET /api/schools` calculait les statistiques école par école (4 requêtes chacune) et saturait la connexion locale ; elles sont désormais comptées en trois requêtes.
 - Décidé le 12 novembre : **un seul ambassadeur par promo** (migration `20261112100000_un_ambassadeur_par_promo.sql`, index unique). L’API refuse (409) de nommer un second ambassadeur, et d’accepter une demande « ambassadeur » si la promo en a déjà un ou si un code d’ambassadeur pour elle attend d’être utilisé ; un tel code utilisé malgré tout crée le compte sans le statut. Chaque demande d’accès porte `promo_ambassador` (l’ambassadeur actuel, ou null). La migration s’arrête si une promo en compte déjà plusieurs : vérifier la production avant de l’appliquer.
+- Les listes d’écoles (`GET /api/schools` et `GET /api/admin/schools`) s’arrêtaient aux 1 000 premières lignes ; elles lisent désormais toute la table par lots. L’ajout et la modification d’une école sont vérifiés côté serveur (nom, ville et pays requis, sigle de 10 caractères au plus, description de 1 000 au plus ; sigle et description vides enregistrés comme absents). Le champ `flag` (émoji) n’est plus écrit : le site dessine le drapeau d’après le pays.
 - Les statistiques de l’administration (`GET /api/admin/stats`) ne comptaient par rôle et par école que les 1 000 premiers membres (limite de lignes de l’API de la base) ; elles lisent désormais toute la table par lots (`backend/src/utils/pages.ts`). Les graphiques Recharts ont été retirés.
 - En local, les toutes premières requêtes d’un compte tout juste créé peuvent renvoyer 401 ; React Query réessaie.
 - Dette de lint dans les pages pas encore refaites (`any`, apostrophes), hors des fichiers de la refonte.
