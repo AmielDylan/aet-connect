@@ -14,8 +14,8 @@ router.get('/', asyncRoute(async (req, res) => {
     .select(`
       *,
       users!deletion_requests_user_id_fkey(
-        id, first_name, last_name, email,
-        schools(id, name_fr, acronym)
+        id, first_name, last_name, email, role, entry_year, created_at,
+        schools(id, name_fr, acronym, country)
       )
     `)
     .order('created_at', { ascending: false })

@@ -230,7 +230,10 @@ export interface DeletionRequest {
     first_name: string
     last_name: string
     email: string
-    schools?: { id: string; name_fr: string; acronym: string | null } | null
+    role: 'alumni' | 'moderator' | 'admin'
+    entry_year: string | null
+    created_at: string
+    schools?: { id: string; name_fr: string; acronym: string | null; country: string } | null
   } | null
 }
 
