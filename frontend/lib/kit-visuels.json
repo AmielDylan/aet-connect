@@ -1,0 +1,460 @@
+[
+  {
+    "fichier": "/kit/visuels/01-lancement/lancement-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "lancement",
+    "usage": "Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre"
+  },
+  {
+    "fichier": "/kit/visuels/01-lancement/lancement-portrait.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "lancement",
+    "usage": "Publication Instagram, Facebook (1080 × 1350)",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/01-lancement/lancement-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "lancement",
+    "usage": "Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story"
+  },
+  {
+    "fichier": "/kit/visuels/01-lancement/lancement-paysage.png",
+    "l": 1200,
+    "h": 627,
+    "groupe": "lancement",
+    "usage": "Lien LinkedIn, Facebook, X (1200 × 627)",
+    "format": "paysage"
+  },
+  {
+    "fichier": "/kit/visuels/02-votre-promo/votre-promo-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "promo",
+    "usage": "Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre"
+  },
+  {
+    "fichier": "/kit/visuels/02-votre-promo/votre-promo-portrait.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "promo",
+    "usage": "Publication Instagram, Facebook (1080 × 1350)",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/02-votre-promo/votre-promo-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "promo",
+    "usage": "Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story"
+  },
+  {
+    "fichier": "/kit/visuels/02-votre-promo/votre-promo-paysage.png",
+    "l": 1200,
+    "h": 627,
+    "groupe": "promo",
+    "usage": "Lien LinkedIn, Facebook, X (1200 × 627)",
+    "format": "paysage"
+  },
+  {
+    "fichier": "/kit/visuels/04-ambassadeur/ambassadeur-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ambassadeur",
+    "usage": "Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre"
+  },
+  {
+    "fichier": "/kit/visuels/04-ambassadeur/ambassadeur-portrait.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "ambassadeur",
+    "usage": "Publication Instagram, Facebook (1080 × 1350)",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/04-ambassadeur/ambassadeur-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ambassadeur",
+    "usage": "Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story"
+  },
+  {
+    "fichier": "/kit/visuels/04-ambassadeur/ambassadeur-paysage.png",
+    "l": 1200,
+    "h": 627,
+    "groupe": "ambassadeur",
+    "usage": "Lien LinkedIn, Facebook, X (1200 × 627)",
+    "format": "paysage"
+  },
+  {
+    "fichier": "/kit/visuels/05-entraide/entraide-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "entraide",
+    "usage": "Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre"
+  },
+  {
+    "fichier": "/kit/visuels/05-entraide/entraide-portrait.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "entraide",
+    "usage": "Publication Instagram, Facebook (1080 × 1350)",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/05-entraide/entraide-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "entraide",
+    "usage": "Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story"
+  },
+  {
+    "fichier": "/kit/visuels/05-entraide/entraide-paysage.png",
+    "l": 1200,
+    "h": 627,
+    "groupe": "entraide",
+    "usage": "Lien LinkedIn, Facebook, X (1200 × 627)",
+    "format": "paysage"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/neuf-ecoles-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/neuf-ecoles-portrait.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "ecoles",
+    "usage": "Publication Instagram, Facebook (1080 × 1350)",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/neuf-ecoles-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/neuf-ecoles-paysage.png",
+    "l": 1200,
+    "h": 627,
+    "groupe": "ecoles",
+    "usage": "Lien LinkedIn, Facebook, X (1200 × 627)",
+    "format": "paysage"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/empt-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "EMPT · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "EMPT"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/empt-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "EMPT · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "EMPT"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pms-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "PMS · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "PMS"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pms-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "PMS · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "PMS"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/cme-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "CME · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "CME"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/cme-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "CME · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "CME"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmk-kati-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "PMK (Kati) · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "PMK (Kati)"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmk-kati-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "PMK (Kati) · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "PMK (Kati)"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmb-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "PMB · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "PMB"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmb-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "PMB · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "PMB"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmk-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "PMK · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "PMK"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmk-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "PMK · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "PMK"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmn-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "PMN · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "PMN"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pmn-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "PMN · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "PMN"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/lmjf-gmk-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "LMJF-GMK · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "LMJF-GMK"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/lmjf-gmk-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "LMJF-GMK · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "LMJF-GMK"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pml-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "ecoles",
+    "usage": "PML · Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre",
+    "ecole": "PML"
+  },
+  {
+    "fichier": "/kit/visuels/03-ecoles/pml-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "ecoles",
+    "usage": "PML · Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story",
+    "ecole": "PML"
+  },
+  {
+    "fichier": "/kit/visuels/06-carrousel-rejoindre/rejoindre-1.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "carrousel",
+    "usage": "Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/06-carrousel-rejoindre/rejoindre-2.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "carrousel",
+    "usage": "Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/06-carrousel-rejoindre/rejoindre-3.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "carrousel",
+    "usage": "Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/06-carrousel-rejoindre/rejoindre-4.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "carrousel",
+    "usage": "Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/06-carrousel-rejoindre/rejoindre-5.png",
+    "l": 1080,
+    "h": 1350,
+    "groupe": "carrousel",
+    "usage": "Carrousel Instagram, LinkedIn (1080 × 1350), dans l’ordre",
+    "format": "portrait"
+  },
+  {
+    "fichier": "/kit/visuels/07-devise/devise-carre.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "devise",
+    "usage": "Publication Facebook, Instagram, LinkedIn (1080 × 1080)",
+    "format": "carre"
+  },
+  {
+    "fichier": "/kit/visuels/07-devise/devise-story.png",
+    "l": 1080,
+    "h": 1920,
+    "groupe": "devise",
+    "usage": "Story Instagram, Facebook, statut WhatsApp (1080 × 1920)",
+    "format": "story"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/photo-de-profil-vert.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "profils",
+    "usage": "Photo de profil, fond vert (1080 × 1080, se recadre en rond)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/photo-de-profil-creme.png",
+    "l": 1080,
+    "h": 1080,
+    "groupe": "profils",
+    "usage": "Photo de profil, fond crème (1080 × 1080)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/couverture-facebook.png",
+    "l": 1640,
+    "h": 624,
+    "groupe": "profils",
+    "usage": "Couverture de page Facebook (1640 × 624)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/banniere-linkedin-profil.png",
+    "l": 1584,
+    "h": 396,
+    "groupe": "profils",
+    "usage": "Bannière de profil LinkedIn (1584 × 396)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/couverture-linkedin-page.png",
+    "l": 1128,
+    "h": 191,
+    "groupe": "profils",
+    "usage": "Couverture de page LinkedIn (1128 × 191)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/banniere-x.png",
+    "l": 1500,
+    "h": 500,
+    "groupe": "profils",
+    "usage": "Bannière X (1500 × 500)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/profils-et-couvertures/couverture-groupe.png",
+    "l": 1640,
+    "h": 856,
+    "groupe": "profils",
+    "usage": "Couverture de groupe WhatsApp ou Facebook (1640 × 856)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/marque/logo-vert.png",
+    "l": 1600,
+    "h": 400,
+    "groupe": "marque",
+    "usage": "Logo vert, fond transparent",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/marque/logo-creme.png",
+    "l": 1600,
+    "h": 400,
+    "groupe": "marque",
+    "usage": "Logo crème, fond transparent (sur fond foncé)",
+    "format": "autre"
+  },
+  {
+    "fichier": "/kit/marque/soleil.png",
+    "l": 1024,
+    "h": 1024,
+    "groupe": "marque",
+    "usage": "Soleil seul, fond transparent",
+    "format": "autre"
+  }
+]
